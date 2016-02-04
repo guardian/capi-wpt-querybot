@@ -37,7 +37,7 @@ class WebPageTest(baseUrl: String, passedKey: String) {
     }
 
     def toHTMLSimpleTableCells(): String = {
-      "<th>" + testUrl + " </th><td>" +  (timeDocComplete/1000).toString + "s </td><td>" + (bytesInFullyLoaded/1000) + "kB </td><td>" + costAt5CentsPerMB + "</td><td>" + speedIndex.toString + " </td><td> " + resultStatus + "</td>"
+      "<th>" + testUrl + " </th><td>" +  (timeDocComplete/1000).toString + "s </td><td>" + (bytesInFullyLoaded/1000) + "kB </td><td>$(US)" + costAt5CentsPerMB + "</td><td>" + speedIndex.toString + " </td><td> " + resultStatus + "</td>"
     }
 
     override def toString(): String = {
@@ -64,7 +64,7 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
   def sendPage(gnmPageUrl:String): String = {
     println("Forming desktop webpage test query")
-    val getUrl: String = apiBaseUrl + "/runtest.php?url=" + gnmPageUrl + "&f=" + wptResponseFormat + "&k=" + apiKey
+    val getUrl: String = apiBaseUrl + "/runtest.php?url=" + gnmPageUrl + "&f=" + wptResponseFormat + "&k=" + apiKey + "&timeline=1&timelinestack=5"
     val request: Request = new Request.Builder()
       .url(getUrl)
       .get()

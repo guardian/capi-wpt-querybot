@@ -27,7 +27,7 @@ object App {
     val configFileName = "config.conf"
     val outputFileName = "liveBlogPerformanceData.html"
     val simpleOutputFileName = "liveBlogPerformanceDataExpurgated.html"
-    val interactiveOutputFilename = "interactivePerformanceData.html"
+    val interactiveOutputFilename = "selectedInteractivesPerformanceData.html"
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val averageColor: String = "\"grey\""
@@ -52,12 +52,11 @@ object App {
     var wptApiKey: String = ""
     var wptLocation: String = ""
 
-    //initialize list of Migrated LiveBlogs - will set this up as a file another time
-    val listOfMigratedLiveBlogs: List[String] = List("http://www.theguardian.com/film/filmblog/live/2015/oct/21/back-to-the-future-day-live-experience-21-october-2015-round-the-world",
-      "http://www.theguardian.com/music/live/2016/jan/11/david-bowie-dies-of-cancer-aged-69-reports",
-      "http://www.theguardian.com/world/live/2015/nov/14/paris-terror-attacks-attackers-dead-mass-killing-live-updates",
-      "http://www.theguardian.com/us-news/live/2015/oct/13/cnn-democratic-debate-bernie-sanders-hillary-clinton-las-vegas",
-      "http://www.theguardian.com/politics/blog/live/2015/may/07/election-2015-live-final-votes-cast-as-battle-for-power-looms")
+    val listofDesiredInteractivesForTesting: List[String] = List("http://www.theguardian.com/cities/ng-interactive/2015/dec/31/night-riders-metro-3am-barcelona-berlin-sydney-new-york-copenhagen",
+      "http://www.theguardian.com/football/ng-interactive/2015/dec/21/the-100-best-footballers-in-the-world-2015-interactive",
+      "http://www.theguardian.com/us-news/ng-interactive/2015/dec/11/kern-county-california-victims-police-killings-justice-video",
+      "http://www.theguardian.com/environment/ng-interactive/2015/nov/28/how-to-stage-a-spectacular-climate-march",
+      "http://www.theguardian.com/environment/ng-interactive/2015/nov/26/the-mekong-river-stories-from-the-heart-of-the-climate-crisis-interactive")
 
     val listofLargeInteractives: List[String] = List("http://www.theguardian.com/us-news/2015/sep/01/moving-targets-police-shootings-vehicles-the-counted")
 
@@ -83,7 +82,7 @@ object App {
       {
             println(DateTime.now + " retrieving local config file: " + configFileName)
             for (line <- Source.fromFile(configFileName).getLines()) {
-              if (line.contains("contehttp://www.theguardian.com/world/2016/jan/23/drone-strike-victim-barack-obamant.api.key")) {
+              if (line.contains("content.api.key")) {
                 println("capi key found")
                 contentApiKey = line.takeRight((line.length - line.indexOf("=")) - 1)
               }
@@ -110,7 +109,7 @@ object App {
       }
 
     //  Define new CAPI Query object
-    val articleUrlList = new ArticleUrls(contentApiKey)
+    /*val articleUrlList = new ArticleUrls(contentApiKey)
     //  Request a list of urls from Content API
     val articleUrls: List[String] = articleUrlList.getLiveBlogUrls
     println(DateTime.now + " Closing Liveblog Content API query connection")
@@ -184,19 +183,20 @@ object App {
     else {
       // Send each article URL to the webPageTest API and obtain resulting data
       println("Results from Interactive CAPI calls")
-      interactiveUrls.foreach(println)
+      interactiveUrls.foreach(println)*/
       println("Generating average values for migrated liveblogs")
       val largeInteractivesAverages: PageAverageObject = testMigratedLiveBlogList(listofLargeInteractives ,wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel)
       interactiveResults = interactiveResults.concat(largeInteractivesAverages.toHTMLString)
 
-      val interactiveTestResults: List[List[String]] = interactiveUrls.map(url => testUrlReturnHtml(url, wptBaseUrl, wptApiKey, wptLocation, largeInteractivesAverages, warningColor, alertColor))
+//      val interactiveTestResults: List[List[String]] = interactiveUrls.map(url => testUrlReturnHtml(url, wptBaseUrl, wptApiKey, wptLocation, largeInteractivesAverages, warningColor, alertColor))
+      val interactiveTestResults: List[List[String]] = listofDesiredInteractivesForTesting.map(url => testUrlReturnHtml(url, wptBaseUrl, wptApiKey, wptLocation, largeInteractivesAverages, warningColor, alertColor))
       // Add results to a single string so that we only need to write to S3 once (S3 will only take complete objects).
       val interactiveResultsList: List[String] = interactiveTestResults.map(x => x.head)
       val simplifiedInteractiveResultsList : List[String] = interactiveTestResults.map(x => x.tail.head)
 
       interactiveResults = interactiveResults.concat(simplifiedInteractiveResultsList.mkString)
       println(DateTime.now + " Results added to accumulator string \n")
-    }
+//    }
     interactiveResults = interactiveResults.concat(hTMLTableFooters)
     interactiveResults = interactiveResults.concat(hTMLPageFooterStart + DateTime.now + hTMLPageFooterEnd)
 
