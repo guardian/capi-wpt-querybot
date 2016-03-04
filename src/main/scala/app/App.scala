@@ -17,7 +17,7 @@ object App {
   def main(args: Array[String]) {
     /*  This value stops the forces the config to be read and the output file to be written locally rather than reading and writing from/to S3
     #####################    this should be set to false before merging!!!!################*/
-    val iamTestingLocally = false
+    val iamTestingLocally = true
     /*#####################################################################################*/
     println("Job started at: " + DateTime.now)
     println("Local Testing Flag is set to: " + iamTestingLocally.toString)
@@ -55,7 +55,7 @@ object App {
     val listofLargeInteractives: List[String] = List("http://www.theguardian.com/us-news/2015/sep/01/moving-targets-police-shootings-vehicles-the-counted")
     val interactiveItemLabel: String = "Interactive"
 
-    val listofFronts: List[String] = List("http://www.theguardian.com/uk",
+    val listofFronts: List[String] = List("http://www.theguardian.com/uk"/*,
       "http://www.theguardian.com/us",
       "http://www.theguardian.com/au",
       "http://www.theguardian.com/uk-news",
@@ -70,7 +70,7 @@ object App {
       "http://www.theguardian.com/fashion",
       "http://www.theguardian.com/uk/environment",
       "http://www.theguardian.com/uk/technology",
-      "http://www.theguardian.com/travel")
+      "http://www.theguardian.com/travel"*/)
     val frontsItemlabel: String = "Front"
 
     //Initialise List of email contacts (todo - this must be put in a file before getting any real folk)
