@@ -124,7 +124,8 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
     println("Creating PerformanceResultsObject")
     val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
-    val sortedElementList = sortPageElementList(elementsList)
+    val trimmedElementList = trimToEditorialElements(elementsList)
+    val sortedElementList = sortPageElementList(trimmedElementList)
     result.takeElementsFromSortedList(sortedElementList)
     println("Returning PerformanceResultsObject")
     result
@@ -220,7 +221,8 @@ class WebPageTest(baseUrl: String, passedKey: String) {
     val status: String = "Test Success"
     println("Creating PerformanceResultsObject")
     val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
-    val sortedElementList = sortPageElementList(elementsList)
+    val trimmedElementList = trimToEditorialElements(elementsList)
+    val sortedElementList = sortPageElementList(trimmedElementList)
     result.takeElementsFromSortedList(sortedElementList)
     println("Result string: " + result.toHTMLSimpleTableCells())
     println("List of heaviest page Elements contains " + result.heavyElementList.length + " elements")
@@ -243,6 +245,11 @@ class WebPageTest(baseUrl: String, passedKey: String) {
     val pageElementList: List[PageElementFromHTMLTableRow] = generatePageElementList(tableString)
     println("List generated - contains: " + pageElementList.length + " elements.")
     pageElementList
+  }
+
+  def trimToEditorialElements(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
+    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.contentType.contains("image") || element.contentType.contains("video") || element.contentType.contains("application") || element.contentType.contains("document")) yield element
+    returnList
   }
 
   def trimToHTMLTable(pageHTML: String): String = {

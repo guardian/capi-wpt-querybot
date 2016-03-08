@@ -14,21 +14,21 @@ class PerformanceResultsObject(url:String, testType: String, tTFB: Int, tFP:Int,
   val typeOfTest: String = testType
   val timeToFirstByte: Int = tTFB
   val timeFirstPaintInMs: Int = tFP
-  val timeFirstPaintInSec: Double = roundAt(2)(timeFirstPaintInMs/1000)
+  val timeFirstPaintInSec: Double = roundAt(3)(timeFirstPaintInMs/1000)
   val timeDocCompleteInMs: Int = tDC
-  val timeDocCompleteInSec: Int = timeDocCompleteInMs/1000
+  val timeDocCompleteInSec: Double = roundAt(3)(timeDocCompleteInMs/1000)
   val bytesInDocComplete: Int = bDC
   val kBInDocComplete: Int = bytesInDocComplete/1024
-  val mBInDocComplete: Double = roundAt(2)(bytesInDocComplete/1048576)
+  val mBInDocComplete: Double = roundAt(3)(bytesInDocComplete/1048576)
   val timeFullyLoadedInMs: Int = tFL
   val timeFullyLoadedInSec: Int = timeFullyLoadedInMs/1000
   val bytesInFullyLoaded: Int = bFL
   val kBInFullyLoaded: Int = bytesInFullyLoaded/1024
-  val mBInFullyLoaded: Double = roundAt(2)(bytesInFullyLoaded/1048576)
-  val estUSPrePaidCost: Double = roundAt(2)((bytesInFullyLoaded.toDouble/1048576)*0.10)
-  val estUSPostPaidCost: Double = roundAt(2)((bytesInFullyLoaded.toDouble/1048576)*0.06)
+  val mBInFullyLoaded: Double = roundAt(3)(bytesInFullyLoaded/1048576)
+  val estUSPrePaidCost: Double = roundAt(3)((bytesInFullyLoaded.toDouble/1048576)*0.10)
+  val estUSPostPaidCost: Double = roundAt(3)((bytesInFullyLoaded.toDouble/1048576)*0.06)
   val speedIndex: Int = sI
-  val aboveTheFoldCompleteInSec: Double = roundAt(2)(speedIndex/1000) 
+  val aboveTheFoldCompleteInSec: Double = roundAt(3)(speedIndex/1000)
   val resultStatus:String = status
   var alertDescription: String = ""
   var warningStatus: Boolean = warning
@@ -74,7 +74,7 @@ class PerformanceResultsObject(url:String, testType: String, tTFB: Int, tFP:Int,
   }
 
   def toHTMLSimpleTableCells(): String = {
-   "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<th>" + "<a href=" + testUrl + ">" + testUrl + "</a>" + " </th>" +" <td>" + timeFirstPaintInSec.toString + "s </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "<td> $(US)" + estUSPrePaidCost + "</td>" + "<td> $(US)" + estUSPrePaidCost + "</td>" + "<td> " + genTestResultString() + "</td>"
+   "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<th>" + "<a href=" + testUrl + ">" + testUrl + "</a>" + " </th>" +" <td>" + timeFirstPaintInMs.toString + "ms </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "<td> $(US)" + estUSPrePaidCost + "</td>" + "<td> $(US)" + estUSPrePaidCost + "</td>" + "<td> " + genTestResultString() + "</td>"
   }
 
   def toHTMLAlertMessageCells(): String = {

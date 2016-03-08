@@ -265,8 +265,8 @@ def runAllTestsForContentType(contentType:String, contentApiKey:String, wptBaseU
           (resultObject.speedIndex >= averages.desktopSpeedIndex) ||
           (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded)) {
           println("row should be red one of the items qualifies")
-          if(resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) {resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. Should only take " + averages.desktopTimeFirstPaintInSeconds + "s.</p>"}
-          if(resultObject.speedIndex >= averages.desktopSpeedIndex) {resultObject.alertDescription = "<p>Page takes " + averages.desktopAboveTheFoldCompleteInSec + "To render visible images etc. It should take " + averages.desktopAboveTheFoldCompleteInSec + "s.</P>"}
+          if(resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) {resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInMs + "ms" + " for text to load and page to become scrollable. Should only take " + averages.desktopTimeFirstPaintInMs + "ms.</p>"}
+          if(resultObject.speedIndex >= averages.desktopSpeedIndex) {resultObject.alertDescription = resultObject.alertDescription + "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + " s to render visible images etc. It should take " + averages.desktopAboveTheFoldCompleteInSec + "s.</P>"}
           if(resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded) {resultObject.alertDescription = resultObject.alertDescription +  "<p>Page is too heavy. Size is: " + resultObject.kBInFullyLoaded + "KB. It should be less than: " + averages.desktopKBInFullyLoaded + "KB.</p>"}
           println(resultObject.alertDescription)
           resultObject.warningStatus = true
@@ -294,8 +294,8 @@ def runAllTestsForContentType(contentType:String, contentApiKey:String, wptBaseU
           (resultObject.speedIndex >= averages.mobileSpeedIndex) ||
           (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded)){
           println("warning and alert statuses set to true")
-          if(resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) {resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. Should only take " + averages.mobileTimeFirstPaintInSeconds + "s.</p>"}
-          if(resultObject.speedIndex >= averages.mobileSpeedIndex) {resultObject.alertDescription = "<p>Page takes " + averages.mobileAboveTheFoldCompleteInSec + "To render visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less.</p>"}
+          if(resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) {resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInMs + "ms" + " for text to load and page to become scrollable. Should only take " + averages.mobileTimeFirstPaintInMs + "ms.</p>"}
+          if(resultObject.speedIndex >= averages.mobileSpeedIndex) {resultObject.alertDescription = resultObject.alertDescription + "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + "s To render visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less.</p>"}
           if(resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {resultObject.alertDescription = resultObject.alertDescription +  "<p>Page is too heavy. Size is: " + resultObject.kBInFullyLoaded + "KB. It should be less than: " + averages.mobileKBInFullyLoaded + "KB.</p>"}
           resultObject.warningStatus = true
           resultObject.alertStatus = true
