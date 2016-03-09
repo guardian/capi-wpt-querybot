@@ -27,26 +27,74 @@ object App {
     val s3BucketName = "capi-wpt-querybot"
     val configFileName = "config.conf"
 
-    val articleCSVName = "accumulatedArticlePerformanceData.csv"
-    val liveBlogCSVName = "accumulatedLiveblogPerformanceData.csv"
-    val interactiveCSVName = "accumulatedInteractivePerformanceData.csv"
-    val videoCSVName = "accumulatedVideoPerformanceData"
-    val audioCSVName = "accumulatedAudioPerformanceData"
-    val frontsCSVName = "accumulatedFrontsPerformanceData"
+    val articleOutputFileName = "articlePerformanceData.html"
+    val outputFileName = "liveBlogPerformanceData.html"
+    val simpleOutputFileName = "liveBlogPerformanceDataExpurgated.html"
+    val interactiveOutputFilename = "interactivePerformanceData.html"
+    val videoOutputFilename =  "videoPerformanceData.html"
+    val audioOutputFilename = "audioPerformanceData.html"
+    val frontsOutputFilename = "frontsData.html"
+
+    val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + simpleOutputFileName
+    val interactiveResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + interactiveOutputFilename
+    val frontsResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + frontsOutputFilename
+
+    //val articleCSVName = "accumulatedArticlePerformanceData.csv"
+    //val liveBlogCSVName = "accumulatedLiveblogPerformanceData.csv"
+    //val interactiveCSVName = "accumulatedInteractivePerformanceData.csv"
+    //val videoCSVName = "accumulatedVideoPerformanceData"
+    //val audioCSVName = "accumulatedAudioPerformanceData"
+    //val frontsCSVName = "accumulatedFrontsPerformanceData"
 
     //    val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + simpleOutputFileName
 
     //Define colors to be used for average values, warnings and alerts
+    val averageColor: String = "\"grey\""
+    val warningColor: String = "\"#FFFF00\""
+    val alertColor: String = "\"#FF0000\""
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
+     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
+    var simplifiedResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
+    var interactiveResults: String = htmlString.initialisePageForInteractive + htmlString.initialiseTable
+    var frontsResults: String = htmlString.initialisePageForFronts + htmlString.initialiseTable
 
+    //Initialize email alerts string - this will be used to generate emails
+    var liveBlogAlertMessageBody: String = ""
+    var interactiveAlertMessageBody: String = ""
+    var frontsAlertMessageBody: String = ""
 
-    var articleCSVResults: String = ""
-    var liveBlogCSVResults: String = ""
-    var interactiveCSVResults: String = ""
-    var videoCSVResults: String = ""
-    var audioCSVResults: String = ""
-    var frontsCSVResults: String = ""
+    //Initialise List of sample items to be used to make alerting levels for different content types
+    val listofLargeInteractives: List[String] = List("http://www.theguardian.com/us-news/2015/sep/01/moving-targets-police-shootings-vehicles-the-counted")
+    val interactiveItemLabel: String = "Interactive"
+
+    val listofFronts: List[String] = List("http://www.theguardian.com/uk",
+      "http://www.theguardian.com/us",
+      "http://www.theguardian.com/au",
+      "http://www.theguardian.com/uk-news",
+      "http://www.theguardian.com/world",
+      "http://www.theguardian.com/politics",
+      "http://www.theguardian.com/uk/sport",
+      "http://www.theguardian.com/football",
+      "http://www.theguardian.com/uk/commentisfree",
+      "http://www.theguardian.com/uk/culture",
+      "http://www.theguardian.com/uk/business",
+      "http://www.theguardian.com/uk/lifeandstyle",
+      "http://www.theguardian.com/fashion",
+      "http://www.theguardian.com/uk/environment",
+      "http://www.theguardian.com/uk/technology",
+      "http://www.theguardian.com/travel")
+    val frontsItemlabel: String = "Front"
+
+    //Initialise List of email contacts (todo - this must be put in a file before getting any real folk)
+    val emailAddressList: List[String] = List("michael.mcnamara@guardian.co.uk", "m_w_mcnamara@hotmail.com")
+
+    // var articleCSVResults: String = ""
+    //  var liveBlogCSVResults: String = ""
+    // var interactiveCSVResults: String = ""
+    //  var videoCSVResults: String = ""
+    //  var audioCSVResults: String = ""
+    //  var frontsCSVResults: String = ""
 
     //Create new S3 Client
     println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
@@ -82,15 +130,23 @@ object App {
     val emailUsername: String = configArray(4)
     val emailPassword: String = configArray(5)
 
+    //Create Email Handler class
+    val emailer: EmailOperations = new EmailOperations(emailUsername, emailPassword)
+
     //Get Articles
-    articleCSVResults = runAllTestsForContentType("Article", contentApiKey, wptBaseUrl, wptApiKey, wptLocation)
-    println(DateTime.now + " Results added to accumulator string \n")
-    if (articleCSVResults.isEmpty) {
+//    articleCSVResults = runAllTestsForContentType("Article", contentApiKey, wptBaseUrl, wptApiKey, wptLocation)
+    val articleResults = runAllTestsForContentType("Article", contentApiKey, wptBaseUrl, wptApiKey, wptLocation)
+
+    if (articleResults.isEmpty) {
       println(DateTime.now + " WARNING: No results returned from Content API for Article Queries")
     } else {
+      val resultsStringList: List[String] = articleResults.map(x => x.toCSVString())
+      simplifiedResults = simplifiedResults + resultsStringList.mkString
+      println(DateTime.now + " Results added to accumulator string \n")
       if (!iamTestingLocally) {
         println(DateTime.now + " Writing Article results to S3")
         s3Interface.writeFileToS3(articleCSVName, articleCSVResults)
+//        s3Interface.writeFileToS3(articleCSVName, articleCSVResults)
       }
       else {
         val outputWriter = new LocalFileOperations
@@ -206,9 +262,10 @@ object App {
 
 
 
-def runAllTestsForContentType(contentType:String, contentApiKey:String, wptBaseUrl:String, wptApiKey: String, wptLocation:String):String  = {
-  var resultString: String = "testUrl,timeOfTest,resultStatus,timeFirstPaintInMs,timeDocCompleteInMs,bytesInDocComplete,timeFullyLoadedInMs,bytesInFullyLoaded,speedIndex,element1.resource,element1.contentType,element1.bytesDownloaded,element2.resource,element2.contentType,element2.bytesDownloaded,element3.resource,element3.contentType,element3.bytesDownloaded,element4.resource,element4.contentType,element4.bytesDownloaded,element5.resource,element5.contentType,element5.bytesDownloaded\n"
+def runAllTestsForContentType(contentType:String, contentApiKey:String, wptBaseUrl:String, wptApiKey: String, wptLocation:String):List[PerformanceResultsObject] = {
+//  var resultString: String = "testUrl,timeOfTest,resultStatus,timeFirstPaintInMs,timeDocCompleteInMs,bytesInDocComplete,timeFullyLoadedInMs,bytesInFullyLoaded,speedIndex,element1.resource,element1.contentType,element1.bytesDownloaded,element2.resource,element2.contentType,element2.bytesDownloaded,element3.resource,element3.contentType,element3.bytesDownloaded,element4.resource,element4.contentType,element4.bytesDownloaded,element5.resource,element5.contentType,element5.bytesDownloaded\n"
 
+  var resultsObjectList:List[PerformanceResultsObject] = List()
   val capiHandler = new ArticleUrls(contentApiKey)
   val urlList: List[String] = capiHandler.getUrlsForContentType(contentType)
   println(DateTime.now + " Closing Liveblog Content API query connection")
@@ -224,7 +281,7 @@ def runAllTestsForContentType(contentType:String, contentApiKey:String, wptBaseU
     })
     //Confirm alert status by retesting alerting urls
     val confirmedTestResults = testResults.map(x => {
-      if (x.brokenTest) {
+      if (x.alertStatus || x.brokenTest) {
         val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
         val testCount: Int = if(x.timeToFirstByte > 1000) {5} else {3}
         webPageTest.testMultipleTimes(x.testUrl, x.typeOfTest, wptLocation, testCount)
@@ -232,14 +289,12 @@ def runAllTestsForContentType(contentType:String, contentApiKey:String, wptBaseU
       else
         x
     })
-    val resultsList: List[String] = confirmedTestResults.map(x => x.toCSVString())
-    resultString = resultString + resultsList.mkString
+    resultsObjectList = confirmedTestResults
   }
   else {
     println(DateTime.now + " WARNING: No results returned from Content API for LiveBlog Queries")
-    resultString = ""
   }
-  resultString
+    resultsObjectList
 }
 
 

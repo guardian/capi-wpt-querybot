@@ -41,7 +41,7 @@ class ArticleUrls(key: String) {
   def getContentTypeLiveBlogUrls: List[String] = {
     println("Creating CAPI query")
     val until = DateTime.now
-    val from = until.minusHours(100)
+    val from = until.minusHours(24)
 
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
@@ -51,7 +51,7 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(100)
+      .pageSize(20)
       .orderBy("oldest")
       .contentType("liveblog")
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
@@ -67,7 +67,7 @@ class ArticleUrls(key: String) {
 
   def getMinByMinUrls: List[String] = {
     val until = DateTime.now
-    val from = until.minusHours(100)
+    val from = until.minusHours(24)
 
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
@@ -77,7 +77,7 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(100)
+      .pageSize(20)
       .orderBy("oldest")
       .tag("tone/minutebyminute")
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
@@ -95,7 +95,7 @@ class ArticleUrls(key: String) {
 
   def getInteractiveUrls: List[String] = {
     val until = DateTime.now
-    val from = until.minusHours(100)
+    val from = until.minusHours(24)
 
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
@@ -105,7 +105,7 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(100)
+      .pageSize(20)
       .orderBy("oldest")
       .contentType("interactive")
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
@@ -122,7 +122,7 @@ class ArticleUrls(key: String) {
 
   def getVideoUrls: List[String] = {
     val until = DateTime.now
-    val from = until.minusHours(100)
+    val from = until.minusHours(24)
 
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
@@ -132,7 +132,7 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(100)
+      .pageSize(20)
       .orderBy("oldest")
       .contentType("video")
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
@@ -149,7 +149,7 @@ class ArticleUrls(key: String) {
 
   def getAudioUrls: List[String] = {
     val until = DateTime.now
-    val from = until.minusHours(100)
+    val from = until.minusHours(24)
 
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
@@ -159,7 +159,7 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(100)
+      .pageSize(20)
       .orderBy("oldest")
       .contentType("audio")
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
@@ -177,7 +177,7 @@ class ArticleUrls(key: String) {
 
   def getArticleUrls: List[String] = {
     val until = DateTime.now
-    val from = until.minusHours(100)
+    val from = until.minusHours(24)
 
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
@@ -187,7 +187,7 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(100)
+      .pageSize(20)
       .orderBy("oldest")
       .contentType("article")
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
