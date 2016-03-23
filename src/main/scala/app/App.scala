@@ -19,7 +19,7 @@ object App {
   def main(args: Array[String]) {
     /*  This value stops the forces the config to be read and the output file to be written locally rather than reading and writing from/to S3
     #####################    this should be set to false before merging!!!!################*/
-    val iamTestingLocally = false
+    val iamTestingLocally = true
     /*#####################################################################################*/
     println("Job started at: " + DateTime.now)
     println("Local Testing Flag is set to: " + iamTestingLocally.toString)
@@ -155,6 +155,7 @@ object App {
       //Create a list of alerting pages and write to string
       liveBlogAlertList = for (result <- liveBlogResultsList if result.alertStatus) yield result
       liveBlogAlertMessageBody = htmlString.generateAlertEmailBodyElement(liveBlogAlertList, liveBlogAverages)
+      println("liveBlogAlertMessageBody: " + liveBlogAlertMessageBody)
 
       liveBlogResults = liveBlogResults.concat(liveBlogHTMLResults.mkString)
       liveBlogResults = liveBlogResults + htmlString.closeTable + htmlString.closePage
@@ -187,6 +188,7 @@ object App {
       //generate interactive alert message body
       interactiveAlertList = for (result <- interactiveResultsList if result.alertStatus) yield result
       interactiveAlertMessageBody = htmlString.generateAlertEmailBodyElement(interactiveAlertList, interactiveAverages)
+      println("interactiveAlertMessageBody: " + interactiveAlertMessageBody)
       // write interactive results to string
       interactiveResults = interactiveResults.concat(interactiveHTMLResults.mkString)
       interactiveResults = interactiveResults + htmlString.closeTable + htmlString.closePage
@@ -219,6 +221,7 @@ object App {
       //Create a list of alerting pages and write to string
       frontsAlertList = for (result <- frontsResultsList if result.alertStatus) yield result
       frontsAlertMessageBody = htmlString.generateAlertEmailBodyElement(frontsAlertList, frontsAverages)
+      println("frontsAlertMessageBody: " + frontsAlertMessageBody)
       // write fronts results to string
       frontsResults = frontsResults.concat(frontsHTMLResults.mkString)
       frontsResults = frontsResults + htmlString.closeTable + htmlString.closePage

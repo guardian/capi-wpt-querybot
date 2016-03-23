@@ -96,8 +96,8 @@ class PerformanceResultsObject(url:String, testType: String, tTFB: Int, tFP:Int,
 
 
     tableNormalCellEmailTag + "<a href=" + testUrl + aHrefEmailStyle + ">" + testUrl + "</a>" + "</td>" + tableNormalCellEmailTag + typeOfTest + "</td>" + tableNormalCellEmailTag + genTestResultString() +"</td>" +
-    "<tr>List of 5 heaviest elements on page - Recommend reviewing these items </tr>" +
-    "<tr><td>Resource</td><td>Content Type</td><td>Bytes Transferred</td></tr>" +
+    tableNormalRowEmailTag+ "List of 5 heaviest elements on page - Recommend reviewing these items </tr>" +
+    tableNormalRowEmailTag+tableNormalCellEmailTag+"Resource"+"</td>"+tableNormalCellEmailTag+"Content Type"+"</td>"+tableNormalCellEmailTag+"Bytes Transferred"+"</td>"+"</tr>\n" +
       heavyElementList.map(element => element.alertHTMLString()).mkString
   }
 

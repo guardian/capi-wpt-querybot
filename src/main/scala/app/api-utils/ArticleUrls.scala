@@ -45,7 +45,7 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(20)
+      .pageSize(1)
       .orderBy("newest")
       .tag("tone/minutebyminute")
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
@@ -73,7 +73,7 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(20)
+      .pageSize(1)
       .orderBy("newest")
       .contentType("interactive")
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
@@ -127,9 +127,10 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(20)
+      .pageSize(1)
       .orderBy("newest")
       .contentType("audio")
+
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
 
     val apiResponse = contentApiClient.getResponse(liveBlogSearchQuery)
@@ -171,7 +172,7 @@ class ArticleUrls(key: String) {
   }
 
   def getFrontsUrls: List[String] = {
-    val listofFronts: List[String] = List("http://www.theguardian.com/uk",
+    val listofFronts: List[String] = List("http://www.theguardian.com/uk"/*,
       "http://www.theguardian.com/us",
       "http://www.theguardian.com/au",
       "http://www.theguardian.com/uk-news",
@@ -186,7 +187,7 @@ class ArticleUrls(key: String) {
       "http://www.theguardian.com/fashion",
       "http://www.theguardian.com/uk/environment",
       "http://www.theguardian.com/uk/technology",
-      "http://www.theguardian.com/travel")
+      "http://www.theguardian.com/travel"*/)
     listofFronts
   }
 

@@ -183,10 +183,18 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
   }
 
   def alertHTMLString():String = {
-    val returnString: String = "<tr>" +
-      "<td><a href = \"resource\">" + resource + "</a></td>" +
-      "<td>" + contentType + "</td>" +
-      "<td>" + sizeInKB + "KB</td>" +
+    //Email
+    //tags with inline styles for email
+    val tableNormalRowEmailTag: String = "<tr style=\"background-color: ;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;page-break-inside: avoid;\" #d9edf7\";\">"
+    val tableNormalCellEmailTag: String = "<td style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 0;background-color: #fff!important;\">"
+
+    val aHrefEmailStyle: String = "style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;background-color: transparent;color: #337ab7;text-decoration: underline;\""
+
+
+    val returnString: String = tableNormalRowEmailTag +
+      tableNormalCellEmailTag + "<a href = \"" + this.resource + "\""+ aHrefEmailStyle +">" + this.resource + "</a></td>" +
+      tableNormalCellEmailTag + this.contentType + "</td>" +
+      tableNormalCellEmailTag + this.sizeInKB + "KB</td>" +
       "</tr>"
     returnString
   }
