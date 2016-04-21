@@ -1,6 +1,8 @@
 package app.apiutils
 
 import org.joda.time.DateTime
+import play.api.libs.json
+import play.api.libs.json._
 
 import scala.xml.Elem
 
@@ -36,8 +38,8 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   var alertStatus: Boolean = alert
   val brokenTest: Boolean = failedNeedsRetest
 
-  var headline: Option[String] = None
-  var pageType: Option[String] = None
+  var headline: Option[String] = Some("Unknown")
+  var pageType: Option[String] = Some("Unknown")
 
   var fullElementList: List[PageElementFromHTMLTableRow] = List()
   var heavyElementList: List[PageElementFromHTMLTableRow] = List()
@@ -127,6 +129,30 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   def returnElementTableRows(): String = {
 
            heavyElementList.map(element => element.emailHTMLString()).mkString
+  }
+
+  def toJson(): JsObject = {
+    val ResultAsJson = Json.obj(
+          "timeOfTest" -> JsString(timeOfTest),
+          "testUrl" -> JsString(url),
+          "typeOfTest"-> JsString(typeOfTest),
+          "friendlyResultUrl"-> JsString(friendlyResultUrl),
+          "timeToFirstByte"-> JsNumber(timeToFirstByte),
+          "timeFirstPaintInMs"-> JsNumber(timeFirstPaintInMs),
+          "timeDocCompleteInMs"-> JsNumber(timeDocCompleteInMs),
+          "bytesInDocComplete"-> JsNumber(bytesInDocComplete),
+          "timeFullyLoadedInMs"-> JsNumber(timeFullyLoadedInMs),
+          "bytesInFullyLoaded"-> JsNumber(bytesInFullyLoaded),
+          "speedIndex"-> JsNumber(speedIndex),
+          "resultStatus" -> JsString(resultStatus),
+          "alertDescription" -> JsString(alertDescription),
+          "warningStatus" -> JsBoolean(warningStatus),
+          "alertStatus" -> JsBoolean(alertStatus),
+          "brokenTest" -> JsBoolean(brokenTest),
+          "PageElements" -> JsArray(for (element <- fullElementList) yield element.toJsonObject()),
+          "heaviestPageElements" -> JsArray(for (element <- heavyElementList) yield element.toJsonObject())
+      )
+    ResultAsJson
   }
 
   def toHTMLAlertMessageCells(): String = {

@@ -1,7 +1,11 @@
 package app.api
 
 import java.io.{FileInputStream, File}
+import java.util.Date
 
+import app.apiutils.PerformanceResultsObject
+import com.fasterxml.jackson.databind.JsonNode
+import netscape.javascript.JSUtil
 import play.libs.Json
 
 /**
@@ -14,5 +18,13 @@ class JSONOperations() {
     val json = try {  Json.parse(stream) } finally { stream.close() }
 
   }
+
+  def writeToFile(results: List[PerformanceResultsObject], filename: String): Boolean = {
+    val jsonList: List[JsonNode] = results.map(result => {Json.toJson(result)})
+
+
+  }
+
+
 
 }

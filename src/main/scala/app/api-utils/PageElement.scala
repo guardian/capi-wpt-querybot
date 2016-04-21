@@ -1,5 +1,7 @@
 package app.apiutils
 
+import play.api.libs.json._
+
 /**
  * Created by mmcnamara on 25/02/16.
  */
@@ -189,6 +191,24 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
       "<td>" + sizeInKB + "KB</td>" +
       "</tr>" + "\n"
     returnString
+  }
+
+  def toJsonObject(): JsObject = {
+    val json: JsObject = JsObject(Seq(
+      "resource" -> JsString(resource),
+      "contentType" -> JsString(contentType),
+      "requestStart" -> JsNumber(requestStart),
+      "dnsLookUp" -> JsNumber(dnsLookUp),
+      "initialConnection" -> JsNumber(initialConnection),
+      "sslNegotiation" -> JsNumber(sslNegotiation),
+      "timeToFirstByte" -> JsNumber(timeToFirstByte),
+      "ontentDownload" -> JsNumber(contentDownload),
+      "bytesDownloaded" -> JsNumber(bytesDownloaded),
+      "errorStatusCode" -> JsNumber(errorStatusCode),
+      "iP" -> JsString(iP)
+      )
+    )
+    json
   }
 
   def alertHTMLString():String = {

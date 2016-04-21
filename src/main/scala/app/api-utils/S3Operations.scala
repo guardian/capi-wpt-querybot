@@ -4,9 +4,12 @@ import java.io.{FileOutputStream, OutputStreamWriter, Writer, File}
 
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
+import com.fasterxml.jackson.databind.JsonNode
 import com.typesafe.config.{ConfigFactory, Config}
+import play.api.libs.json.JsObject
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime
+import play.api.libs.json
 
 
 
@@ -162,6 +165,27 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     println("returning File object")
     file
   }
+
+  def writeJsonToS3(fileName:String, results: JsObject): Unit = {
+    println(DateTime.now + " Writing jSon file to S3:\n")
+    s3Client.putObject(new PutObjectRequest(s3BucketName, fileName, createJsonFile(fileName, JsObject.unapply(results)))
+    val acl: AccessControlList = s3Client.getObjectAcl(bucket, fileName)
+    acl.grantPermission(GroupGrantee.AllUsers, Permission.Read)
+    s3Client.setObjectAcl(bucket, fileName, acl)
+
+  }
+
+  def createJsonFile(fileName: String, content: List[JsonNode]): File = {
+    println("creating output file")
+    val file: File = File.createTempFile(fileName.takeWhile(_ != '.'), fileName.dropWhile(_ != '.'))
+    file.deleteOnExit()
+    val writer: Writer = new OutputStreamWriter(new FileOutputStream(file))
+    play.api.libs.json
+    writer.close()
+    println("returning File object")
+    file
+  }
+
 
   def closeS3Client(): Unit = s3Client.shutdown()
 
