@@ -255,6 +255,8 @@ object App {
       pageWeightAnchorId = getAnchorId._2
 
       combinedResultsList = articleResultsWithAnchor
+      println("\n \n \n article tests complete. \n tested " + articleResultsWithAnchor.length + "pages")
+      println("Total number of results gathered so far " + combinedResultsList.length + "pages")
 
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
       val sortedByWeightArticleResultsList = orderListByWeight(articleResultsWithAnchor)
@@ -299,8 +301,9 @@ object App {
       val liveBlogResultsWithAnchor = getAnchorId._1
       pageWeightAnchorId = getAnchorId._2
 
-
       combinedResultsList = combinedResultsList ::: liveBlogResultsWithAnchor
+      println("\n \n \n liveBlog tests complete. \n tested " + liveBlogResultsWithAnchor.length + "pages")
+      println("Total number of results gathered so far " + combinedResultsList.length + "pages")
       val sortedLiveBlogResultsList = orderListByWeight(liveBlogResultsWithAnchor)
       if(sortedLiveBlogResultsList.isEmpty) {
         println("Sorting algorithm for Liveblogs has returned empty list. Aborting")
@@ -344,6 +347,8 @@ object App {
       pageWeightAnchorId = getAnchorId._2
 
       combinedResultsList = combinedResultsList ::: interactiveResultsWithAnchor
+      println("\n \n \n interactive tests complete. \n tested " + interactiveResultsWithAnchor.length + "pages")
+      println("Total number of results gathered so far " + combinedResultsList.length + "pages")
       val sortedInteractiveResultsList = orderListByWeight(interactiveResultsWithAnchor)
       if(sortedInteractiveResultsList.isEmpty) {
         println("Sorting algorithm has returned empty list. Aborting")
@@ -420,12 +425,15 @@ object App {
     val sortedByWeightCombinedResults: List[PerformanceResultsObject] = orderListByWeight(combinedResultsList :::  previousTestResultsHandler.recentButNoRetestRequired)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Desktop")) yield result
     val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
-
+    println("\n \n \n Combining lists of results and sorting for dashboard pages.")
+    println("length of sorted By Weight Combined List is: " + sortedByWeightCombinedResults.length)
     //Generate lists for sortByWeight combined pages
 
     val sortedByWeightCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResultsByWeight(combinedDesktopResultsList)
     val sortedCombinedByWeightMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsByWeight(combinedMobileResultsList)
 
+    println("length of sorted By Weight Mobile List is: " + sortedByWeightCombinedDesktopResults.length)
+    println("length of sorted By Weight Combined List is: " + sortedCombinedByWeightMobileResults.length)
     //  strip out errors
     val errorFreeSortedByWeightCombinedResults = for (result <- sortedByWeightCombinedResults if result.speedIndex > 0) yield result
 

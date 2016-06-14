@@ -9,6 +9,9 @@ import org.joda.time.DateTime
  */
 class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObject], desktopResultsList: List[PerformanceResultsObject], mobileResultsList: List[PerformanceResultsObject]) {
 
+    val numberOfCombinedRecords = combinedResultsList.length
+    val numberOfDesktopRecords = desktopResultsList.length
+    val numberOfMobileRecords = mobileResultsList.length
     //HTML Page elements
     //Page Header
     val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
@@ -137,6 +140,10 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
     // Access Methods
 
     override def toString(): String = {
+      println("\n PAGEWEIGHTDASHBOARD--TABBED CREATED \n" +
+        "Number of combined records " + numberOfCombinedRecords +
+        "Number of desktop records " + numberOfDesktopRecords +
+        "Number of mobile records " + numberOfMobileRecords + "\n \n \n")
       HTML_PAGE
     }
 
