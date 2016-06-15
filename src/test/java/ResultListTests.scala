@@ -120,7 +120,11 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
     assert((cleanedListArray(6).testUrl, cleanedListArray(6).typeOfTest) == (testResult5d.testUrl,testResult5d.typeOfTest))
     assert((cleanedListArray(7).testUrl, cleanedListArray(7).typeOfTest) == (testResult6d.testUrl,testResult6d.typeOfTest))
     assert((cleanedListArray(8).testUrl, cleanedListArray(8).typeOfTest) == (testResult6m.testUrl,testResult6m.typeOfTest))
+  }
 
+  "When removeDuplicates is called on a list with no duplicates it" should "return an identical list" in {
+    val cleanedList = prevResults.removeDuplicates(oldResultList)
+    assert(cleanedList == oldResultList)
   }
 
 
