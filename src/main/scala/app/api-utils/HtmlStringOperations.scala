@@ -90,10 +90,10 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
     if (resultsObject.alertStatusPageWeight) {
         println("row should be red one of the items qualifies")
-        returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLBasicTableCells() + "</tr>"
+        returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLPageWeightTableCells() + "</tr>"
       } else {
       println("all fields within size limits")
-      returnString = "<tr>" + resultsObject.toHTMLBasicTableCells() + "</tr>"
+      returnString = "<tr>" + resultsObject.toHTMLPageWeightTableCells() + "</tr>"
     }
     println(DateTime.now + " returning results string to main thread")
     println(returnString)

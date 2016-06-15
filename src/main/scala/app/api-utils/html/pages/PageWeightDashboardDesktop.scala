@@ -9,6 +9,10 @@ import org.joda.time.DateTime
  */
 class PageWeightDashboardDesktop(combinedResultsList: List[PerformanceResultsObject], desktopResultsList: List[PerformanceResultsObject], mobileResultsList: List[PerformanceResultsObject]) {
 
+  val numberOfCombinedRecords = combinedResultsList.length
+  val numberOfDesktopRecords = desktopResultsList.length
+  val numberOfMobileRecords = mobileResultsList.length
+
   //HTML Page elements
   //Page Header
   val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
@@ -103,10 +107,10 @@ class PageWeightDashboardDesktop(combinedResultsList: List[PerformanceResultsObj
     (for (result <- resultsList) yield {
 
       if(result.alertStatusPageWeight){
-        "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div class=\"arrow\"><a id=" + result.anchorId.getOrElse("") + "></a></div></td></tr>" + "\n" +
+        "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLPageWeightTableCells() + "<td><div class=\"arrow\"><a id=" + result.anchorId.getOrElse("") + "></a></div></td></tr>" + "\n" +
           generatePageElementTable(result)
       } else {
-        "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div>" + "" + "</div></td></tr>" + "\n"
+        "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLPageWeightTableCells() + "<td><div>" + "<a id=" + result.anchorId.getOrElse("") + "></a>" + "</div></td></tr>" + "\n"
       }
     }).mkString
 
@@ -137,6 +141,10 @@ class PageWeightDashboardDesktop(combinedResultsList: List[PerformanceResultsObj
   // Access Methods
 
   override def toString(): String = {
+    println("\n PAGEWEIGHTDASHBOARD--DESKTOP CREATED \n" +
+      "Number of combined records " + numberOfCombinedRecords +
+      "Number of desktop records " + numberOfDesktopRecords +
+      "Number of mobile records " + numberOfMobileRecords + "\n \n \n")
     HTML_PAGE
   }
 

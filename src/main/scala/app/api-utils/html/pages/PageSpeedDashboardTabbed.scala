@@ -60,7 +60,7 @@ class PageSpeedDashboardTabbed(combinedResultsList: List[PerformanceResultsObjec
   //Page Tables
   val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
     "<thead>" + "\n" +
-    "<tr> <th>Time Last Tested</th>" + "<th>Test VisualsElementType</th>" + "<th>Headline</th>" + "<th>VisualsElementType of Page</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" +  "</tr>"+ "\n" +
+    "<tr> <th>Time Last Tested</th>" + "<th>Test VisualsElementType</th>" + "<th>Headline</th>" + "<th>VisualsElementType of Page</th>" + "<th>Time till page is scrollable</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" +  "</tr>"+ "\n" +
     "</thead>" +"\n" +
     "<tbody>"
 
@@ -102,10 +102,10 @@ class PageSpeedDashboardTabbed(combinedResultsList: List[PerformanceResultsObjec
   def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
     (for (result <- resultsList) yield {
       if(result.alertStatusPageSpeed){
-        "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div class=\"arrow\"></div></td></tr>" + "\n" +
+        "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLInteractiveTableCells() + "<td><div class=\"arrow\"></div></td></tr>" + "\n" +
           generatePageElementTable(result)
       } else {
-        "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div>" + "" + "</div></td></tr>" + "\n"
+        "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLInteractiveTableCells() + "<td><div>" + "" + "</div></td></tr>" + "\n"
       }
     }).mkString
 

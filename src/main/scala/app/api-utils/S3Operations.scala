@@ -109,7 +109,6 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
 
     println("calling parseString on ConfigFactory object")
     val conf = ConfigFactory.parseString(configString)
-    println("conf: \n" + conf)
 
     println("returning config object")
     val interactives = conf.getStringList("sample.large.interactives").toList

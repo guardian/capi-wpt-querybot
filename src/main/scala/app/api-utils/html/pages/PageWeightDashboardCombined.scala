@@ -71,7 +71,7 @@ class PageWeightDashboardCombined (resultsList: List[PerformanceResultsObject]) 
 
   def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
     (for (result <- resultsList) yield {
-      "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div class=\"arrow\"></div></td></tr>" + "\n" +
+      "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLPageWeightTableCells() + "<td><div class=\"arrow\"></div></td></tr>" + "\n" +
         generatePageElementTable(result)
     }).mkString
 
