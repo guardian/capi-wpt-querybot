@@ -18,8 +18,8 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   val resultsFromLast24Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime) yield result
   val oldResults = for (result <- previousResults if result.mostRecentUpdate < cutoffTime) yield result
 
-  val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if result.alertStatusPageWeight || result.alertStatusPageSpeed || result.getLiveBloggingNow) yield result
-  val recentButNoRetestRequired: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if !(result.alertStatusPageWeight || result.alertStatusPageSpeed || result.getLiveBloggingNow)) yield result
+  val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if result.needsRetest()) yield result
+  val recentButNoRetestRequired: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if !result.needsRetest()) yield result
   val hasPreviouslyAlerted: List[PerformanceResultsObject] = for (result <- previousResultsToRetest if result.alertStatusPageWeight || result.alertStatusPageSpeed) yield result
 
   val desktopPreviousResultsToReTest = for (result <- previousResultsToRetest if result.typeOfTest.contains("Desktop")) yield result

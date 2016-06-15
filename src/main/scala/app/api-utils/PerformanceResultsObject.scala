@@ -160,6 +160,10 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     returnList
   }
 
+  def needsRetest(): Boolean = {
+    getLiveBloggingNow || alertStatusPageWeight || (alertStatusPageSpeed && getPageType.contains("Interactive"))
+  }
+
   def toStringList(): List[String] = {
     List(testUrl.toString + ", " + timeFirstPaintInMs.toString + "ms", timeDocCompleteInSec.toString + "s", mBInDocComplete + "MB" , timeFullyLoadedInSec.toString + "s", mBInFullyLoaded + "MB", speedIndex.toString, resultStatus)
   }
