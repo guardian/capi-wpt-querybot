@@ -13,7 +13,7 @@ import org.joda.time.DateTime
 class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
-  val previousResults: List[PerformanceResultsObject] = resultsList
+  val previousResults: List[PerformanceResultsObject] = removeDuplicates(resultsList)
 
   val resultsFromLast24Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime) yield result
   val oldResults = for (result <- previousResults if result.mostRecentUpdate < cutoffTime) yield result
@@ -43,7 +43,27 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     for (result <- resultsList if !hasPreviouslyAlerted.map(_.testUrl).contains(result.testUrl)) yield result
   }
 
+  def removeDuplicates(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    val emptyResultList: List[PerformanceResultsObject] = List()
+    cleanList(results, emptyResultList)
+  }
 
+  def cleanList(inputList: List[PerformanceResultsObject], expurgatedList: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+   if (inputList.isEmpty) {
+     val emptyResultList: List[PerformanceResultsObject] = List()
+     emptyResultList
+   } else {
+     if(isResultPresent(inputList.head, expurgatedList)){
+       cleanList(inputList.tail, expurgatedList)
+     } else {
+       List(inputList.head) ::: cleanList(inputList.tail, expurgatedList ::: List(inputList.head))
+     }
+   }
+  }
+
+  def isResultPresent(result: PerformanceResultsObject, resultList: List[PerformanceResultsObject]): Boolean = {
+    resultList.map(test => (test.testUrl, test.typeOfTest)).contains((result.testUrl,result.typeOfTest))
+  }
 
 
   def checkConsistency(): Boolean = {

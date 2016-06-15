@@ -442,7 +442,7 @@ object App {
     val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
 
 //record results
-    val resultsToRecord = (errorFreeSortedByWeightCombinedResults ::: previousTestResultsHandler.oldResults).take(3000)
+    val resultsToRecord = previousTestResultsHandler.removeDuplicates(errorFreeSortedByWeightCombinedResults ::: previousTestResultsHandler.oldResults).take(3000)
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 
 //Generate Lists for sortBySpeed combined pages
