@@ -124,11 +124,16 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if
       element.contentType.contains("application") ||
       element.contentType.contains("image") ||
+      element.contentType.contains("jpeg") ||
+      element.contentType.contains("png") ||
       element.contentType.contains("video") ||
+      element.contentType.contains("media") ||
       element.contentType.contains("xhr") ||
       element.contentType.contains("x-shockwave-flash") ||
+      element.resource.contains("player") ||
       element.resource.contains(".tv") ||
       element.resource.contains("abc") ||
+      element.resource.contains("pbs") ||
       element.resource.contains("audioboo") ||
       element.resource.contains("brightcove") ||
       element.resource.contains("cloud") ||
@@ -155,6 +160,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
       element.resource.contains("vimeo") ||
       element.resource.contains("vine") ||
       element.resource.contains("witness") ||
+      element.resource.contains("ytimg") ||
       element.resource.contains("youtube")
     ) yield element
     returnList
