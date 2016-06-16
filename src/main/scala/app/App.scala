@@ -61,6 +61,8 @@ object App {
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
 
+    val duplicateResultList = "duplicateresultsfromlastrun.csv"
+
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
@@ -459,11 +461,17 @@ object App {
     val sortedInteractiveDesktopResults: List[PerformanceResultsObject] = sortHomogenousInteractiveResultsBySpeed(interactiveDesktopResults)
     val sortedInteractiveMobileResults: List[PerformanceResultsObject] = sortHomogenousInteractiveResultsBySpeed(interactiveMobileResults)
 
-
     val dotcomPageSpeedDashboard = new PageSpeedDashboardTabbed(sortedBySpeedCombinedResults, sortedBySpeedCombinedDesktopResults, sortedBySpeedCombinedMobileResults)
     val interactiveDashboard = new InteractiveDashboardTabbed(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
     val interactiveDashboardDesktop = new InteractiveDashboardDesktop(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
     val interactiveDashboardMobile = new InteractiveDashboardMobile(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
+
+    val listOfDupes = for (result <- sortedByWeightCombinedResults if sortedByWeightCombinedResults.count(_ == result) > 1 ) yield result
+
+    if(listOfDupes.nonEmpty) {
+      println("\n\n\n\n ******** Duplicates found in results! ****** \n Found " + listOfDupes.length + " duplicates")
+      println("Duplicate urls are: \n" + listOfDupes.map(result => "url: " + result.testUrl + " TestType: " + result.typeOfTest + "\n"))
+    }
 
       //write combined results to file
       if (!iamTestingLocally) {
@@ -476,6 +484,7 @@ object App {
         s3Interface.writeFileToS3(interactiveDashboardDesktopFilename, interactiveDashboardDesktop.toString())
         s3Interface.writeFileToS3(interactiveDashboardMobileFilename, interactiveDashboardMobile.toString())
         s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
+        s3Interface.writeFileToS3(duplicateResultList, listOfDupes.map(_.toCSVString()).mkString)
       }
       else {
         val outputWriter = new LocalFileOperations
