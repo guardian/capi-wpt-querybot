@@ -152,6 +152,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
       element.resource.contains("reuters") ||
       element.resource.contains("scribd") ||
       element.resource.contains("scribdassets") ||
+      element.resource.contains("sndcdn") ||
       element.resource.contains("soundcloud") ||
       element.resource.contains("spotify") ||
       element.resource.contains("twitter") ||
