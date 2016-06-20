@@ -55,8 +55,6 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   var editorialElementList: List[PageElementFromHTMLTableRow] = List()
   var editorialElementListMaxSize: Int = 5
 
-  var combinedImageSize: Double
-
   def setHeadline(text: Option[String]):Unit = {headline = text}
   def setPageType(text: String):Unit = {pageType = Option(text)}
   def setFirstPublished(dateTime: Option[CapiDateTime]):Unit = {firstPublished = dateTime}
@@ -154,7 +152,6 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
       element.resource.contains("reuters") ||
       element.resource.contains("scribd") ||
       element.resource.contains("scribdassets") ||
-      element.resource.contains("sndcdn") ||
       element.resource.contains("soundcloud") ||
       element.resource.contains("spotify") ||
       element.resource.contains("twitter") ||
