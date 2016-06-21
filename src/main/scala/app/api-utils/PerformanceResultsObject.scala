@@ -110,7 +110,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
       println("Error: Attempt to feed an unordered list of page elements to Performance Results Object")
       false
     } else {
-      var workingList: List[PageElementFromHTMLTableRow] = for (element <- trimmedList if element.isMedia()) yield element
+      var workingList = trimmedList
       var roomInTheList: Boolean = true
       while(workingList.nonEmpty && roomInTheList) {
         roomInTheList = addtoElementList(workingList.head)
@@ -119,6 +119,10 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
       true
     }
   }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
   def trimToEditorialElements(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
     val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if
