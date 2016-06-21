@@ -119,55 +119,38 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
       true
     }
   }
+  
 
   def trimToEditorialElements(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
-    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if
-      element.contentType.contains("application") ||
-      element.contentType.contains("image") ||
-      element.contentType.contains("jpeg") ||
-      element.contentType.contains("png") ||
-      element.contentType.contains("video") ||
-      element.contentType.contains("media") ||
-      element.contentType.contains("xhr") ||
-      element.contentType.contains("x-shockwave-flash") ||
-      element.resource.contains("player") ||
-      element.resource.contains(".tv") ||
-      element.resource.contains("abc") ||
-      element.resource.contains("pbs") ||
-      element.resource.contains("audioboo") ||
-      element.resource.contains("brightcove") ||
-      element.resource.contains("cloud") ||
-      element.resource.contains("cnn") ||
-      element.resource.contains("comment") ||
-      element.resource.contains("dailymotion") ||
-      element.resource.contains("discussion") ||
-      element.resource.contains("facebook") ||
-      element.resource.contains("formstack") ||
-      element.resource.contains("hulu") ||
-      element.resource.contains("infostrada") ||
-      element.resource.contains("instagram") ||
-      element.resource.contains("itunes") ||
-      element.resource.contains("maps") ||
-      element.resource.contains("nbc") ||
-      element.resource.contains("reuters") ||
-      element.resource.contains("scribd") ||
-      element.resource.contains("scribdassets") ||
-      element.resource.contains("sndcdn") ||
-      element.resource.contains("soundcloud") ||
-      element.resource.contains("spotify") ||
-      element.resource.contains("twitter") ||
-      element.resource.contains("ustream") ||
-      element.resource.contains("video") ||
-      element.resource.contains("vimeo") ||
-      element.resource.contains("vine") ||
-      element.resource.contains("witness") ||
-      element.resource.contains("ytimg") ||
-      element.resource.contains("youtube")
-    ) yield element
-    returnList
+    elementList.filterNot(isAStandardPageElement(_))
   }
 
-  def needsRetest(): Boolean = {
+  def isAStandardPageElement(element: PageElementFromHTMLTableRow): Boolean = {
+    element.resource.contains(testUrl) ||
+    element.resource.contains("assets.guim.co.uk/stylesheets") ||
+    element.resource.contains("assets.guim.co.uk/javascripts") ||
+    element.resource.contains("www.google-analytics.com") ||
+    element.resource.contains("idapi.theguardian.com") ||
+    element.resource.contains("www.theguardian.com/email") ||
+    element.resource.contains("exclude-tag=tone/advertisement-features") ||
+    element.resource.contains("api.nextgen.guardianapps.co.uk/related") ||
+    element.resource.contains("api.nextgen.guardianapps.co.uk/most-read") ||
+    element.resource.contains("ophan") ||
+    element.resource.contains("idapi.theguardian.com") ||
+    element.resource.contains("api.nextgen.guardianapps.co.uk/news-alert") ||
+    element.resource.contains("hits.secure.theguardian.com") ||
+    element.resource.contains("api.nextgen.guardianapps.co.uk/discussion") ||
+    element.resource.contains("members-data") ||
+    element.resource.contains("beacon") ||
+    element.resource.contains("api.nextgen.guardianapps.co.uk/related") ||
+    element.resource.contains("data:application/x-font-woff")
+  }
+
+
+
+
+
+    def needsRetest(): Boolean = {
     getLiveBloggingNow || alertStatusPageWeight || (alertStatusPageSpeed && getPageType.contains("Interactive"))
   }
 
