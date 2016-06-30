@@ -12,6 +12,8 @@ import org.joda.time.DateTime
 
 class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
+  val fullResultsList = resultsList
+
   val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
   val previousResults: List[PerformanceResultsObject] = removeDuplicates(resultsList)
 
@@ -64,6 +66,21 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   def isResultPresent(result: PerformanceResultsObject, resultList: List[PerformanceResultsObject]): Boolean = {
     resultList.map(test => (test.testUrl, test.typeOfTest)).contains((result.testUrl,result.typeOfTest))
   }
+
+
+  //query full list
+  def returnAllPageWeightAlerts(): List[PerformanceResultsObject] = {
+    fullResultsList.filter(_.alertStatusPageWeight)
+  }
+
+  def returnAllPageSpeedAlerts(): List[PerformanceResultsObject] = {
+    fullResultsList.filter(_.alertStatusPageSpeed)
+  }
+
+  def returnPageSpeedAlertsWithinSizeLimits(): List[PerformanceResultsObject] = {
+    returnAllPageSpeedAlerts().filter(!_.alertStatusPageWeight)
+  }
+
 
 
   def checkConsistency(): Boolean = {
