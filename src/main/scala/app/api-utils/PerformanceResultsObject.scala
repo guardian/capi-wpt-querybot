@@ -129,6 +129,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     element.resource.contains(testUrl) ||
     element.resource.contains("assets.guim.co.uk/stylesheets") ||
     element.resource.contains("assets.guim.co.uk/javascripts") ||
+    element.resource.contains("assets.guim.co.uk/fonts") ||
     element.resource.contains("www.google-analytics.com") ||
     element.resource.contains("idapi.theguardian.com") ||
     element.resource.contains("www.theguardian.com/email") ||
@@ -159,7 +160,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + "," + editorialElementList.map(element => "," + cleanString(element.resource) + "," + cleanString(element.contentType) + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
+    printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + editorialElementList.map(element => "," + element.toCSVString()).mkString + fillRemainingGapsAndNewline()
   }
 
   def toFullHTMLTableCells(): String = {
@@ -268,11 +269,19 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   def fillRemainingGapsAndNewline(): String ={
     var accumulator: Int = editorialElementList.length
     var returnString: String = ""
-    while (accumulator < editorialElementListMaxSize-1){
-      returnString = returnString + ","
+    if(editorialElementList.isEmpty){
+      while (accumulator < editorialElementListMaxSize-1){
+        returnString = returnString + "," + (new EmptyPageElement).toCSVString()
+        accumulator += 1
+      }
+      returnString = returnString.take(returnString.length - 1) + "\n"
+    } else {
+      while (accumulator < editorialElementListMaxSize-1){
+      returnString = returnString + "," + (new EmptyPageElement).toCSVString()
       accumulator += 1
     }
-    returnString = returnString + "\n"
+      returnString = returnString + "\n"
+    }
     returnString
   }
 
