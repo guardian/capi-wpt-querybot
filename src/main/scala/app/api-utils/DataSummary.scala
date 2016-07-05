@@ -3,9 +3,6 @@ package app.api
 import app.apiutils.{PageElementFromHTMLTableRow, ResultsFromPreviousTests, PerformanceResultsObject}
 import org.joda.time.DateTime
 
--utils
-
-- utils
 
 /**
  * Created by mmcnamara on 28/06/16.
@@ -79,10 +76,10 @@ look through data - what are the main embeds
   }
 
   def sortPageElementByType(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
-    ...
+    elementList
   }
 
-  def identifyPageElementType(element: PageElementFromHTMLTableRow): String = {
+ /* def identifyPageElementType(element: PageElementFromHTMLTableRow): String = {
     val audioBoo = ""
     val brightcover = ""
     val cnn = ""
@@ -94,7 +91,7 @@ look through data - what are the main embeds
       case
     }
 
-  }
+  }*/
 
 
 

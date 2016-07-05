@@ -30,6 +30,8 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   val dedupedMobilePreviousResultsToRetest = for (result <- mobilePreviousResultsToReTest if!desktopPreviousResultsToReTest.map(_.testUrl).contains(result.testUrl)) yield result
   val dedupedPreviousResultsToRestest: List[PerformanceResultsObject] = dedupedMobilePreviousResultsToRetest ::: desktopPreviousResultsToReTest
 
+  val resultsWithNoPageElements = (recentButNoRetestRequired ::: oldResults).filter(_.editorialElementList.nonEmpty)
+
   def returnPagesNotYetTested(list: List[(Option[ContentFields],String)]): List[(Option[ContentFields],String)] = {
     val pagesNotYetTested: List[(Option[ContentFields],String)] = for (page <- list if !previousResults.map(_.testUrl).contains(page._2)) yield page
     val pagesAlreadyTested:List[(Option[ContentFields],String)] = for (page <- list if previousResults.map(_.testUrl).contains(page._2)) yield page
@@ -108,6 +110,119 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
           true
     }
   }
+
+
+  def repairPreviousResultsList(): List[PerformanceResultsObject] = {
+    //Create new S3 Client
+    val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
+    val s3BucketName = "capi-wpt-querybot"
+    val configFileName = "config.conf"
+    val emailFileName = "addresses.conf"
+
+    println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
+    val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
+    var configArray: Array[String] = Array("", "", "", "", "", "")
+    var urlFragments: List[String] = List()
+
+    println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
+    val returnTuple = s3Interface.getConfig
+    configArray = Array(returnTuple._1,returnTuple._2,returnTuple._3,returnTuple._4,returnTuple._5,returnTuple._6,returnTuple._7)
+    urlFragments = returnTuple._8
+
+    val contentApiKey: String = configArray(0)
+    val wptBaseUrl: String = configArray(1)
+    val wptApiKey: String = configArray(2)
+    val wptLocation: String = configArray(3)
+
+
+
+    // val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    //    val resultsFromPreviousTests = "resultsFromPreviousTestsTest.csv"
+    //    val resultsFromPreviousTestsTestVersion = "resultsFromPreviousTestsTestOutput.csv"
+    //   val resultsFromPreviousTests = "elementtestinput.csv"
+    //   val resultsFromPreviousTestsTestVersion = "elementtestoutput.csv"
+
+    val outputFile = "repairedPreviousResultsList.csv"
+    //obtain list of items previously alerted on
+    //val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+   // val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
+
+    val urlsToRetest = resultsWithNoPageElements.map(_.testUrl).distinct
+    val containerSize: Int = urlsToRetest.length / 100
+    val retestingList = urlsToRetest.grouped(containerSize).toList
+
+    val urlAndResults: List[(String, String, String)] = retestingList.flatMap(list => {
+      val urlAndResultListFragment: List[(String,String, String)] = sendResultPages(list, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
+      Thread.sleep(1000*60*30)
+      urlAndResultListFragment
+    })
+
+    val resultsWithElementListAdded = resultsWithNoPageElements.flatMap(result => {
+      for (urlSet <- urlAndResults if urlSet._1.contains(result.testUrl)) yield {
+        if(result.typeOfTest.contains("Desktop")){
+          val newResult = getResult(urlSet._2, wptBaseUrl, wptApiKey, urlFragments)
+          newResult.headline = result.headline
+          newResult.pageType = result.pageType
+          newResult.firstPublished = result.firstPublished
+          newResult.pageLastUpdated = result.pageLastUpdated
+          newResult.liveBloggingNow = result.liveBloggingNow
+          newResult.alertStatusPageWeight = result.alertStatusPageWeight
+          newResult.alertStatusPageSpeed = result.alertStatusPageSpeed
+          newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
+          newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
+
+          println("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
+          println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
+          newResult
+      } else {
+          val newResult = getResult(urlSet._3, wptBaseUrl, wptApiKey, urlFragments)
+          newResult.headline = result.headline
+          newResult.pageType = result.pageType
+          newResult.firstPublished = result.firstPublished
+          newResult.pageLastUpdated = result.pageLastUpdated
+          newResult.liveBloggingNow = result.liveBloggingNow
+          newResult.alertStatusPageWeight = result.alertStatusPageWeight
+          newResult.alertStatusPageSpeed = result.alertStatusPageSpeed
+          newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
+          newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
+
+          println("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
+          println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
+          newResult
+
+        }
+     }
+    })
+
+    val unchangedResults: List[PerformanceResultsObject] = for (result <- (recentButNoRetestRequired ::: oldResults) if !resultsWithElementListAdded.map(_.testUrl).contains(result.testUrl)) yield result
+
+    val repairedResultsList: List[PerformanceResultsObject] = unchangedResults ::: resultsWithElementListAdded
+
+    val resultsToRecordCSVString: String = repairedResultsList.map(_.toCSVString()).mkString
+    s3Interface.writeFileToS3(outputFile, resultsToRecordCSVString)
+
+    repairedResultsList
+  }
+
+
+  def sendResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String, String)] = {
+    val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
+    val resultList: List[(String, String, String)] = urlList.map(url => {
+      val desktopResult: String = wpt.sendPage(url)
+      val mobileResult: String = wpt.sendMobile3GPage(url, wptLocation)
+      (url, desktopResult, mobileResult)
+      })
+    resultList
+  }
+
+  def getResult(friendlyUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String] ): PerformanceResultsObject = {
+    val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
+    val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
+    val result: PerformanceResultsObject = wpt.getResults(xmlResultUrl)
+    result
+  }
+
+
 
 
 }
