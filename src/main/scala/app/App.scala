@@ -163,7 +163,6 @@ object App {
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
-    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
 
     //validate list handling
     val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
@@ -445,8 +444,7 @@ object App {
     val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
 
 //record results
-    val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
-    val resultsToRecord = previousTestResultsHandler.removeDuplicates(combinedResultsForFile ::: previousResultsWithElementsAdded)
+    val resultsToRecord = previousTestResultsHandler.removeDuplicates(errorFreeSortedByWeightCombinedResults ::: previousTestResultsHandler.oldResults).take(5000)
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 
 //Generate Lists for sortBySpeed combined pages
