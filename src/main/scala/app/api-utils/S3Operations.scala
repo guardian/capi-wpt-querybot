@@ -2,7 +2,7 @@ package app.api
 
 import java.io._
 
-import app.apiutils._
+import app.apiutils.PerformanceResultsObject
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
 import com.gu.contentapi.client.model.v1.CapiDateTime
@@ -176,9 +176,6 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           data(18).toBoolean,
           data(19).toBoolean)
         //todo - get element list
-        val elementArray = data.drop(20)
-        println("\n\n\n Element Array \n" + elementArray.map(element => element.toString + "\n"))
-        result.populateEditorialElementList(getElementListFromArray(elementArray))
         result.setHeadline(Option(data(2)))
         result.setPageType(data(3))
         val firstPublishedTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
@@ -194,39 +191,6 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       emptyList
     }
   }
-
-  def getElementListFromArray(elementArray: Array[String]): List[PageElementFromHTMLTableRow] = {
-    println("\n\n\n\n  **************** elementArray: **************** \n"+ elementArray.map(element => element.toString + "\n").mkString + "\n\n\n\n\n\n" )
-    if(elementArray.nonEmpty){
-      val length = elementArray.length
-      println("element Array length = " + elementArray.length)
-      var index = 0
-      var elementList: List[PageElementFromHTMLTableRow] = List()
-      while(index < length-1){
-        println("index = " + index)
-        val newElement: PageElementFromHTMLTableRow = new PageElementFromParameters(elementArray(index),
-          elementArray(index+1),
-          elementArray(index+2).toInt,
-          elementArray(index+3).toInt,
-          elementArray(index+4).toInt,
-          elementArray(index+5).toInt,
-          elementArray(index+6).toInt,
-          elementArray(index+7).toInt,
-          elementArray(index+8).toInt,
-          elementArray(index+9).toInt,
-          elementArray(index+10)).convertToPageElementFromHTMLTableRow()
-        elementList = elementList ::: List(newElement)
-        index = index + 11
-      }
-      println("\n\nElementList Populated. \nLength of list: " + elementList.length)
-      println("Element List Contents: \n" + elementList.map(element => element.toCSVString() + "\n"))
-    elementList
-  }else{
-      val emptyList: List[PageElementFromHTMLTableRow] = List()
-      emptyList
-    }
-  }
-
 
   def getVisualsFileFromS3(fileName:String): String = {
     if (doesFileExist(fileName)) {
