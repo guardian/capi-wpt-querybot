@@ -61,6 +61,8 @@ object App {
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
 
+
+
     val duplicateResultList = "duplicateresultsfromlastrun.csv"
 
 
@@ -161,8 +163,12 @@ object App {
 
     //obtain list of items previously alerted on
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+/*    val localInput = new LocalFileOperations
+    val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
     val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
+    println("\n\n\n ***** There are " +  previousTestResultsHandler.fullResultsList.length + " previous results in file  ********* \n\n\n")
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
+    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
 
     //validate list handling
     val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
@@ -228,7 +234,6 @@ object App {
     println("Combined list of urls: \n" + urlsToSend)
 
     val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
-
     // build result page listeners
     // first format alerts from previous test that arent in the new capi queries
     val previousArticlesToRetest: List[PerformanceResultsObject] = for (result <- previousResultsToRetest if result.getPageType.contains("Article")) yield result
@@ -444,7 +449,9 @@ object App {
     val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
 
 //record results
-    val resultsToRecord = previousTestResultsHandler.removeDuplicates(errorFreeSortedByWeightCombinedResults ::: previousTestResultsHandler.oldResults).take(5000)
+    val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
+    val resultsToRecord = previousTestResultsHandler.removeDuplicates(combinedResultsForFile ::: previousResultsWithElementsAdded)
+    println("\n\n\n ***** There are " +  resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 
 //Generate Lists for sortBySpeed combined pages

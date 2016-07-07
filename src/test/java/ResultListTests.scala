@@ -1,5 +1,5 @@
 import app.api.S3Operations
-import app.apiutils.{ResultsFromPreviousTests, PerformanceResultsObject}
+import app.apiutils.{WebPageTest, EmailOperations, ResultsFromPreviousTests, PerformanceResultsObject}
 import com.gu.contentapi.client.model.v1.{MembershipTier, Office, ContentFields, CapiDateTime}
 import org.joda.time.DateTime
 import org.scalatest._
@@ -127,6 +127,69 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
     assert(cleanedList == oldResultList)
   }
 
+
+  "Getting data from results file" should " allow me to repopulate data from tests" in {
+    //Create new S3 Client
+    val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
+    val s3BucketName = "capi-wpt-querybot"
+    val configFileName = "config.conf"
+    val emailFileName = "addresses.conf"
+
+    println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
+    val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
+    var configArray: Array[String] = Array("", "", "", "", "", "")
+    var urlFragments: List[String] = List()
+
+    println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
+    val returnTuple = s3Interface.getConfig
+    configArray = Array(returnTuple._1,returnTuple._2,returnTuple._3,returnTuple._4,returnTuple._5,returnTuple._6,returnTuple._7)
+    urlFragments = returnTuple._8
+
+    val contentApiKey: String = configArray(0)
+    val wptBaseUrl: String = configArray(1)
+    val wptApiKey: String = configArray(2)
+    val wptLocation: String = configArray(3)
+
+
+
+   // val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+//    val resultsFromPreviousTests = "resultsFromPreviousTestsTest.csv"
+//    val resultsFromPreviousTestsTestVersion = "resultsFromPreviousTestsTestOutput.csv"
+ //   val resultsFromPreviousTests = "elementtestinput.csv"
+ //   val resultsFromPreviousTestsTestVersion = "elementtestoutput.csv"
+    val resultsFromPreviousTests = "elementtestoutput.csv"
+    val resultsFromPreviousTestsTestVersion = "elementtestoutputresuts.csv"
+    //obtain list of items previously alerted on
+    val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
+
+    val resurrectedResults: List[PerformanceResultsObject] = previousTestResultsHandler.fullResultsList.map(result => {
+      val newResult = getResult(result.friendlyResultUrl, wptBaseUrl, wptApiKey, urlFragments)
+      newResult.headline = result.headline
+      newResult.pageType = result.pageType
+      newResult.firstPublished = result.firstPublished
+      newResult.pageLastUpdated = result.pageLastUpdated
+      newResult.liveBloggingNow = result.liveBloggingNow
+      newResult.alertStatusPageWeight = result.alertStatusPageWeight
+      newResult.alertStatusPageSpeed = result.alertStatusPageSpeed
+      newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
+      newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
+
+      println("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
+      println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
+      newResult
+    })
+    val resultsToRecordCSVString: String = resurrectedResults.map(_.toCSVString()).mkString
+    s3Interface.writeFileToS3(resultsFromPreviousTestsTestVersion, resultsToRecordCSVString)
+    assert(s3Interface.doesFileExist(resultsFromPreviousTestsTestVersion))
+  }
+
+  def getResult(friendlyUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String] ): PerformanceResultsObject = {
+    val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
+    val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
+    val result: PerformanceResultsObject = wpt.getResults(xmlResultUrl)
+    result
+  }
 
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
