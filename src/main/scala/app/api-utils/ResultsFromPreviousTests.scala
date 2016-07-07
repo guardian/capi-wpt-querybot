@@ -160,7 +160,9 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
     val urlAndResults: List[(String, String, String)] = retestingList.flatMap(list => {
       val urlAndResultListFragment: List[(String,String, String)] = sendResultPages(list, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
- //     Thread.sleep(1000*60*30)
+      if(urlsToRetest.length > 100){
+        Thread.sleep(1000*60*15)
+      }
       urlAndResultListFragment
     })
 
