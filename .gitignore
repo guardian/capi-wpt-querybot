@@ -6,6 +6,10 @@
 config.conf
 
 #results output
+emptyelementtest.csv
+prevresultstest.csv
+prevresultstestOriginal.csv
+reswithemptyelements.csv
 results.csv
 liveBlogPerformanceData.csv
 liveBlogPerformanceData.html

@@ -30,7 +30,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   val dedupedMobilePreviousResultsToRetest = for (result <- mobilePreviousResultsToReTest if!desktopPreviousResultsToReTest.map(_.testUrl).contains(result.testUrl)) yield result
   val dedupedPreviousResultsToRestest: List[PerformanceResultsObject] = dedupedMobilePreviousResultsToRetest ::: desktopPreviousResultsToReTest
 
-  val resultsWithNoPageElements = (recentButNoRetestRequired ::: oldResults).filter(_.editorialElementList.nonEmpty)
+  val resultsWithNoPageElements = (recentButNoRetestRequired ::: oldResults).filter(_.editorialElementList.isEmpty)
 
   def returnPagesNotYetTested(list: List[(Option[ContentFields],String)]): List[(Option[ContentFields],String)] = {
     val pagesNotYetTested: List[(Option[ContentFields],String)] = for (page <- list if !previousResults.map(_.testUrl).contains(page._2)) yield page
@@ -148,12 +148,19 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
    // val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
 
     val urlsToRetest = resultsWithNoPageElements.map(_.testUrl).distinct
-    val containerSize: Int = urlsToRetest.length / 100
-    val retestingList = urlsToRetest.grouped(containerSize).toList
+    val containerSize: Int = if(urlsToRetest.length > 100){urlsToRetest.length / 100}else{urlsToRetest.length}
+    println("urls to retest: " + urlsToRetest.length)
+    println("container size: " + containerSize)
+    val retestingList: List[List[String]] = if(urlsToRetest.nonEmpty){
+      urlsToRetest.grouped(containerSize).toList
+    }else{
+      val emptyListOfLists: List[List[String]] = List()
+      emptyListOfLists
+    }
 
     val urlAndResults: List[(String, String, String)] = retestingList.flatMap(list => {
       val urlAndResultListFragment: List[(String,String, String)] = sendResultPages(list, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
-      Thread.sleep(1000*60*30)
+ //     Thread.sleep(1000*60*30)
       urlAndResultListFragment
     })
 
