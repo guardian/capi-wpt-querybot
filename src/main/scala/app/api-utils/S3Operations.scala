@@ -178,9 +178,9 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
         //todo - get element list
         val elementArray = data.drop(20)
         println("\n\n\n Element Array \n" + elementArray.map(element => element.toString + "\n"))
-        if(elementArray.isEmpty){
-          println("non empty element array found. \npopulating editorial element list")
-        result.populateEditorialElementList(getElementListFromArray(elementArray))
+        val elementList = getElementListFromArray(elementArray)
+        if(elementList.nonEmpty) {
+          result.populateEditorialElementList(elementList)
         }
         result.setHeadline(Option(data(2)))
         result.setPageType(data(3))
@@ -225,7 +225,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       println("Element List Contents: \n" + elementList.map(element => element.toCSVString() + "\n"))
     elementList
   }else{
-      println("No elements found - returning empty list")
+      println("No elements found - returning empty list \n this case should never be reached as it breaks things")
       val emptyList: List[PageElementFromHTMLTableRow] = List()
       emptyList
     }
