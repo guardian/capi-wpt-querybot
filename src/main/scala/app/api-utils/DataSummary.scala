@@ -80,13 +80,37 @@ look through data - what are the main embeds
   }
 
  /* def identifyPageElementType(element: PageElementFromHTMLTableRow): String = {
-    val audioBoo = ""
-    val brightcover = ""
-    val cnn = ""
-    val dailymotion = ""
+    val audioBoomCss = List("audioboom_core", "audioboom_styles")
+    val audioBoomImages = List("audioboom_color")
+    val audioBoomAudioFile = List("audio_clip_id")
+    val brightcove = List("bcsecure", "player.h-cdn.com/loader.js")
+    val cnn = List("cnn")
+    val dailymotion = List("dailymotion")
     val formstack = ""
     val googlemaps = ""
-    val guardian = ""
+    val guardianComments = ""
+    val guardianVideos = ""
+    val guardianWitnessText = ""
+    val guardianWitnessImage = ""
+    val guardianWitnessVideo = ""
+    val hulu = ""
+    val infostrada = ""
+    val scribd = ""
+    val soundCloud = ""
+    val spotifySong = ""
+    val spotifyAlbum = ""
+    val spotifyPlaylists = ""
+    val twitter = ""
+    val vimeo = ""
+    val vine = ""
+    val youTube = ""
+    val parliamentliveTv = ""
+    val facebook = ""
+    val instagram = ""
+    val uStream = ""
+    val documentCloud = ""
+    val audio = List(".mp3")
+    val otherVideo = List(".mp4")
     match(element.resource){
       case
     }

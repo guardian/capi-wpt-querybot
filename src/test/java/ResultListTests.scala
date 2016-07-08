@@ -105,7 +105,7 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   "All lists in previous results object" should "be conistent in number" in {
     assert(prevResults.checkConsistency())
   }
-  
+
 
   "Getting data from results file" should " allow me to repopulate data from tests" in {
     //Create new S3 Client
