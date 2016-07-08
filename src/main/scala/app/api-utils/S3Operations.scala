@@ -222,7 +222,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       println("Element List Contents: \n" + elementList.map(element => element.toCSVString() + "\n"))
     elementList
   }else{
-      println "No elements found - returning empty list"
+      println("No elements found - returning empty list")
       val emptyList: List[PageElementFromHTMLTableRow] = List()
       emptyList
     }
