@@ -178,7 +178,10 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
         //todo - get element list
         val elementArray = data.drop(20)
         println("\n\n\n Element Array \n" + elementArray.map(element => element.toString + "\n"))
+        if(elementArray.isEmpty){
+          println("non empty element array found. \npopulating editorial element list")
         result.populateEditorialElementList(getElementListFromArray(elementArray))
+        }
         result.setHeadline(Option(data(2)))
         result.setPageType(data(3))
         val firstPublishedTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
