@@ -47,9 +47,9 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     for (result <- resultsList if !hasPreviouslyAlerted.map(_.testUrl).contains(result.testUrl)) yield result
   }
 
-  def removeDuplicates(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
-    val emptyResultList: List[PerformanceResultsObject] = List()
-    cleanList(results, emptyResultList)
+ /* def removeDuplicates(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+  //  val emptyResultList: List[PerformanceResultsObject] = List()
+  //  cleanList(results, emptyResultList)
   }
 
   def cleanList(inputList: List[PerformanceResultsObject], expurgatedList: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
@@ -63,7 +63,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
        List(inputList.head) ::: cleanList(inputList.tail, expurgatedList ::: List(inputList.head))
      }
    }
-  }
+  }*/
 
   def isResultPresent(result: PerformanceResultsObject, resultList: List[PerformanceResultsObject]): Boolean = {
     resultList.map(test => (test.testUrl, test.typeOfTest)).contains((result.testUrl,result.typeOfTest))
