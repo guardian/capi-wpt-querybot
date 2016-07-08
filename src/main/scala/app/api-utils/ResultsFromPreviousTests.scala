@@ -15,7 +15,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   val fullResultsList = resultsList
 
   val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
-  val previousResults: List[PerformanceResultsObject] = removeDuplicates(resultsList)
+  val previousResults: List[PerformanceResultsObject] = resultsList.distinct
 
   val resultsFromLast24Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime) yield result
   val oldResults = for (result <- previousResults if result.mostRecentUpdate < cutoffTime) yield result

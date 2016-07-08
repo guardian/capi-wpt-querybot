@@ -105,28 +105,7 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   "All lists in previous results object" should "be conistent in number" in {
     assert(prevResults.checkConsistency())
   }
-
-  "When Remove Duplicates is called on a list it" should "return the correct list" in {
-    val cleanedList = prevResults.removeDuplicates(listWithDupes)
-    assert(cleanedList.length == 9)
-//    println(cleanedList.map(result => (result.testUrl,result.typeOfTest)).mkString)
-    val cleanedListArray = cleanedList.toArray
-    assert((cleanedListArray(0).testUrl, cleanedListArray(0).typeOfTest) == (testResult1d.testUrl,testResult1d.typeOfTest))
-    assert((cleanedListArray(1).testUrl, cleanedListArray(1).typeOfTest) == (testResult1m.testUrl,testResult1m.typeOfTest))
-    assert((cleanedListArray(2).testUrl, cleanedListArray(2).typeOfTest) == (testResult2m.testUrl,testResult2m.typeOfTest))
-    assert((cleanedListArray(3).testUrl, cleanedListArray(3).typeOfTest) == (testResult3d.testUrl,testResult3d.typeOfTest))
-    assert((cleanedListArray(4).testUrl, cleanedListArray(4).typeOfTest) == (testResult4d.testUrl,testResult4d.typeOfTest))
-    assert((cleanedListArray(5).testUrl, cleanedListArray(5).typeOfTest) == (testResult4m.testUrl,testResult4m.typeOfTest))
-    assert((cleanedListArray(6).testUrl, cleanedListArray(6).typeOfTest) == (testResult5d.testUrl,testResult5d.typeOfTest))
-    assert((cleanedListArray(7).testUrl, cleanedListArray(7).typeOfTest) == (testResult6d.testUrl,testResult6d.typeOfTest))
-    assert((cleanedListArray(8).testUrl, cleanedListArray(8).typeOfTest) == (testResult6m.testUrl,testResult6m.typeOfTest))
-  }
-
-  "When removeDuplicates is called on a list with no duplicates it" should "return an identical list" in {
-    val cleanedList = prevResults.removeDuplicates(oldResultList)
-    assert(cleanedList == oldResultList)
-  }
-
+  
 
   "Getting data from results file" should " allow me to repopulate data from tests" in {
     //Create new S3 Client
