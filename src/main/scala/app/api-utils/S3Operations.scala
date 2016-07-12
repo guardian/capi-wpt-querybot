@@ -180,7 +180,9 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
         println("\n\n\n Element Array \n" + elementArray.map(element => element.toString + "\n"))
         val elementList = getElementListFromArray(elementArray)
         if(elementList.nonEmpty) {
+          if (elementArray(0) != "0"){
           result.populateEditorialElementList(elementList)
+          }
         }
         result.setHeadline(Option(data(2)))
         result.setPageType(data(3))

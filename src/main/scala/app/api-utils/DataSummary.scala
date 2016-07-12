@@ -30,7 +30,8 @@ look through data - what are the main embeds
 
  */
   val timeNow = DateTime.now
-  val today = timeNow.getDayOfMonth
+  val today = timeNow.getDayOfYear
+  val yesterday = timeNow.minusDays(1).getDayOfYear
 
   val durationOfRunMs = timeNow.getMillis - jobStarted.getMillis
   val durationOfRunS = durationOfRunMs.toDouble/1000
@@ -39,13 +40,13 @@ look through data - what are the main embeds
   val previousResultsHandler = previousResultsObject
 
   val resultsFromRun: List[PerformanceResultsObject] = latestResults
-  val previousResults: List[PerformanceResultsObject] = previousResultsHandler.oldResults
+  val previousResults: List[PerformanceResultsObject] = previousResultsHandler.fullResultsList
   val allResults: List[PerformanceResultsObject] = resultsFromRun ::: previousResults
   val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = previousResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageWeight)
   val hasPreviouslyAlertedOnSpeed: List[PerformanceResultsObject] = previousResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageSpeed)
 
-  val todaysResults = for (result <- allResults if DateTime.parse(result.timeOfTest).getDayOfMonth == today) yield result
-  val yesterdaysResults = for (result <- allResults if DateTime.parse(result.timeOfTest).getDayOfMonth != today) yield result
+  val todaysResults = for (result <- allResults if DateTime.parse(result.timeOfTest).getDayOfYear == today) yield result
+  val yesterdaysResults = for (result <- allResults if DateTime.parse(result.timeOfTest).getDayOfYear != yesterday) yield result
 
   val activePageWeightAlerts = resultsFromRun.filter(_.alertStatusPageWeight)
   val activePageSpeedAlerts = resultsFromRun.filter(_.alertStatusPageSpeed)
@@ -58,8 +59,19 @@ look through data - what are the main embeds
   val pageSpeedAlertsThatHaveBeenResolved = for (result <- hasPreviouslyAlertedOnSpeed if !activePageSpeedAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl,result.typeOfTest))) yield result
   val pageSpeedAlertsResolvedForUnderweightPages = pageSpeedAlertsThatHaveBeenResolved.filter(!_.alertStatusPageWeight)
 
-  val numberOfPageWeightAlertsResolvedLast24Hrs = pageWeightAlertsThatHaveBeenResolved.length
-  val numberOfPageSpeedAlertsResolvedLast24Hrs = pageSpeedAlertsThatHaveBeenResolved.length
+  // todo - Need some way of persisting these values
+  val numberOfPageWeightAlertsResolvedThisRun = pageWeightAlertsThatHaveBeenResolved.length
+  val numberOfPageSpeedAlertsResolvedThisRun = pageSpeedAlertsThatHaveBeenResolved.length
+  val numberOfPageSpeedAlertsResolvedForUnderWeightPagesThisRun = pageSpeedAlertsThatHaveBeenResolved.length
+
+  // todo - Use persisted values from previous runs
+  //val numberOfPageWeightAlertsResolvedLast24Hrs = numberOfPageWeightAlertsResolvedThisRun + Some_value_we_store
+  //val numberOfPageSpeedAlertsResolvedLast24Hrs = numberOfPageSpeedAlertsResolvedThisRun + Some_value_we_store
+  //val numberOfPageSpeedAlertsResolvedForUnderWeightPagesLast24Hrs = numberOfPageSpeedAlertsResolvedForUnderWeightPagesThisRun + Some_value_we_store
+
+  //val numberOfPageWeightAlertsResolvedSoFar = numberOfPageWeightAlertsResolvedThisRun + Some_value_we_store
+  //val numberOfPageSpeedAlertsResolvedSoFar = numberOfPageSpeedAlertsResolvedThisRun + Some_value_we_store
+  //val numberOfPageSpeedAlertsResolvedForUnderWeightPagesSoFar = numberOfPageSpeedAlertsResolvedForUnderWeightPagesThisRun + Some_value_we_store
 
   val fulllistOfElementsFromPageWeightAlertPages: List[PageElementFromHTMLTableRow] = sortPageElementByWeight((newPageWeightAlerts ::: hasPreviouslyAlertedOnWeight).flatMap(_.fullElementList))
   val fulllistOfElementsFromPageSpeedAlertPages: List[PageElementFromHTMLTableRow] = sortPageElementBySpeed((newPageSpeedAlerts ::: hasPreviouslyAlertedOnSpeed).flatMap(_.fullElementList))
@@ -80,30 +92,30 @@ look through data - what are the main embeds
   }
 
  /* def identifyPageElementType(element: PageElementFromHTMLTableRow): String = {
-    val audioBoomCss = List("audioboom_core", "audioboom_styles")
-    val audioBoomImages = List("audioboom_color")
+    val audioBoomFurniture = List("audioboom")
     val audioBoomAudioFile = List("audio_clip_id")
     val brightcove = List("bcsecure", "player.h-cdn.com/loader.js")
     val cnn = List("cnn")
     val dailymotion = List("dailymotion")
-    val formstack = ""
-    val googlemaps = ""
-    val guardianComments = ""
-    val guardianVideos = ""
-    val guardianWitnessText = ""
-    val guardianWitnessImage = ""
-    val guardianWitnessVideo = ""
-    val hulu = ""
-    val infostrada = ""
-    val scribd = ""
+    val formstack = List("formstack")
+    val googlemaps = List("maps.google.com")
+    val guardianComments = List("comment-permalink","profile.theguardian.com", "avatar.guim.co.uk/user")
+    val guardianVideos = List("cdn.theguardian.tv")
+    val guardianImages = List("i.guim.co.uk/img/media/")
+    val guardianWitnessText = "" - cant see anything
+    val guardianWitnessImage = List("n0tice-static.s3.amazonaws.com/image/")
+    val guardianWitnessVideo = List("https://n0tice-static.s3.amazonaws.com/video/thumbnails", "googlevideo.com")
+    val hulu = need a sample page - cant find a working embed""
+    val infostrada = need a sample page ""
+    val scribd = need a sample page""
     val soundCloud = ""
     val spotifySong = ""
     val spotifyAlbum = ""
     val spotifyPlaylists = ""
-    val twitter = ""
+    val twitter = List("twitter")
     val vimeo = ""
     val vine = ""
-    val youTube = ""
+    val youTube = List("ytimg")
     val parliamentliveTv = ""
     val facebook = ""
     val instagram = ""
