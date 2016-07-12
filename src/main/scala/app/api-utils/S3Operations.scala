@@ -180,8 +180,8 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
         println("\n\n\n Element Array \n" + elementArray.map(element => element.toString + "\n"))
         val elementList = getElementListFromArray(elementArray)
         if(elementList.nonEmpty) {
-          println("ElementArray 2 as an in" + elementArray(2).toInt)
-          println("Data 9 as an in" + data(9).toInt)
+          println("ElementArray 2: " + elementArray(2))
+          println("Data 9: " + data(9))
           if ((elementArray(2).toInt > 0) || (data(9).toInt > -1)){
           result.populateEditorialElementList(elementList)
           }
