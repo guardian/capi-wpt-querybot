@@ -178,12 +178,12 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
         //todo - get element list
         val elementArray = data.drop(20)
         println("\n\n\n Element Array \n" + elementArray.map(element => element.toString + "\n"))
+        if ((elementArray(2).toInt > 0) || (data(9).toInt > -1)){
         val elementList = getElementListFromArray(elementArray)
         if(elementList.nonEmpty) {
-          println("ElementArray 2: " + elementArray(2))
-          println("Data 9: " + data(9))
-          if ((elementArray(2).toInt > 0) || (data(9).toInt > -1)){
-          result.populateEditorialElementList(elementList)
+            {
+            result.populateEditorialElementList(elementList)
+            }
           }
         }
         result.setHeadline(Option(data(2)))
