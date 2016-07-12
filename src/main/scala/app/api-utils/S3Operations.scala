@@ -177,11 +177,14 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           data(19).toBoolean)
         //todo - get element list
         val elementArray = data.drop(20)
-        println("\n\n\n Element Array \n" + elementArray.map(element => element.toString + "\n"))
-        if ((elementArray(2).toInt > 0) || (data(9).toInt > -1)){
+        println("\n\n\n  **** Element Array pulled from file \n" + "length = " + elementArray.length +
+          "contents: \n" + elementArray.mkString + "\n ***************\n")
+        if ((elementArray(2).toInt > 0) && (data(9).toInt > -1)){
+        println("calling getElementListFromArray")
         val elementList = getElementListFromArray(elementArray)
         if(elementList.nonEmpty) {
             {
+             println("calling populateEditorialElementsList. \n elementList to be passed is:\n" + elementList.map(element => element.toHTMLRowString() + "\n"))
             result.populateEditorialElementList(elementList)
             }
           }
@@ -211,19 +214,48 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       var elementList: List[PageElementFromHTMLTableRow] = List()
       while(index < length-1){
         println("index = " + index)
-        val newElement: PageElementFromHTMLTableRow = new PageElementFromParameters(elementArray(index),
-          elementArray(index+1),
-          elementArray(index+2).toInt,
-          elementArray(index+3).toInt,
-          elementArray(index+4).toInt,
-          elementArray(index+5).toInt,
-          elementArray(index+6).toInt,
-          elementArray(index+7).toInt,
-          elementArray(index+8).toInt,
-          elementArray(index+9).toInt,
-          elementArray(index+10)).convertToPageElementFromHTMLTableRow()
-        elementList = elementList ::: List(newElement)
-        index = index + 11
+        println("\n\n\n\n******* building element \n " +
+          "Index" + elementArray(index) + "\n" +
+          "Index +1" + elementArray(index+1) + "\n" +
+          "Index +2 " + elementArray(index+2) + "\n" +
+          "Index +3 " + elementArray(index+3) + "\n" +
+          "Index +4 " + elementArray(index+4) + "\n" +
+          "Index +5 " + elementArray(index+5) + "\n" +
+          "Index +6 " + elementArray(index+6) + "\n" +
+          "Index +7 " + elementArray(index+7) + "\n" +
+          "Index +8 " + elementArray(index+8) + "\n" +
+          "Index +9 " + elementArray(index+9) + "\n" +
+          "Index +10 " + elementArray(index+10) + "\n" +
+          "\n ********* \n\n\n\n")
+        if((elementArray(index+2).length > 8) || elementArray(index+2).matches("-")){
+          val newElement: PageElementFromHTMLTableRow = new PageElementFromParameters(elementArray(index) + elementArray(index + 1),
+          elementArray(index + 2),
+          elementArray(index + 3).toInt,
+          elementArray(index + 4).toInt,
+          elementArray(index + 5).toInt,
+          elementArray(index + 6).toInt,
+          elementArray(index + 7).toInt,
+          elementArray(index + 8).toInt,
+          elementArray(index + 9).toInt,
+          elementArray(index + 10).toInt,
+          elementArray(index + 11)).convertToPageElementFromHTMLTableRow()
+          elementList = elementList ::: List(newElement)
+          index = index + 12
+        }else {
+          val newElement: PageElementFromHTMLTableRow = new PageElementFromParameters(elementArray(index),
+            elementArray(index + 1),
+            elementArray(index + 2).toInt,
+            elementArray(index + 3).toInt,
+            elementArray(index + 4).toInt,
+            elementArray(index + 5).toInt,
+            elementArray(index + 6).toInt,
+            elementArray(index + 7).toInt,
+            elementArray(index + 8).toInt,
+            elementArray(index + 9).toInt,
+            elementArray(index + 10)).convertToPageElementFromHTMLTableRow()
+          elementList = elementList ::: List(newElement)
+          index = index + 11
+        }
       }
       println("\n\nElementList Populated. \nLength of list: " + elementList.length)
       println("Element List Contents: \n" + elementList.map(element => element.toCSVString() + "\n"))

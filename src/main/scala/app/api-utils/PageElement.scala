@@ -175,7 +175,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
   val errorStatusCodeClassname: String = "reqResult"
   val iPClassname: String = "reqIP"
 
-  val cleanString: String = htmlTableRow.replaceAll("<tr>","").replaceAll("</tr>", "").replaceAll(" odd","").replaceAll(" even","").replaceAll("Render", "").replaceAll("Doc","").replaceAll(" warning", "").replaceAll(" error", "")
+  val cleanString: String = htmlTableRow.replaceAll("<tr>","").replaceAll("</tr>", "").replaceAll(" odd","").replaceAll(" even","").replaceAll("Render", "").replaceAll("Doc","").replaceAll(" warning", "").replaceAll(" error", "").replaceAll(",", "")
 
   val resourceHTMLElement: String = getDataFromHTMLTableElement(cleanString, resourceClassname)
 

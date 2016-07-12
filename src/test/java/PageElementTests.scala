@@ -1,4 +1,6 @@
+import app.api.S3Operations
 import app.apiutils.{PageElementFromHTMLTableRow, WebPageTest, PageElement, LocalFileOperations}
+import org.joda.time.DateTime
 import org.scalatest._
 
 import scala.io.Source
@@ -10,9 +12,29 @@ import scala.io.Source
   OptionValues with Inside with Inspectors
 
   class PageElementTests extends UnitSpec with Matchers {
+    //Create new S3 Client
+    val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
+    val s3BucketName = "capi-wpt-querybot"
+    val configFileName = "config.conf"
+    val emailFileName = "addresses.conf"
+
+    println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
+    val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
+    var configArray: Array[String] = Array("", "", "", "", "", "")
+    var urlFragments: List[String] = List()
+
+    println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
+    val returnTuple = s3Interface.getConfig
+    configArray = Array(returnTuple._1,returnTuple._2,returnTuple._3,returnTuple._4,returnTuple._5,returnTuple._6,returnTuple._7)
+    urlFragments = returnTuple._8
+
+    val contentApiKey: String = configArray(0)
+    val wptBaseUrl: String = configArray(1)
+    val wptApiKey: String = configArray(2)
+    val wptLocation: String = configArray(3)
 
     "A pageElementList" should "contain page elements" in {
-      val wpt = new WebPageTest("foo", "bar", List())
+      val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
 
       var htmlString: String = ""
       for (line <- Source.fromFile("webpagetestresultdetails.html").getLines()) {
@@ -26,7 +48,7 @@ import scala.io.Source
     }
 
     "A non-empty pageElementList" should "contain page elements that have non-empty values" in {
-      val wpt = new WebPageTest("foo", "bar", List())
+      val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
 
       var htmlString: String = ""
       for (line <- Source.fromFile("webpagetestresultdetails.html").getLines()) {
@@ -54,7 +76,7 @@ import scala.io.Source
     }
 
     "A sorted pageElementList" should "be sorted in order of largest bytesDownloaded to smallest" in {
-      val wpt = new WebPageTest("foo", "bar", List())
+      val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
 
       var htmlString: String = ""
       for (line <- Source.fromFile("webpagetestresultdetails.html").getLines()) {
@@ -77,6 +99,12 @@ import scala.io.Source
       assert(isordered)
     }
 
+    "A list of elements from results" should "not contain any commas" in {
+      val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
+      val result = wpt.getResults("http://wpt.gu-web.net/xmlResult/160708_D4_ZK/")
+      assert(!result.editorialElementList.map(element => element.resource).contains(","))
+
+    }
  
   }
 
