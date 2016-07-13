@@ -450,7 +450,8 @@ object App {
 
 //record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
-    val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
+//    val resultsToRecord = (combinedResultsForFile ::: previousTestResultsHandler.recentButNoRetestRequired ::: previousTestResultsHandler.oldResults).distinct
+val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
     println("\n\n\n ***** There are " +  resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 

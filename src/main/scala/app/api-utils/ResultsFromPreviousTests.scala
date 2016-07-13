@@ -166,10 +166,10 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
       urlAndResultListFragment
     })
 
-    val resultsWithElementListAdded = resultsWithNoPageElements.flatMap(result => {
+    val resultsWithElementListAdded: List[PerformanceResultsObject] = resultsWithNoPageElements.flatMap(result => {
       for (urlSet <- urlAndResults if urlSet._1.contains(result.testUrl)) yield {
-        if(result.typeOfTest.contains("Desktop")){
-          val newResult = getResult(urlSet._2, wptBaseUrl, wptApiKey, urlFragments)
+        if(urlSet._1.contains("wpt.gu-web.net")){
+          val newResult = getResult(urlSet._1, wptBaseUrl, wptApiKey, urlFragments)
           newResult.headline = result.headline
           newResult.pageType = result.pageType
           newResult.firstPublished = result.firstPublished
@@ -179,26 +179,40 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
           newResult.alertStatusPageSpeed = result.alertStatusPageSpeed
           newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
           newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
-
-          println("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
-          println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
           newResult
-      } else {
-          val newResult = getResult(urlSet._3, wptBaseUrl, wptApiKey, urlFragments)
-          newResult.headline = result.headline
-          newResult.pageType = result.pageType
-          newResult.firstPublished = result.firstPublished
-          newResult.pageLastUpdated = result.pageLastUpdated
-          newResult.liveBloggingNow = result.liveBloggingNow
-          newResult.alertStatusPageWeight = result.alertStatusPageWeight
-          newResult.alertStatusPageSpeed = result.alertStatusPageSpeed
-          newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
-          newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
+        } else {
+          if (result.typeOfTest.contains("Desktop")) {
+            val newResult = getResult(urlSet._2, wptBaseUrl, wptApiKey, urlFragments)
+            newResult.headline = result.headline
+            newResult.pageType = result.pageType
+            newResult.firstPublished = result.firstPublished
+            newResult.pageLastUpdated = result.pageLastUpdated
+            newResult.liveBloggingNow = result.liveBloggingNow
+            newResult.alertStatusPageWeight = result.alertStatusPageWeight
+            newResult.alertStatusPageSpeed = result.alertStatusPageSpeed
+            newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
+            newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
 
-          println("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
-          println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
-          newResult
+            println("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
+            println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
+            newResult
+          } else {
+            val newResult = getResult(urlSet._3, wptBaseUrl, wptApiKey, urlFragments)
+            newResult.headline = result.headline
+            newResult.pageType = result.pageType
+            newResult.firstPublished = result.firstPublished
+            newResult.pageLastUpdated = result.pageLastUpdated
+            newResult.liveBloggingNow = result.liveBloggingNow
+            newResult.alertStatusPageWeight = result.alertStatusPageWeight
+            newResult.alertStatusPageSpeed = result.alertStatusPageSpeed
+            newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
+            newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
 
+            println("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
+            println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
+            newResult
+
+          }
         }
      }
     })
@@ -217,9 +231,13 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   def sendResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String, String)] = {
     val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
     val resultList: List[(String, String, String)] = urlList.map(url => {
-      val desktopResult: String = wpt.sendPage(url)
-      val mobileResult: String = wpt.sendMobile3GPage(url, wptLocation)
-      (url, desktopResult, mobileResult)
+        if(url.contains("wpt.gu-web.net")){
+          (url, url, url)
+        } else {
+          val desktopResult: String = wpt.sendPage(url)
+          val mobileResult: String = wpt.sendMobile3GPage(url, wptLocation)
+          (url, desktopResult, mobileResult)
+        }
       })
     resultList
   }
