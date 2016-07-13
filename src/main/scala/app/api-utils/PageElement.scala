@@ -19,10 +19,87 @@ abstract  class PageElement {
   lazy val sizeInKB: Double = roundAt(3)(bytesDownloaded.toDouble/1024.0)
   lazy val sizeInMB: Double = roundAt(3)(bytesDownloaded.toDouble/(1024.0 * 1024.0))
 
+
+  def identifyPageElementType(): String = {
+    val audioBoom = List("audioboom","audio_clip_id")
+    val brightcove = List("bcsecure", "player.h-cdn.com")
+    val cnn = List("cnn.com","z.cdn.turner.com")
+    val dailymotion = List("dailymotion","dmcdn")
+    val formstack = List("formstack")
+    val googlemaps = List("maps.google.com", "maps.gstatic.com", "maps.googleapis.com", "www.google.com/maps")
+    val guardianComments = List("comment-permalink","profile.theguardian.com", "avatar.guim.co.uk/user")
+    val guardianVideos = List("cdn.theguardian.tv")
+    val guardianImages = List("i.guim.co.uk/img/media/")
+    val guardianWitnessImage = List("n0tice-static.s3.amazonaws.com/image/")
+    val guardianWitnessVideo = List("https://n0tice-static.s3.amazonaws.com/video/thumbnails", "googlevideo.com")
+    val hulu = List("hulu", "embed.ly")
+    val infostrada = List("infostrada")
+    val scribd = List("scribd")
+    val soundCloud = List("sndcdn.com", "soundcloud")
+    val spotify = List("scdn.co", "spotify")
+    val twitter = List("twitter","twimg.com")
+    val vimeo = List("vimeocdn", "vimeo.com")
+    val vine = List("vine.co")
+    val youTube = List("ytimg")
+    val parliamentLiveTv = List("parliamentlive.tv", "kaltura")
+    val facebook = List("facebook","fbcdn")
+    val instagram = List("instagram","instagramstatic","cdninstagram")
+    val uStream = List("ustream")
+    val documentCloud = List("documentcloud")
+    val otherAudio = List(".mp3")
+    val otherVideo = List(".mp4")
+
+    var returnString = "unknownElement"
+
+    if(listContainsText(resource, otherAudio)){returnString = "Audio Embed"}
+    if(listContainsText(resource, otherVideo)){returnString = "Video Embed"}
+    if(listContainsText(resource, audioBoom)){returnString = "audioBoom"}
+    if(listContainsText(resource, brightcove)){returnString = "brightcove"}
+    if(listContainsText(resource, cnn)){returnString = "cnn"}
+    if(listContainsText(resource, dailymotion)){returnString = "dailymotion"}
+    if(listContainsText(resource, formstack)){returnString = "formstack"}
+    if(listContainsText(resource, googlemaps)){returnString = "googlemaps"}
+    if(listContainsText(resource, guardianComments)){returnString = "guardianComments"}
+    if(listContainsText(resource, guardianVideos)){returnString = "guardianVideos"}
+    if(listContainsText(resource, guardianImages)){returnString = "guardianImages"}
+    if(listContainsText(resource, guardianWitnessImage)){returnString = "guardianWitnessImage"}
+    if(listContainsText(resource, guardianWitnessVideo)){returnString = "guardianWitnessVideo"}
+    if(listContainsText(resource, hulu)){returnString = "hulu"}
+    if(listContainsText(resource, infostrada)){returnString = "infostrada"}
+    if(listContainsText(resource, scribd)){returnString = "scribd"}
+    if(listContainsText(resource, soundCloud)){returnString = "soundCloud"}
+    if(listContainsText(resource, spotify)){returnString = "spotify"}
+    if(listContainsText(resource, twitter)){returnString = "twitter"}
+    if(listContainsText(resource, vimeo)){returnString = "vimeo"}
+    if(listContainsText(resource, vine)){returnString = "vine"}
+    if(listContainsText(resource, youTube)){returnString = "youTube"}
+    if(listContainsText(resource, parliamentLiveTv)){returnString = "parliamentLiveTv"}
+    if(listContainsText(resource, facebook)){returnString = "facebook"}
+    if(listContainsText(resource, instagram)){returnString = "instagram"}
+    if(listContainsText(resource, uStream)){returnString = "uStream"}
+    if(listContainsText(resource, documentCloud)){returnString = "documentCloud"}
+
+    returnString
+  }
+
+  def listContainsText(text: String, stringList: List[String]): Boolean = {
+    val checkList = stringList.map(stringText => stringText.contains(text))
+    checkList.contains(true)
+  }
+
+
   def toHTMLTableRow(): String = {
+    val determinedResourceType = identifyPageElementType()
+    val contentTypeToDisplay = {if(determinedResourceType.contains("unknownElement")){
+        contentType
+      } else {
+      determinedResourceType
+      }
+    }
+
     "<tr>" +
       "<td>" + "<a href=\"" + resource + "\">" + resource + "</a>" + "</td>" +
-      "<td>" + contentType + "</td>" +
+      "<td>" + contentTypeToDisplay + "</td>" +
       "<td>" + requestStart.toString + "ms</td>" +
       "<td>" + dnsLookUp + "ms</td>" +
       "<td>" + initialConnection + "ms</td>" +
@@ -214,6 +291,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
 //    println("\nGetDataFromHTMLTableElement Called: \n" + "classname = " + classname + "\n" + "returnString = " + returnString)
     returnString
   }
+
   def returnString():String = {
     val returnString:String  = "Resource: " + resource + ", \n" +
       "Content VisualsElementType: " + contentType + ", \n" +
@@ -285,9 +363,8 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
       tableNormalCellEmailTag + sizeInKB + "KB</td>" +
       "</tr>"
     returnString
-
-
   }
+
 
 }
 

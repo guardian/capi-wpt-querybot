@@ -73,11 +73,68 @@ look through data - what are the main embeds
   //val numberOfPageSpeedAlertsResolvedSoFar = numberOfPageSpeedAlertsResolvedThisRun + Some_value_we_store
   //val numberOfPageSpeedAlertsResolvedForUnderWeightPagesSoFar = numberOfPageSpeedAlertsResolvedForUnderWeightPagesThisRun + Some_value_we_store
 
-  val fulllistOfElementsFromPageWeightAlertPages: List[PageElementFromHTMLTableRow] = sortPageElementByWeight((newPageWeightAlerts ::: hasPreviouslyAlertedOnWeight).flatMap(_.fullElementList))
-  val fulllistOfElementsFromPageSpeedAlertPages: List[PageElementFromHTMLTableRow] = sortPageElementBySpeed((newPageSpeedAlerts ::: hasPreviouslyAlertedOnSpeed).flatMap(_.fullElementList))
 
-  val sortedlistOfElementsFromPageWeightAlertPages: List[PageElementFromHTMLTableRow] = sortPageElementByWeight((newPageWeightAlerts ::: hasPreviouslyAlertedOnWeight).flatMap(result => result.trimToEditorialElements(result.fullElementList)))
-  val sortedlistOfElementsFromPageSpeedAlertPages: List[PageElementFromHTMLTableRow] = sortPageElementBySpeed((newPageSpeedAlerts ::: hasPreviouslyAlertedOnSpeed).flatMap(result => result.trimToEditorialElements(result.fullElementList)))
+  val pagesWithAudioBoomEmbed = allResults.filter(pageContainsElementType(_, "audioBoom"))
+  val pagesWithBrightcoveEmbed = allResults.filter(pageContainsElementType(_, "brightcove"))
+  val pagesWithCNNEmbed = allResults.filter(pageContainsElementType(_, "cnn"))
+  val pagesWithDailyMotionEmbed = allResults.filter(pageContainsElementType(_, "dailymotion"))
+  val pagesWithFormStackEmbed = allResults.filter(pageContainsElementType(_, "formstack"))
+  val pagesWithGoogleMapsEmbed = allResults.filter(pageContainsElementType(_, "googlemaps"))
+  val pagesWithGuardianCommentsEmbed = allResults.filter(pageContainsElementType(_, "guardianComments"))
+  val pagesWithGuardianVideos = allResults.filter(pageContainsElementType(_, "guardianVideos"))
+  val pagesWithGuardianImages = allResults.filter(pageContainsElementType(_, "guardianImages"))
+  val pagesWithGuardianWitnessImageEmbed = allResults.filter(pageContainsElementType(_, "guardianWitnessImage"))
+  val pagesWithGuardianWitnessVideoEmbed = allResults.filter(pageContainsElementType(_, "guardianWitnessVideo"))
+  val pagesWithHuluEmbed = allResults.filter(pageContainsElementType(_, "hulu"))
+  val pagesWithInfoStradaEmbed = allResults.filter(pageContainsElementType(_, "infostrada"))
+  val pagesWithScribdEmbed = allResults.filter(pageContainsElementType(_, "scribd"))
+  val pagesWithSoundCloudEmbed = allResults.filter(pageContainsElementType(_, "soundcloud"))
+  val pagesWithSpotifyEmbed = allResults.filter(pageContainsElementType(_, "spotify"))
+  val pagesWithTwitterEmbed = allResults.filter(pageContainsElementType(_, "twitter"))
+  val pagesWithVimeoEmbed = allResults.filter(pageContainsElementType(_, "vimeo"))
+  val pagesWithYouTubeEmbed = allResults.filter(pageContainsElementType(_, "youTube"))
+  val pagesWithParliamentLiveTvEmbed = allResults.filter(pageContainsElementType(_, "parliamentLiveTv"))
+  val pagesWithFacebookEmbed = allResults.filter(pageContainsElementType(_, "facebook"))
+  val pagesWithInstagramEmbed = allResults.filter(pageContainsElementType(_, "instagram"))
+  val pagesWithUStreamEmbed = allResults.filter(pageContainsElementType(_, "uStream"))
+  val pagesWithDocumentCloudEmbed = allResults.filter(pageContainsElementType(_, "documentCloud"))
+  val pagesWithUnknownAudioEmbed = allResults.filter(pageContainsElementType(_, "Audio Embed"))
+  val pagesWithUnknownVideoEmbed = allResults.filter(pageContainsElementType(_, "Video Embed"))
+
+  val fullListOfEditorialElements = allResults.flatMap(result => result.editorialElementList)
+  val mapOfElementsByType = fullListOfEditorialElements.groupBy(_.identifyPageElementType())
+
+  val audioBoom: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("audioBoom", List())
+  val brightcove: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("brightcove", List())
+  val cnn: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("cnn", List())
+  val dailymotion: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("dailymotion", List())
+  val formstack: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("formstack", List())
+  val googlemaps: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("googlemaps", List())
+  val guardianComments: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("guardianComments", List())
+  val guardianVideos: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("guardianVideos", List())
+  val guardianImages: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("guardianImages", List())
+  val guardianWitnessImage: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("guardianWitnessImage", List())
+  val guardianWitnessVideo: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("guardianWitnessVideo", List())
+  val hulu: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("hulu", List())
+  val infostrada: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("infostrada", List())
+  val scribd: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("scribd", List())
+  val soundCloud: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("soundCloud", List())
+  val spotify: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("spotify", List())
+  val twitter: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("twitter", List())
+  val vimeo: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("vimeo", List())
+  val vine: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("vine", List())
+  val youTube: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("youTube", List())
+  val parliamentLiveTv: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("parliamentLiveTv", List())
+  val facebook: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("facebook", List())
+  val instagram: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("instagram", List())
+  val uStream: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("uStream", List())
+  val documentCloud: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("documentCloud", List())
+  val otherAudio: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("Audio Embed", List())
+  val otherVideo: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("Video Embed", List())
+  val unknownElement: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("unknownElement", List())
+
+
+
 
   def sortPageElementByWeight(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] ={
     elementList.sortWith(_.bytesDownloaded > _.bytesDownloaded)
@@ -88,46 +145,16 @@ look through data - what are the main embeds
   }
 
   def sortPageElementByType(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
-    elementList
+    elementList.sortWith(_.identifyPageElementType() > _.identifyPageElementType())
   }
 
- /* def identifyPageElementType(element: PageElementFromHTMLTableRow): String = {
-    val audioBoomFurniture = List("audioboom")
-    val audioBoomAudioFile = List("audio_clip_id")
-    val brightcove = List("bcsecure", "player.h-cdn.com/loader.js")
-    val cnn = List("cnn")
-    val dailymotion = List("dailymotion")
-    val formstack = List("formstack")
-    val googlemaps = List("maps.google.com")
-    val guardianComments = List("comment-permalink","profile.theguardian.com", "avatar.guim.co.uk/user")
-    val guardianVideos = List("cdn.theguardian.tv")
-    val guardianImages = List("i.guim.co.uk/img/media/")
-    val guardianWitnessText = "" - cant see anything
-    val guardianWitnessImage = List("n0tice-static.s3.amazonaws.com/image/")
-    val guardianWitnessVideo = List("https://n0tice-static.s3.amazonaws.com/video/thumbnails", "googlevideo.com")
-    val hulu = need a sample page - cant find a working embed""
-    val infostrada = need a sample page ""
-    val scribd = need a sample page""
-    val soundCloud = ""
-    val spotifySong = ""
-    val spotifyAlbum = ""
-    val spotifyPlaylists = ""
-    val twitter = List("twitter")
-    val vimeo = ""
-    val vine = ""
-    val youTube = List("ytimg")
-    val parliamentliveTv = ""
-    val facebook = ""
-    val instagram = ""
-    val uStream = ""
-    val documentCloud = ""
-    val audio = List(".mp3")
-    val otherVideo = List(".mp4")
-    match(element.resource){
-      case
-    }
+  def pageContainsElementType(result: PerformanceResultsObject, typeName: String): Boolean = {
+    val checkEditorialElementsList = result.editorialElementList.map(_.identifyPageElementType().contains(typeName))
+    val checkFullElementList = result.fullElementList.map(_.identifyPageElementType().contains(typeName))
+    checkEditorialElementsList.contains(true) || checkFullElementList.contains(true)
+  }
 
-  }*/
+ 
 
 
 
