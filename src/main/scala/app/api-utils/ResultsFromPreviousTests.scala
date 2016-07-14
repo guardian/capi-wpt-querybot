@@ -23,6 +23,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if result.needsRetest()) yield result
   val recentButNoRetestRequired: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if !result.needsRetest()) yield result
   val hasPreviouslyAlerted: List[PerformanceResultsObject] = for (result <- previousResultsToRetest if result.alertStatusPageWeight || result.alertStatusPageSpeed) yield result
+  val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = previousResultsToRetest.filter(_.alertStatusPageWeight)
 
   val desktopPreviousResultsToReTest = for (result <- previousResultsToRetest if result.typeOfTest.contains("Desktop")) yield result
   val mobilePreviousResultsToReTest = for (result <- previousResultsToRetest if result.typeOfTest.contains("Android/3G")) yield result
