@@ -25,6 +25,7 @@ object App {
     println("Job started at: " + DateTime.now)
     println("Local Testing Flag is set to: " + iamTestingLocally.toString)
 
+    val jobStart = DateTime.now
     //  Define names of s3bucket, configuration and output Files
     val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
     val s3BucketName = "capi-wpt-querybot"
@@ -568,7 +569,10 @@ object App {
     } else {
       println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
     }
-    println("Job complete")
+    val jobFinish = DateTime.now()
+    val timeTaken = (jobFinish.getMillis - jobStart.getMillis).toDouble/(1000*60)
+    val numberOfPagesTested = urlsToSend.length
+    println("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.\n Job tested: " + numberOfPagesTested + " pages.")
   }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
@@ -614,6 +618,7 @@ object App {
     })
     val testResults = resultsList.map(element => element.testResults).toList
     val resultsWithAlerts: List[PerformanceResultsObject] = testResults.map(element => setAlertStatus(element, averages))
+
 
     //Confirm alert status by retesting alerting urls
     println("Confirming any items that have an alert")
