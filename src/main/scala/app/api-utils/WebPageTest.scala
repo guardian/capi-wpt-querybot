@@ -334,8 +334,8 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       testResults = scala.xml.XML.loadString(response.body.string)
     }
     if ((testResults \\ "statusCode").text.toInt == 200) {
-      //Add one final request as occasionally 200 code comes before the data we want.
-      Thread.sleep(5000)
+      println("Add one final request as occasionally 200 code comes before the data we want.")
+      Thread.sleep(15000)
       response = httpClient.newCall(request).execute()
       testResults = scala.xml.XML.loadString(response.body.string)
       if ((testResults \\ "response" \ "data" \ "successfulFVRuns").text.toInt > 0) {
