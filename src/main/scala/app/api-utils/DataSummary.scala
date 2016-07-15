@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 28/06/16.
  */
-class DataSummary(jobStarted: DateTime,numberOfPagesTested: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests) {
+class DataSummary(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesTested: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests) {
 /*
 Data summary
 Its time to take note of pages tested each run,
@@ -29,13 +29,32 @@ look through data - what are the main embeds
                   - which embeds are most associated with pageSpeed alert
 
  */
+//current run tab metrics
   val timeNow = DateTime.now
   val today = timeNow.getDayOfYear
   val yesterday = timeNow.minusDays(1).getDayOfYear
 
+  val jobStartedTime: Int
+  val jobFinishTime: Int
   val durationOfRunMs = timeNow.getMillis - jobStarted.getMillis
   val durationOfRunS = durationOfRunMs.toDouble/1000
   val durationOfRunMin = durationOfRunS/60
+
+  //last run
+
+  - job finished at
+  - time taken from start to finish
+    - number of pages pulled from capi
+    - number of pages sent from previous runs
+  - number of wpt jobs sent
+  - number of pageWeight alerts raised on non-interactive content
+    - number of pageSpeed alerts raised on non-interactive content
+    - number of page speed alerts raised where content was underweight
+    - number of interactives tested
+    - number of alerts raised on interactives
+    - number of failed tests
+
+
 
   val previousResultsHandler = previousResultsObject
 
@@ -154,7 +173,8 @@ look through data - what are the main embeds
     checkEditorialElementsList.contains(true) || checkFullElementList.contains(true)
   }
 
- 
+
+  
 
 
 
