@@ -12,10 +12,10 @@ import org.joda.time.DateTime
 
 class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
-  val fullResultsList = resultsList
+  //val fullResultsList = resultsList
 
   val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
-  val previousResults: List[PerformanceResultsObject] = resultsList.distinct
+  val previousResults: List[PerformanceResultsObject] = removeDuplicates(resultsList)
 
   val resultsFromLast24Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime) yield result
   val oldResults = for (result <- previousResults if result.mostRecentUpdate < cutoffTime) yield result
@@ -48,12 +48,12 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     for (result <- resultsList if !hasPreviouslyAlerted.map(_.testUrl).contains(result.testUrl)) yield result
   }
 
- /* def removeDuplicates(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
-  //  val emptyResultList: List[PerformanceResultsObject] = List()
-  //  cleanList(results, emptyResultList)
-  }
+  /*def removeDuplicates(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    val emptyResultList: List[PerformanceResultsObject] = List()
+    cleanList(results, emptyResultList)
+  }*/
 
-  def cleanList(inputList: List[PerformanceResultsObject], expurgatedList: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+  /*def cleanList(inputList: List[PerformanceResultsObject], expurgatedList: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
    if (inputList.isEmpty) {
      val emptyResultList: List[PerformanceResultsObject] = List()
      emptyResultList
@@ -66,18 +66,29 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
    }
   }*/
 
-  def isResultPresent(result: PerformanceResultsObject, resultList: List[PerformanceResultsObject]): Boolean = {
-    resultList.map(test => (test.testUrl, test.typeOfTest)).contains((result.testUrl,result.typeOfTest))
+  def removeDuplicates(inputList: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    //val inputListArray = inputList.toArray
+    val cleanList: List[PerformanceResultsObject] = for (result <- inputList if !isResultADupe(result, inputList )) yield result
+    cleanList
+  }
+
+  def isResultADupe(result: PerformanceResultsObject, resultList: List[PerformanceResultsObject]): Boolean = {
+    if(resultList.isEmpty){
+      false
+    } else {
+      val resultIncidenceCount: Int = resultList.map(test => (test.testUrl, test.typeOfTest)).count(_ == (result.testUrl, result.typeOfTest))
+      resultIncidenceCount > 1
+    }
   }
 
 
   //query full list
   def returnAllPageWeightAlerts(): List[PerformanceResultsObject] = {
-    fullResultsList.filter(_.alertStatusPageWeight)
+    previousResults.filter(_.alertStatusPageWeight)
   }
 
   def returnAllPageSpeedAlerts(): List[PerformanceResultsObject] = {
-    fullResultsList.filter(_.alertStatusPageSpeed)
+    previousResults.filter(_.alertStatusPageSpeed)
   }
 
   def returnPageSpeedAlertsWithinSizeLimits(): List[PerformanceResultsObject] = {
