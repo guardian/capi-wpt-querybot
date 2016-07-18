@@ -573,7 +573,16 @@ object App {
     val timeTaken = (jobFinish.getMillis - jobStart.getMillis).toDouble/(1000*60)
     val numberOfPagesTested = urlsToSend.length
     println("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.\n Job tested: " + numberOfPagesTested + " pages.")
-  }
+    println("Breakdown of pages tested: \n" +
+    pagesToRetest.length + " pages retested from previous run\n" +
+    articleUrls.length + " Article pages returned from CAPI\n" +
+    liveBlogUrls.length + " LiveBlog pages returned from CAPI\n" +
+    interactiveUrls.length + " Interactive pages returned from CAPI")
+    println("Breakdown of alerts: \n" +
+    articlePageWeightAlertList.length + " Article pageWeight alerts\n" +
+    liveBlogPageWeightAlertList.length + " LiveBlog pageWeight alerts\n" +
+    interactivePageWeightAlertList.length + " Interactive pageWeight alerts\n" +
+    interactiveAlertList.length + " Interactive weight or perfromance alerts.")
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
     val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
