@@ -109,7 +109,6 @@ object App {
     //  var frontsCSVResults: String = ""
 
 
-
     //Create new S3 Client
     println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
@@ -121,7 +120,7 @@ object App {
     if (!iamTestingLocally) {
       println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
       val returnTuple = s3Interface.getConfig
-      configArray = Array(returnTuple._1,returnTuple._2,returnTuple._3,returnTuple._4,returnTuple._5,returnTuple._6,returnTuple._7)
+      configArray = Array(returnTuple._1, returnTuple._2, returnTuple._3, returnTuple._4, returnTuple._5, returnTuple._6, returnTuple._7)
       urlFragments = returnTuple._8
     }
     else {
@@ -164,18 +163,18 @@ object App {
 
     //obtain list of items previously alerted on
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
-/*    val localInput = new LocalFileOperations
+    /*    val localInput = new LocalFileOperations
     val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
     val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
-    println("\n\n\n ***** There are " +  previousTestResultsHandler.fullResultsList.length + " previous results in file  ********* \n\n\n")
+    println("\n\n\n ***** There are " + previousTestResultsHandler.fullResultsList.length + " previous results in file  ********* \n\n\n")
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
-//    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
+    //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
 
     //validate list handling
     val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
     val visualPagesString: String = s3Interface.getVisualsFileFromS3(visualsPagesFileName)
     val jsonHandler: JSONOperations = new JSONOperations
- //   val visualPagesSeq: Seq[Visuals] = jsonHandler.stringToVisualsPages(visualPagesString)
+    //   val visualPagesSeq: Seq[Visuals] = jsonHandler.stringToVisualsPages(visualPagesString)
     val visualPagesSeq: Seq[Visuals] = Seq()
 
     val untestedVisualsTeamPages: List[Visuals] = (for (visual <- visualPagesSeq if !previousResults.map(_.testUrl).contains(visual.pageUrl)) yield visual).toList
@@ -186,12 +185,12 @@ object App {
     //  Define new CAPI Query object
     val capiQuery = new ArticleUrls(contentApiKey)
     //get all content-type-lists
-    val articles: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Article")
-    val liveBlogs: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("LiveBlog")
-    val interactives: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Interactive")
-    val fronts:  List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Front")
-    val videoPages: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Video")
-    val audioPages: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Audio")
+    val articles: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Article")
+    val liveBlogs: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("LiveBlog")
+    val interactives: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Interactive")
+    val fronts: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Front")
+    val videoPages: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Video")
+    val audioPages: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Audio")
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
 
@@ -212,13 +211,13 @@ object App {
 
     //val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
 
- //todo - work in visuals list
- //   val visualsCapiResults = for(result <- combinedCapiResults if untestedVisualsTeamPagesFromToday.map(_.pageUrl).contains(result._2)) yield result
- //   val nonVisualsCapiResults = for(result <- combinedCapiResults if !untestedVisualsTeamPagesFromToday.map(_.pageUrl).contains(result._2)) yield result
+    //todo - work in visuals list
+    //   val visualsCapiResults = for(result <- combinedCapiResults if untestedVisualsTeamPagesFromToday.map(_.pageUrl).contains(result._2)) yield result
+    //   val nonVisualsCapiResults = for(result <- combinedCapiResults if !untestedVisualsTeamPagesFromToday.map(_.pageUrl).contains(result._2)) yield result
 
- //   val nonCAPIResultsToRetest = for (result <- previousResultsToRetest if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
+    //   val nonCAPIResultsToRetest = for (result <- previousResultsToRetest if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
 
-//    val dedupedResultsToRetestUrls: List[String] = for (result <- nonCAPIResultsToRetest) yield result.testUrl
+    //    val dedupedResultsToRetestUrls: List[String] = for (result <- nonCAPIResultsToRetest) yield result.testUrl
     val pagesToRetest: List[String] = previousResultsToRetest.map(_.testUrl)
     val articleUrls: List[String] = for (page <- newOrChangedArticles) yield page._2
     val liveBlogUrls: List[String] = for (page <- newOrChangedLiveBlogs) yield page._2
@@ -246,9 +245,9 @@ object App {
     val previousLiveBlogReTestContentFieldsAndUrl = previousLiveBlogsToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), result.testUrl))
     val previousInteractiveReTestContentFieldsAndUrl = previousInteractivesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), result.testUrl))
 
-    val combinedArticleList: List[(Option[ContentFields],String)] = previousArticlesReTestContentFieldsAndUrl ::: newOrChangedArticles
-    val combinedLiveBlogList: List[(Option[ContentFields],String)] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
-    val combinedInteractiveList: List[(Option[ContentFields],String)] = previousInteractiveReTestContentFieldsAndUrl ::: newOrChangedInteractives
+    val combinedArticleList: List[(Option[ContentFields], String)] = previousArticlesReTestContentFieldsAndUrl ::: newOrChangedArticles
+    val combinedLiveBlogList: List[(Option[ContentFields], String)] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
+    val combinedInteractiveList: List[(Option[ContentFields], String)] = previousInteractiveReTestContentFieldsAndUrl ::: newOrChangedInteractives
 
 
     //obtain results for articles
@@ -269,7 +268,7 @@ object App {
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
       val sortedByWeightArticleResultsList = orderListByWeight(articleResultsWithAnchor)
       val sortedBySpeedArticleResultsList = orderListBySpeed(articleResultsWithAnchor)
-      if(sortedByWeightArticleResultsList.isEmpty || sortedBySpeedArticleResultsList.isEmpty) {
+      if (sortedByWeightArticleResultsList.isEmpty || sortedBySpeedArticleResultsList.isEmpty) {
         println("Sorting algorithm for articles has returned empty list. Aborting")
         System exit 1
       }
@@ -313,7 +312,7 @@ object App {
       println("\n \n \n liveBlog tests complete. \n tested " + liveBlogResultsWithAnchor.length + "pages")
       println("Total number of results gathered so far " + combinedResultsList.length + "pages")
       val sortedLiveBlogResultsList = orderListByWeight(liveBlogResultsWithAnchor)
-      if(sortedLiveBlogResultsList.isEmpty) {
+      if (sortedLiveBlogResultsList.isEmpty) {
         println("Sorting algorithm for Liveblogs has returned empty list. Aborting")
         System exit 1
       }
@@ -345,7 +344,7 @@ object App {
 
     if (combinedInteractiveList.nonEmpty) {
       println("Generating average values for interactives")
-//      val interactiveAverages: PageAverageObject = generateInteractiveAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
+      //      val interactiveAverages: PageAverageObject = generateInteractiveAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
       val interactiveAverages: PageAverageObject = new InteractiveDefaultAverages(averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
@@ -358,7 +357,7 @@ object App {
       println("\n \n \n interactive tests complete. \n tested " + interactiveResultsWithAnchor.length + "pages")
       println("Total number of results gathered so far " + combinedResultsList.length + "pages")
       val sortedInteractiveResultsList = orderListByWeight(interactiveResultsWithAnchor)
-      if(sortedInteractiveResultsList.isEmpty) {
+      if (sortedInteractiveResultsList.isEmpty) {
         println("Sorting algorithm has returned empty list. Aborting")
         System exit 1
       }
@@ -430,7 +429,7 @@ object App {
       println("CAPI query found no Fronts")
     }*/
 
-    val sortedByWeightCombinedResults: List[PerformanceResultsObject] = orderListByWeight(combinedResultsList :::  previousTestResultsHandler.recentButNoRetestRequired)
+    val sortedByWeightCombinedResults: List[PerformanceResultsObject] = orderListByWeight(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Desktop")) yield result
     val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
     println("\n \n \n Combining lists of results and sorting for dashboard pages.")
@@ -449,22 +448,22 @@ object App {
     val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
     val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
 
-//record results
+    //record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
     val resultsToRecord = (combinedResultsForFile ::: previousTestResultsHandler.recentButNoRetestRequired ::: previousTestResultsHandler.oldResults).distinct
-//val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
-    println("\n\n\n ***** There are " +  resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
+    //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
+    println("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 
-//Generate Lists for sortBySpeed combined pages
+    //Generate Lists for sortBySpeed combined pages
     val sortedBySpeedCombinedResults: List[PerformanceResultsObject] = orderListBySpeed(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
     val sortedBySpeedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedDesktopResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
-    val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedMobileResultsList :::  previousTestResultsHandler.recentButNoRetestRequired)
+    val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedMobileResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
 
-//Generate Lists for interactive pages
-    val combinedInteractiveResultsList = for (result <- combinedResultsList :::  previousTestResultsHandler.recentButNoRetestRequired  if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
-    val interactiveDesktopResults = for (result <- combinedDesktopResultsList :::  previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
-    val interactiveMobileResults = for (result <- combinedMobileResultsList :::  previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
+    //Generate Lists for interactive pages
+    val combinedInteractiveResultsList = for (result <- combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
+    val interactiveDesktopResults = for (result <- combinedDesktopResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
+    val interactiveMobileResults = for (result <- combinedMobileResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
 
     val sortedInteractiveCombinedResults: List[PerformanceResultsObject] = orderInteractivesBySpeed(combinedInteractiveResultsList)
     val sortedInteractiveDesktopResults: List[PerformanceResultsObject] = sortHomogenousInteractiveResultsBySpeed(interactiveDesktopResults)
@@ -476,64 +475,64 @@ object App {
     val interactiveDashboardMobile = new InteractiveDashboardMobile(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
 
     val pageWeightAlertsPreviouslyFixed = s3Interface.getResultsFileFromS3("alertsthathavebeenfixed.csv")
-    val pageWeightAlertsFixedThisRun = for (alert <- previousTestResultsHandler.hasPreviouslyAlertedOnWeight if !(articlePageWeightAlertList ::: liveBlogPageWeightAlertList ::: interactivePageWeightAlertList).map(result => (result.testUrl, result.typeOfTest)).contains((alert.testUrl,alert.typeOfTest))) yield alert
+    val pageWeightAlertsFixedThisRun = for (alert <- previousTestResultsHandler.hasPreviouslyAlertedOnWeight if !(articlePageWeightAlertList ::: liveBlogPageWeightAlertList ::: interactivePageWeightAlertList).map(result => (result.testUrl, result.typeOfTest)).contains((alert.testUrl, alert.typeOfTest))) yield alert
     val pageWeightAlertsFixedCSVString = (pageWeightAlertsFixedThisRun ::: pageWeightAlertsPreviouslyFixed).map(_.toCSVString()).mkString
 
-    val listOfDupes = for (result <- sortedByWeightCombinedResults if sortedByWeightCombinedResults.count(_ == result) > 1 ) yield result
+    val listOfDupes = for (result <- sortedByWeightCombinedResults if sortedByWeightCombinedResults.count(_ == result) > 1) yield result
 
-    if(listOfDupes.nonEmpty) {
+    if (listOfDupes.nonEmpty) {
       println("\n\n\n\n ******** Duplicates found in results! ****** \n Found " + listOfDupes.length + " duplicates")
       println("Duplicate urls are: \n" + listOfDupes.map(result => "url: " + result.testUrl + " TestType: " + result.typeOfTest + "\n"))
     }
 
-      //write combined results to file
-      if (!iamTestingLocally) {
-        println(DateTime.now + " Writing liveblog results to S3")
-        s3Interface.writeFileToS3(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
-        s3Interface.writeFileToS3(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
-        s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard.toString())
-        s3Interface.writeFileToS3(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
-        s3Interface.writeFileToS3(interactiveDashboardFilename, interactiveDashboard.toString())
-        s3Interface.writeFileToS3(interactiveDashboardDesktopFilename, interactiveDashboardDesktop.toString())
-        s3Interface.writeFileToS3(interactiveDashboardMobileFilename, interactiveDashboardMobile.toString())
-        s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
-        s3Interface.writeFileToS3(alertsThatHaveBeenFixed, pageWeightAlertsFixedCSVString)
-        s3Interface.writeFileToS3(duplicateResultList, listOfDupes.map(_.toCSVString()).mkString)
+    //write combined results to file
+    if (!iamTestingLocally) {
+      println(DateTime.now + " Writing liveblog results to S3")
+      s3Interface.writeFileToS3(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
+      s3Interface.writeFileToS3(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
+      s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard.toString())
+      s3Interface.writeFileToS3(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
+      s3Interface.writeFileToS3(interactiveDashboardFilename, interactiveDashboard.toString())
+      s3Interface.writeFileToS3(interactiveDashboardDesktopFilename, interactiveDashboardDesktop.toString())
+      s3Interface.writeFileToS3(interactiveDashboardMobileFilename, interactiveDashboardMobile.toString())
+      s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
+      s3Interface.writeFileToS3(alertsThatHaveBeenFixed, pageWeightAlertsFixedCSVString)
+      s3Interface.writeFileToS3(duplicateResultList, listOfDupes.map(_.toCSVString()).mkString)
+    }
+    else {
+      val outputWriter = new LocalFileOperations
+      val writeSuccessPWDC: Int = outputWriter.writeLocalResultFile(editorialPageweightFilename, editorialPageWeightDashboard.toString())
+      if (writeSuccessPWDC != 0) {
+        println("problem writing local outputfile")
+        System exit 1
       }
-      else {
-        val outputWriter = new LocalFileOperations
-        val writeSuccessPWDC: Int = outputWriter.writeLocalResultFile(editorialPageweightFilename, editorialPageWeightDashboard.toString())
-        if (writeSuccessPWDC != 0) {
-          println("problem writing local outputfile")
-          System exit 1
-        }
-        val writeSuccessPWDD: Int = outputWriter.writeLocalResultFile(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
-        if (writeSuccessPWDD != 0) {
-          println("problem writing local outputfile")
-          System exit 1
-        }
-        val writeSuccessPWDM: Int = outputWriter.writeLocalResultFile(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
-        if (writeSuccessPWDM != 0) {
-          println("problem writing local outputfile")
-          System exit 1
-        }
-        val writeSuccessDCPSD: Int = outputWriter.writeLocalResultFile(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
-        if (writeSuccessDCPSD != 0) {
-          println("problem writing local outputfile")
-          System exit 1
-        }
-        val writeSuccessIPSD: Int = outputWriter.writeLocalResultFile(interactiveDashboardFilename, interactiveDashboard.toString())
-        if (writeSuccessIPSD != 0) {
-          println("problem writing local outputfile")
-          System exit 1
-        }
-        val writeSuccessAlertsRecord: Int = outputWriter.writeLocalResultFile(resultsFromPreviousTests, resultsToRecordCSVString)
-        if (writeSuccessAlertsRecord != 0) {
-          println("problem writing local outputfile")
-          System exit 1
-        }
+      val writeSuccessPWDD: Int = outputWriter.writeLocalResultFile(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
+      if (writeSuccessPWDD != 0) {
+        println("problem writing local outputfile")
+        System exit 1
+      }
+      val writeSuccessPWDM: Int = outputWriter.writeLocalResultFile(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
+      if (writeSuccessPWDM != 0) {
+        println("problem writing local outputfile")
+        System exit 1
+      }
+      val writeSuccessDCPSD: Int = outputWriter.writeLocalResultFile(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
+      if (writeSuccessDCPSD != 0) {
+        println("problem writing local outputfile")
+        System exit 1
+      }
+      val writeSuccessIPSD: Int = outputWriter.writeLocalResultFile(interactiveDashboardFilename, interactiveDashboard.toString())
+      if (writeSuccessIPSD != 0) {
+        println("problem writing local outputfile")
+        System exit 1
+      }
+      val writeSuccessAlertsRecord: Int = outputWriter.writeLocalResultFile(resultsFromPreviousTests, resultsToRecordCSVString)
+      if (writeSuccessAlertsRecord != 0) {
+        println("problem writing local outputfile")
+        System exit 1
+      }
 
-      }
+    }
 
 
 
@@ -541,25 +540,25 @@ object App {
     val newArticlePageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(articlePageWeightAlertList)
     val newLiveBlogPageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(liveBlogPageWeightAlertList)
     val newInteractivePageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(interactivePageWeightAlertList)
-//    val newFrontsPageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(frontsPageWeightAlertList)
+    //    val newFrontsPageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(frontsPageWeightAlertList)
     val newInteractiveAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(interactiveAlertList)
 
     val alertsToSend = newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList
     if (alertsToSend.nonEmpty) {
       println("There are new pageWeight alerts to send! There are " + alertsToSend + " new alerts")
-      val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename )
+      val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
       val pageWeightEmailSuccess = emailer.sendPageWeightAlert(generalAlertsAddressList, pageWeightEmailAlerts.toString())
       if (pageWeightEmailSuccess)
         println(DateTime.now + " Page-Weight Alert Emails sent successfully. ")
       else
         println(DateTime.now + "ERROR: Sending of Page-Weight Alert Emails failed")
-    }else {
+    } else {
       println("No pages to alert on Page-Weight. Email not sent.")
     }
 
     if (newInteractiveAlertsList.nonEmpty) {
       println("There are new interactive email alerts to send - length of list is: " + newInteractiveAlertsList.length)
-      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractiveAlertsList, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename )
+      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractiveAlertsList, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
       val interactiveEmailSuccess = emailer.sendInteractiveAlert(interactiveAlertsAddressList, interactiveEmailAlerts.toString())
       if (interactiveEmailSuccess) {
         println("Interactive Alert email sent successfully.")
@@ -570,19 +569,20 @@ object App {
       println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
     }
     val jobFinish = DateTime.now()
-    val timeTaken = (jobFinish.getMillis - jobStart.getMillis).toDouble/(1000*60)
+    val timeTaken = (jobFinish.getMillis - jobStart.getMillis).toDouble / (1000 * 60)
     val numberOfPagesTested = urlsToSend.length
     println("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.\n Job tested: " + numberOfPagesTested + " pages.")
     println("Breakdown of pages tested: \n" +
-    pagesToRetest.length + " pages retested from previous run\n" +
-    articleUrls.length + " Article pages returned from CAPI\n" +
-    liveBlogUrls.length + " LiveBlog pages returned from CAPI\n" +
-    interactiveUrls.length + " Interactive pages returned from CAPI")
+      pagesToRetest.length + " pages retested from previous run\n" +
+      articleUrls.length + " Article pages returned from CAPI\n" +
+      liveBlogUrls.length + " LiveBlog pages returned from CAPI\n" +
+      interactiveUrls.length + " Interactive pages returned from CAPI")
     println("Breakdown of alerts: \n" +
-    articlePageWeightAlertList.length + " Article pageWeight alerts\n" +
-    liveBlogPageWeightAlertList.length + " LiveBlog pageWeight alerts\n" +
-    interactivePageWeightAlertList.length + " Interactive pageWeight alerts\n" +
-    interactiveAlertList.length + " Interactive weight or perfromance alerts.")
+      articlePageWeightAlertList.length + " Article pageWeight alerts\n" +
+      liveBlogPageWeightAlertList.length + " LiveBlog pageWeight alerts\n" +
+      interactivePageWeightAlertList.length + " Interactive pageWeight alerts\n" +
+      interactiveAlertList.length + " Interactive weight or perfromance alerts.")
+  }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
     val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
