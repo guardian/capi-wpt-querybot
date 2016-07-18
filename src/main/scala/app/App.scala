@@ -610,7 +610,7 @@ object App {
 
     val resultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
-      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields,element.wptResultUrl)
+      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields, element.wptResultUrl)
       println("getting result for page element")
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
       println("result received\n setting headline")
@@ -629,9 +629,11 @@ object App {
     val testResults = resultsList.map(element => element.testResults).toList
     val resultsWithAlerts: List[PerformanceResultsObject] = testResults.map(element => setAlertStatus(element, averages))
 
-
-    //Confirm alert status by retesting alerting urls
-    println("Confirming any items that have an alert")
+    resultsWithAlerts
+  }
+    //Confirm alert status by retesting alerting urls - this has been removed as an attempt to reduce excessive load on the revised
+    // - much cheaper and less powerful testing agents
+    /*println("Confirming any items that have an alert")
     val confirmedTestResults = resultsWithAlerts.map(x => {
       if (x.alertStatusPageWeight || (x.timeFirstPaintInMs == -1)) {
         val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, urlFragments, wptBaseUrl, wptApiKey ,wptLocation)
@@ -646,7 +648,8 @@ object App {
         x
     })
     confirmedTestResults
-  }
+
+  }*/
 
   def confirmAlert(initialResult: PerformanceResultsObject, averages: PageAverageObject, urlFragments: List[String],wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject = {
     val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)

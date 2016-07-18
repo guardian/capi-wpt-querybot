@@ -1,5 +1,6 @@
-import app.api.S3Operations
-import app.apiutils.{WebPageTest, EmailOperations, ResultsFromPreviousTests, PerformanceResultsObject}
+import app.HtmlReportBuilder
+import app.api.{JSONOperations, S3Operations}
+import app.apiutils._
 import com.gu.contentapi.client.model.v1.{MembershipTier, Office, ContentFields, CapiDateTime}
 import org.joda.time.DateTime
 import org.scalatest._
@@ -106,7 +107,229 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
     assert(prevResults.checkConsistency())
   }
 
-  "Remove duplicates function" should "work as expected" in {
+  "messing with capi queries etc " should "gimmie what I want what I really really want" in {
+
+    val iamTestingLocally = false
+    /*#####################################################################################*/
+    println("Job started at: " + DateTime.now)
+    println("Local Testing Flag is set to: " + iamTestingLocally.toString)
+
+    val jobStart = DateTime.now
+    //  Define names of s3bucket, configuration and output Files
+    val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
+    val s3BucketName = "capi-wpt-querybot"
+    val configFileName = "config.conf"
+    val emailFileName = "addresses.conf"
+    val interactiveSampleFileName = "interactivesamples.conf"
+    val visualsPagesFileName = "visuals.conf"
+
+    val articleOutputFilename = "articleperformancedata.html"
+    val liveBlogOutputFilename = "liveblogperformancedata.html"
+    val interactiveOutputFilename = "interactiveperformancedata.html"
+    val frontsOutputFilename = "frontsperformancedata.html"
+    val editorialPageweightFilename = "editorialpageweightdashboard.html"
+    val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
+    val editorialMobilePageweightFilename = "editorialpageweightdashboardmobile.html"
+
+    val dotcomPageSpeedFilename = "dotcompagespeeddashboard.html"
+
+    val interactiveDashboardFilename = "interactivedashboard.html"
+    val interactiveDashboardDesktopFilename = "interactivedashboarddesktop.html"
+    val interactiveDashboardMobileFilename = "interactivedashboardmobile.html"
+
+    val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
+    val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
+    val interactiveResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + interactiveOutputFilename
+    val frontsResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + frontsOutputFilename
+
+    val articleCSVName = "accumulatedArticlePerformanceData.csv"
+    val liveBlogCSVName = "accumulatedLiveblogPerformanceData.csv"
+    val interactiveCSVName = "accumulatedInteractivePerformanceData.csv"
+    val videoCSVName = "accumulatedVideoPerformanceData.csv"
+    val audioCSVName = "accumulatedAudioPerformanceData.csv"
+    val frontsCSVName = "accumulatedFrontsPerformanceData.csv"
+
+    val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+
+
+    val alertsThatHaveBeenFixed = "alertsthathavebeenfixed.csv"
+    val duplicateResultList = "duplicateresultsfromlastrun.csv"
+
+
+    //Define colors to be used for average values, warnings and alerts
+    val averageColor: String = "#d9edf7"
+    //    val warningColor: String = "#fcf8e3"
+    val warningColor: String = "rgba(227, 251, 29, 0.32)"
+    val alertColor: String = "#f2dede"
+
+    //initialize combinedResultsLists - these will be used to sort and accumulate test results
+    // for the combined page and for long term storage file
+    var combinedResultsList: List[PerformanceResultsObject] = List()
+
+    //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
+    val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
+    val newhtmlString = new HtmlReportBuilder(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
+    var articleResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
+    var liveBlogResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
+    var interactiveResults: String = htmlString.initialisePageForInteractive + htmlString.interactiveTable
+    var frontsResults: String = htmlString.initialisePageForFronts + htmlString.initialiseTable
+    var audioResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
+    var videoResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
+
+    //Initialize Page-Weight email alerts lists - these will be used to generate emails
+
+    var articlePageWeightAlertList: List[PerformanceResultsObject] = List()
+    var liveBlogPageWeightAlertList: List[PerformanceResultsObject] = List()
+    var interactivePageWeightAlertList: List[PerformanceResultsObject] = List()
+    var frontsPageWeightAlertList: List[PerformanceResultsObject] = List()
+    var audioPageWeightAlertList: List[PerformanceResultsObject] = List()
+    var videoPageWeightAlertList: List[PerformanceResultsObject] = List()
+
+    var pageWeightAnchorId: Int = 0
+
+    //Initialize Interactive email alerts lists - these will be used to generate emails
+    var interactiveAlertList: List[PerformanceResultsObject] = List()
+
+    // var articleCSVResults: String = ""
+    //  var liveBlogCSVResults: String = ""
+    // var interactiveCSVResults: String = ""
+    //  var videoCSVResults: String = ""
+    //  var audioCSVResults: String = ""
+    //  var frontsCSVResults: String = ""
+
+
+    //Create new S3 Client
+    println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
+    val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
+    var configArray: Array[String] = Array("", "", "", "", "", "")
+    var urlFragments: List[String] = List()
+
+    //Get config settings
+    println("Extracting configuration values")
+    if (!iamTestingLocally) {
+      println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
+      val returnTuple = s3Interface.getConfig
+      configArray = Array(returnTuple._1, returnTuple._2, returnTuple._3, returnTuple._4, returnTuple._5, returnTuple._6, returnTuple._7)
+      urlFragments = returnTuple._8
+    }
+    else {
+      println(DateTime.now + " retrieving local config file: " + configFileName)
+      val configReader = new LocalFileOperations
+      configArray = configReader.readInConfig(configFileName)
+    }
+    println("checking validity of config values")
+    if ((configArray(0).length < 1) || (configArray(1).length < 1) || (configArray(2).length < 1) || (configArray(3).length < 1)) {
+      println("problem extracting config\n" +
+        "contentApiKey length: " + configArray(0).length + "\n" +
+        "wptBaseUrl length: " + configArray(1).length + "\n" +
+        "wptApiKey length: " + configArray(2).length + "\n" +
+        "wptLocation length: " + configArray(3).length + "\n" +
+        "emailUsername length: " + configArray(4).length + "\n" +
+        "emailPassword length: " + configArray(5).length) + "\n" +
+        "visuals URL length: " + configArray(6).length
+
+      System exit 1
+    }
+    println("config values ok")
+    val contentApiKey: String = configArray(0)
+    val wptBaseUrl: String = configArray(1)
+    val wptApiKey: String = configArray(2)
+    val wptLocation: String = configArray(3)
+    val emailUsername: String = configArray(4)
+    val emailPassword: String = configArray(5)
+    val visualsApiUrl: String = configArray(6)
+
+    //obtain list of email addresses for alerting
+    val emailAddresses: Array[List[String]] = s3Interface.getEmailAddresses
+    val generalAlertsAddressList: List[String] = emailAddresses(0)
+    val interactiveAlertsAddressList: List[String] = emailAddresses(1)
+
+    //Create Email Handler class
+    val emailer: EmailOperations = new EmailOperations(emailUsername, emailPassword)
+
+    //obtain list of interactive samples to determine average size
+    //val listofLargeInteractives: List[String] = s3Interface.getUrls(interactiveSampleFileName)
+
+    //obtain list of items previously alerted on
+    val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    /*    val localInput = new LocalFileOperations
+    val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
+    val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
+    println("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
+    val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
+    //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
+
+    //validate list handling
+    val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
+    val visualPagesString: String = s3Interface.getVisualsFileFromS3(visualsPagesFileName)
+    val jsonHandler: JSONOperations = new JSONOperations
+    //   val visualPagesSeq: Seq[Visuals] = jsonHandler.stringToVisualsPages(visualPagesString)
+    val visualPagesSeq: Seq[Visuals] = Seq()
+
+    val untestedVisualsTeamPages: List[Visuals] = (for (visual <- visualPagesSeq if !previousResults.map(_.testUrl).contains(visual.pageUrl)) yield visual).toList
+    val untestedVisualsTeamPagesFromToday: List[Visuals] = for (visual <- untestedVisualsTeamPages if visual.pageWebPublicationDate.dateTime >= cutoffTime) yield visual
+
+
+
+    //  Define new CAPI Query object
+    val capiQuery = new ArticleUrls(contentApiKey)
+    //get all content-type-lists
+    val articles: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Article")
+    val liveBlogs: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("LiveBlog")
+    val interactives: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Interactive")
+    val fronts: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Front")
+    val videoPages: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Video")
+    val audioPages: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Audio")
+    println(DateTime.now + " Closing Content API query connection")
+    capiQuery.shutDown
+
+    println("CAPI call summary: \n")
+    println("Retrieved: " + articles.length + " article pages")
+    println("Retrieved: " + liveBlogs.length + " liveblog pages")
+    println("Retrieved: " + interactives.length + " intearactive pages")
+    println("Retrieved: " + fronts.length + " fronts")
+    println("Retrieved: " + videoPages.length + " video pages")
+    println("Retrieved: " + audioPages.length + " audio pages")
+    println((articles.length + liveBlogs.length + interactives.length + fronts.length + videoPages.length + audioPages.length) + " pages returned in total")
+
+    val newOrChangedArticles = previousTestResultsHandler.returnPagesNotYetTested(articles)
+    val newOrChangedLiveBlogs = previousTestResultsHandler.returnPagesNotYetTested(liveBlogs)
+    val newOrChangedInteractives = previousTestResultsHandler.returnPagesNotYetTested(interactives)
+    val newOrChangedVideoPages = previousTestResultsHandler.returnPagesNotYetTested(videoPages)
+    val newOrChangedAudioPages = previousTestResultsHandler.returnPagesNotYetTested(audioPages)
+
+    //val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
+
+    //todo - work in visuals list
+    //   val visualsCapiResults = for(result <- combinedCapiResults if untestedVisualsTeamPagesFromToday.map(_.pageUrl).contains(result._2)) yield result
+    //   val nonVisualsCapiResults = for(result <- combinedCapiResults if !untestedVisualsTeamPagesFromToday.map(_.pageUrl).contains(result._2)) yield result
+
+    //   val nonCAPIResultsToRetest = for (result <- previousResultsToRetest if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
+
+    //    val dedupedResultsToRetestUrls: List[String] = for (result <- nonCAPIResultsToRetest) yield result.testUrl
+    val pagesToRetest: List[String] = previousResultsToRetest.map(_.testUrl)
+    val articleUrls: List[String] = for (page <- newOrChangedArticles) yield page._2
+    val liveBlogUrls: List[String] = for (page <- newOrChangedLiveBlogs) yield page._2
+    val interactiveUrls: List[String] = for (page <- newOrChangedInteractives) yield page._2
+    val frontsUrls: List[String] = for (page <- fronts) yield page._2
+    val videoUrls: List[String] = for (page <- newOrChangedVideoPages) yield page._2
+    val audioUrls: List[String] = for (page <- newOrChangedAudioPages) yield page._2
+
+    //get all pages from the visuals team api
+
+
+    // sendPageWeightAlert all urls to webpagetest at once to enable parallel testing by test agents
+    val urlsToSend: List[String] = (pagesToRetest ::: articleUrls ::: liveBlogUrls ::: interactiveUrls).distinct
+    println("Combined list of urls: \n" + urlsToSend)
+
+    println("\n\n\n\n\n******   sizes of all the things! *******" )
+    println("size of pages to retest = " + pagesToRetest.length)
+    println("size of article urls from CAPI = " + articleUrls.length)
+    println("size of liveblog urls from CAPI = " + liveBlogUrls.length)
+    println("size of interactive urls from CAPI = " + interactiveUrls.length)
+  }
+
+/*  "Remove duplicates function" should "work as expected" in {
     //Create new S3 Client
     val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
     val s3BucketName = "capi-wpt-querybot"
@@ -167,7 +390,7 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
       }
     }
     assert(allIsWell)
-  }
+  }*/
 
 /*  "Getting data from results file" should " allow me to repopulate data from tests" in {
     //Create new S3 Client
