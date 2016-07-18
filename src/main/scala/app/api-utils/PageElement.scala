@@ -181,12 +181,12 @@ abstract  class PageElement {
       "<td class=\"" + errorStatusCodeClassname + "\">" + errorStatusCode + "</td>" +
       "<td class=\"" + iPClassname + "\">" + iP + "</td>" +
       "</tr>"
-    println("\n\n\n returning element as HTML String: \n" + returnString + "\n\n\n")
+    println("returning element as HTML String")
     returnString
   }
 
   def convertToPageElementFromHTMLTableRow():PageElementFromHTMLTableRow = {
-    println("\n\n\n\n converting PageElement to be from HTMLROW: \n" + returnAsHTMLString() + "\n\n\n")
+    println("converting PageElement to be from HTMLROW.")
     new PageElementFromHTMLTableRow(returnAsHTMLString())
   }
 
