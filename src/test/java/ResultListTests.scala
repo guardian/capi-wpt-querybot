@@ -106,8 +106,70 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
     assert(prevResults.checkConsistency())
   }
 
+  "Remove duplicates function" should "work as expected" in {
+    //Create new S3 Client
+    val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
+    val s3BucketName = "capi-wpt-querybot"
+    val configFileName = "config.conf"
+    val emailFileName = "addresses.conf"
 
-  "Getting data from results file" should " allow me to repopulate data from tests" in {
+    println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
+    val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
+    var configArray: Array[String] = Array("", "", "", "", "", "")
+    var urlFragments: List[String] = List()
+
+    println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
+    val returnTuple = s3Interface.getConfig
+    configArray = Array(returnTuple._1,returnTuple._2,returnTuple._3,returnTuple._4,returnTuple._5,returnTuple._6,returnTuple._7)
+    urlFragments = returnTuple._8
+
+    val contentApiKey: String = configArray(0)
+    val wptBaseUrl: String = configArray(1)
+    val wptApiKey: String = configArray(2)
+    val wptLocation: String = configArray(3)
+
+
+
+     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    //    val resultsFromPreviousTests = "resultsFromPreviousTestsTest.csv"
+    //    val resultsFromPreviousTestsTestVersion = "resultsFromPreviousTestsTestOutput.csv"
+    //   val resultsFromPreviousTests = "elementtestinput.csv"
+    //   val resultsFromPreviousTestsTestVersion = "elementtestoutput.csv"
+    //val resultsFromPreviousTests = "elementtestoutput.csv"
+    val resultsFromPreviousTestsTestVersion = "elementtestoutputresuts.csv"
+    val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
+
+    val originalLength = previousResults.length
+    val listOfDupes = for (result <- previousTestResultsHandler.previousResults if previousTestResultsHandler.previousResults.map(page => (page.testUrl, page.typeOfTest)).count(_ == (result.testUrl,result.typeOfTest)) > 1) yield result
+    var duplicatesPresent = false
+    var allIsWell = false
+
+    if (listOfDupes.nonEmpty) {
+      println("\n\n\n\n ******** Duplicates found in previous results file! ****** \n Found " + listOfDupes.length + " duplicates")
+      duplicatesPresent = true
+    }
+    val dedupedList = previousTestResultsHandler.removeDuplicates(previousTestResultsHandler.previousResults)
+    if (duplicatesPresent && dedupedList.length < originalLength){
+      println("duplicates found and deduped list has been shortened")
+      println("checking for dupes")
+      val secondTestForDupes = for (result <- dedupedList if dedupedList.map(page => (page.testUrl, page.typeOfTest)).count(_ == (result.testUrl,result.typeOfTest)) > 1) yield result
+      if(secondTestForDupes.isEmpty){
+        println("couldn't find any more dupes - we cleaned them all!")
+        allIsWell = true
+      } else{
+        println("remove dupes did not remove all dupes")
+      }
+    } else{
+      if(!duplicatesPresent && dedupedList.length == originalLength){
+        allIsWell = true
+        println("no duplicates found")
+      }
+    }
+    assert(allIsWell)
+  }
+
+/*  "Getting data from results file" should " allow me to repopulate data from tests" in {
     //Create new S3 Client
     val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
     val s3BucketName = "capi-wpt-querybot"
@@ -161,7 +223,7 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
     val resultsToRecordCSVString: String = resurrectedResults.map(_.toCSVString()).mkString
     s3Interface.writeFileToS3(resultsFromPreviousTestsTestVersion, resultsToRecordCSVString)
     assert(s3Interface.doesFileExist(resultsFromPreviousTestsTestVersion))
-  }
+  }*/
 
   def getResult(friendlyUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String] ): PerformanceResultsObject = {
     val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
