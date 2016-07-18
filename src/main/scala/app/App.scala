@@ -450,7 +450,7 @@ object App {
 
     //record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
-    val resultsToRecord = (combinedResultsForFile ::: previousTestResultsHandler.recentButNoRetestRequired ::: previousTestResultsHandler.oldResults).distinct
+    val resultsToRecord = (combinedResultsForFile ::: previousTestResultsHandler.oldResults).distinct
     //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
     println("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
@@ -478,7 +478,7 @@ object App {
     val pageWeightAlertsFixedThisRun = for (alert <- previousTestResultsHandler.hasPreviouslyAlertedOnWeight if !(articlePageWeightAlertList ::: liveBlogPageWeightAlertList ::: interactivePageWeightAlertList).map(result => (result.testUrl, result.typeOfTest)).contains((alert.testUrl, alert.typeOfTest))) yield alert
     val pageWeightAlertsFixedCSVString = (pageWeightAlertsFixedThisRun ::: pageWeightAlertsPreviouslyFixed).map(_.toCSVString()).mkString
 
-    val listOfDupes = for (result <- sortedByWeightCombinedResults if sortedByWeightCombinedResults.count(_ == result) > 1) yield result
+    val listOfDupes = for (result <- sortedByWeightCombinedResults if sortedByWeightCombinedResults.map(page => (page.testUrl, page.typeOfTest)).count(_ == (result.testUrl,result.typeOfTest)) > 1) yield result
 
     if (listOfDupes.nonEmpty) {
       println("\n\n\n\n ******** Duplicates found in results! ****** \n Found " + listOfDupes.length + " duplicates")
@@ -582,6 +582,7 @@ object App {
       liveBlogPageWeightAlertList.length + " LiveBlog pageWeight alerts\n" +
       interactivePageWeightAlertList.length + " Interactive pageWeight alerts\n" +
       interactiveAlertList.length + " Interactive weight or perfromance alerts.")
+    println(listOfDupes.length + " Duplicate test results found")
   }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
