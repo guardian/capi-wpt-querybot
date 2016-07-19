@@ -74,7 +74,21 @@ class CAPITests extends CAPITestUnitSpec with Matchers {
 
   "A request to CAPI for Articles" should "return 1 or more results" in {
     val resultsList = capiHandler.getUrlsForContentType("Article")
+    println("Article query Returned: " + resultsList.length + "results")
     assert(resultsList.nonEmpty)
   }
+
+  "A request to CAPI for LiveBlogs" should "return 0 or more results" in {
+    val resultsList = capiHandler.getUrlsForContentType("LiveBlog")
+    println("LiveBlog query Returned: " + resultsList.length + "results")
+    assert(resultsList.nonEmpty || resultsList.isEmpty)
+  }
+
+  "A request to CAPI for Interactives" should "return 0 or more results" in {
+    val resultsList = capiHandler.getUrlsForContentType("Interactive")
+    println("Interactive query Returned: " + resultsList.length + "results")
+    assert(resultsList.nonEmpty || resultsList.isEmpty)
+  }
+
 
 }

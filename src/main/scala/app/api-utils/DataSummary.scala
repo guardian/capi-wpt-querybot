@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 28/06/16.
  */
-class DataSummary(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesTested: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests) {
+class DataSummary(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesFromCapi: Int, numberOfPagesTested: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests) {
 /*
 Data summary
 Its time to take note of pages tested each run,
@@ -34,29 +34,26 @@ look through data - what are the main embeds
   val today = timeNow.getDayOfYear
   val yesterday = timeNow.minusDays(1).getDayOfYear
 
-  val jobStartedTime: Int
-  val jobFinishTime: Int
-  val durationOfRunMs = timeNow.getMillis - jobStarted.getMillis
+  val jobStartedTime = jobStarted
+  val jobFinishTime = jobFinished
+  val durationOfRunMs = jobFinished.getMillis - jobStarted.getMillis
   val durationOfRunS = durationOfRunMs.toDouble/1000
   val durationOfRunMin = durationOfRunS/60
 
-  //last run
-
-  - job finished at
-  - time taken from start to finish
-    - number of pages pulled from capi
-    - number of pages sent from previous runs
-  - number of wpt jobs sent
-  - number of pageWeight alerts raised on non-interactive content
+  //last run - number of pages pulled from capi
+  val numberOfPagesFromCAPI: Int = numberOfPagesFromCapi
+  val numberOfPagesSentToWPT: Int = numberOfPagesTested
+/*  - number of pageWeight alerts raised on non-interactive content
     - number of pageSpeed alerts raised on non-interactive content
     - number of page speed alerts raised where content was underweight
     - number of interactives tested
     - number of alerts raised on interactives
     - number of failed tests
-
+*/
 
 
   val previousResultsHandler = previousResultsObject
+  val numberOfPagesRetestedFromLastRun: Int = previousResultsHandler.previousResultsToRetest.length
 
   val resultsFromRun: List[PerformanceResultsObject] = latestResults
   val previousResults: List[PerformanceResultsObject] = previousResultsHandler.previousResults
@@ -174,7 +171,116 @@ look through data - what are the main embeds
   }
 
 
-  
+ def printSummaryDataToScreen(): Unit ={
+   println("\n\n\n\n ****************** SUMMARY DATA ********************\n")
+   println("Job Summary: \n")
+   println("jobStarted at: " + jobStartedTime.toDateTime)
+   println("jobFinished at: " + jobFinishTime.toDateTime)
+   println("Duration of Run: " + durationOfRunMin + " minutes." )
+   println("Number of pages from CAPI queries: " + numberOfPagesFromCAPI)
+   println("Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun)
+   println("Number of pages tested: " + numberOfPagesSentToWPT)
+   println("**** \n\n")
+   println("*************Element Summary:****************************\n")
+   println("AudioBoom: \n")
+   println("Number of Pages with Audioboom embed: " + pagesWithAudioBoomEmbed.length )
+   println("Number of Pages with Audioboom embed that alerted for pageWeight: " + pagesWithAudioBoomEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Audioboom embed that alerted for pageSpeed: " + pagesWithAudioBoomEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of AudioBoom embed: " + audioBoom.map(_.bytesDownloaded).sum.toDouble/(audioBoom.length * 1024) + " kB")
+   println("\n\n")
+   println("Brightcove: \n")
+   println("Number of Pages with Brightcove embed: " + pagesWithBrightcoveEmbed.length )
+   println("Number of Pages with Brightcove embed that alerted for pageWeight: " + pagesWithBrightcoveEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Brightcove embed that alerted for pageSpeed: " + pagesWithBrightcoveEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of Brightcove embed: " + brightcove.map(_.bytesDownloaded).sum.toDouble/(brightcove.length * 1024) + " kB")
+   println("\n\n")
+   println("CNN: \n")
+   println("Number of Pages with CNN embed: " + pagesWithCNNEmbed.length )
+   println("Number of Pages with CNN embed that alerted for pageWeight: " + pagesWithCNNEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with CNN embed that alerted for pageSpeed: " + pagesWithCNNEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of CNN embed: " + cnn.map(_.bytesDownloaded).sum.toDouble/(cnn.length * 1024) + " kB")
+   println("\n\n")
+   println("DailyMotion: \n")
+   println("Number of Pages with DailyMotion embed: " + pagesWithDailyMotionEmbed.length )
+   println("Number of Pages with DailyMotion embed that alerted for pageWeight: " + pagesWithDailyMotionEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with DailyMotion embed that alerted for pageSpeed: " + pagesWithDailyMotionEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of DailyMotion embed: " + dailymotion.map(_.bytesDownloaded).sum.toDouble/(dailymotion.length * 1024) + " kB")
+   println("\n\n")
+   println("FormStack: \n")
+   println("Number of Pages with FormStack embed: " + pagesWithFormStackEmbed.length )
+   println("Number of Pages with FormStack embed that alerted for pageWeight: " + pagesWithFormStackEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with FormStack embed that alerted for pageSpeed: " + pagesWithFormStackEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of FormStack embed: " + formstack.map(_.bytesDownloaded).sum.toDouble/(formstack.length * 1024) + " kB")
+   println("\n\n")
+   println("GoogleMaps: \n")
+   println("Number of Pages with GoogleMaps embed: " + pagesWithGoogleMapsEmbed.length )
+   println("Number of Pages with GoogleMaps embed that alerted for pageWeight: " + pagesWithGoogleMapsEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with GoogleMaps embed that alerted for pageSpeed: " + pagesWithGoogleMapsEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of GoogleMaps embed: " + googlemaps.map(_.bytesDownloaded).sum.toDouble/(googlemaps.length * 1024) + " kB")
+   println("\n\n")
+   println("Guardian Comments: \n")
+   println("Number of Pages with Guardian Comments embed: " + pagesWithGuardianCommentsEmbed.length )
+   println("Number of Pages with Guardian Comments embed that alerted for pageWeight: " + pagesWithGuardianCommentsEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Guardian Comments embed that alerted for pageSpeed: " + pagesWithGuardianCommentsEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of Guardian Comments embed: " + guardianComments.map(_.bytesDownloaded).sum.toDouble/(guardianComments.length * 1024) + " kB")
+   println("\n\n")
+   println("Guardian Videos: \n")
+   println("Number of Pages with Guardian Videos embed: " + pagesWithGuardianVideos.length )
+   println("Number of Pages with Guardian Videos embed that alerted for pageWeight: " + pagesWithGuardianVideos.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Guardian Videos embed that alerted for pageSpeed: " + pagesWithGuardianVideos.filter(_.alertStatusPageSpeed))
+   println("Average size of Guardian Videos embed: " + guardianVideos.map(_.bytesDownloaded).sum.toDouble/(guardianVideos.length * 1024) + " kB")
+   println("\n\n")
+   println("Guardian Images: \n")
+   println("Number of Pages with Guardian Images embed: " + pagesWithGuardianImages.length )
+   println("Number of Pages with Guardian Images embed that alerted for pageWeight: " + pagesWithGuardianImages.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Guardian Images embed that alerted for pageSpeed: " + pagesWithGuardianImages.filter(_.alertStatusPageSpeed))
+   println("Average size of Guardian Images embed: " + guardianImages.map(_.bytesDownloaded).sum.toDouble/(guardianImages.length * 1024) + " kB")
+   println("\n\n")
+   println("Guardian Witness Image: \n")
+   println("Number of Pages with Guardian Witness Image embed: " + pagesWithGuardianWitnessImageEmbed.length )
+   println("Number of Pages with Guardian Witness Image embed that alerted for pageWeight: " + pagesWithGuardianWitnessImageEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Guardian Witness Image embed that alerted for pageSpeed: " + pagesWithGuardianWitnessImageEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of Guardian Witness Image embed: " + guardianWitnessImage.map(_.bytesDownloaded).sum.toDouble/(guardianWitnessImage.length * 1024) + " kB")
+   println("\n\n")
+   println("Guardian Witness Video: \n")
+   println("Number of Pages with Guardian Witness Video embed: " + pagesWithGuardianWitnessVideoEmbed.length )
+   println("Number of Pages with Guardian Witness Video embed that alerted for pageWeight: " + pagesWithGuardianWitnessVideoEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Guardian Witness Video embed that alerted for pageSpeed: " + pagesWithGuardianWitnessVideoEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of Guardian Witness Video embed: " + guardianWitnessVideo.map(_.bytesDownloaded).sum.toDouble/(guardianWitnessVideo.length * 1024) + " kB")
+   println("\n\n")
+   println("Hulu: \n")
+   println("Number of Pages with Hulu embed: " + pagesWithHuluEmbed.length )
+   println("Number of Pages with Hulu embed that alerted for pageWeight: " + pagesWithHuluEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Hulu embed that alerted for pageSpeed: " + pagesWithHuluEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of Hulu embed: " + hulu.map(_.bytesDownloaded).sum.toDouble/(hulu.length * 1024) + " kB")
+   println("\n\n")
+   println("InfoStrada: \n")
+   println("Number of Pages with InfoStrada embed: " + pagesWithInfoStradaEmbed.length )
+   println("Number of Pages with InfoStrada embed that alerted for pageWeight: " + pagesWithInfoStradaEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with InfoStrada embed that alerted for pageSpeed: " + pagesWithInfoStradaEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of InfoStrada embed: " + infostrada.map(_.bytesDownloaded).sum.toDouble/(infostrada.length * 1024) + " kB")
+   println("\n\n")
+   println("Scribd: \n")
+   println("Number of Pages with Scribd embed: " + pagesWithScribdEmbed.length )
+   println("Number of Pages with Scribd embed that alerted for pageWeight: " + pagesWithScribdEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Scribd embed that alerted for pageSpeed: " + pagesWithScribdEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of Scribd embed: " + scribd.map(_.bytesDownloaded).sum.toDouble/(scribd.length * 1024) + " kB")
+   println("\n\n")
+   println("SoundCloud: \n")
+   println("Number of Pages with SoundCloud embed: " + pagesWithSoundCloudEmbed.length )
+   println("Number of Pages with SoundCloud embed that alerted for pageWeight: " + pagesWithSoundCloudEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with SoundCloud embed that alerted for pageSpeed: " + pagesWithSoundCloudEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of SoundCloud embed: " + soundCloud.map(_.bytesDownloaded).sum.toDouble/(soundCloud.length * 1024) + " kB")
+   println("\n\n")
+   println("Spotify: \n")
+   println("Number of Pages with Spotify embed: " + pagesWithSpotifyEmbed.length )
+   println("Number of Pages with Spotify embed that alerted for pageWeight: " + pagesWithSpotifyEmbed.filter(_.alertStatusPageWeight))
+   println("Number of Pages with Spotify embed that alerted for pageSpeed: " + pagesWithSpotifyEmbed.filter(_.alertStatusPageSpeed))
+   println("Average size of Spotify embed: " + spotify.map(_.bytesDownloaded).sum.toDouble/(spotify.length * 1024) + " kB")
+   println("\n\n")
+
+   println("\n ****************************************************\n\n\n\n")
+ }
 
 
 
