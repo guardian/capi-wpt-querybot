@@ -65,7 +65,7 @@ object App {
 
     val alertsThatHaveBeenFixed = "alertsthathavebeenfixed.csv"
     val duplicateResultList = "duplicateresultsfromlastrun.csv"
-
+    val runLog = "runLog.csv"
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
@@ -166,7 +166,7 @@ object App {
     /*    val localInput = new LocalFileOperations
     val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
     val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
-    println("\n\n\n ***** There are " + previousTestResultsHandler.fullResultsList.length + " previous results in file  ********* \n\n\n")
+    println("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
     //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
 
@@ -450,7 +450,7 @@ object App {
 
     //record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
-    val resultsToRecord = (combinedResultsForFile ::: previousTestResultsHandler.recentButNoRetestRequired ::: previousTestResultsHandler.oldResults).distinct
+    val resultsToRecord = (combinedResultsForFile ::: previousTestResultsHandler.oldResults).distinct
     //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
     println("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
@@ -478,7 +478,7 @@ object App {
     val pageWeightAlertsFixedThisRun = for (alert <- previousTestResultsHandler.hasPreviouslyAlertedOnWeight if !(articlePageWeightAlertList ::: liveBlogPageWeightAlertList ::: interactivePageWeightAlertList).map(result => (result.testUrl, result.typeOfTest)).contains((alert.testUrl, alert.typeOfTest))) yield alert
     val pageWeightAlertsFixedCSVString = (pageWeightAlertsFixedThisRun ::: pageWeightAlertsPreviouslyFixed).map(_.toCSVString()).mkString
 
-    val listOfDupes = for (result <- sortedByWeightCombinedResults if sortedByWeightCombinedResults.count(_ == result) > 1) yield result
+    val listOfDupes = for (result <- sortedByWeightCombinedResults if sortedByWeightCombinedResults.map(page => (page.testUrl, page.typeOfTest)).count(_ == (result.testUrl,result.typeOfTest)) > 1) yield result
 
     if (listOfDupes.nonEmpty) {
       println("\n\n\n\n ******** Duplicates found in results! ****** \n Found " + listOfDupes.length + " duplicates")
@@ -571,17 +571,71 @@ object App {
     val jobFinish = DateTime.now()
     val timeTaken = (jobFinish.getMillis - jobStart.getMillis).toDouble / (1000 * 60)
     val numberOfPagesTested = urlsToSend.length
-    println("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.\n Job tested: " + numberOfPagesTested + " pages.")
-    println("Breakdown of pages tested: \n" +
+    val numberOfPageWeightAlerts = combinedResultsList.filter(_.alertStatusPageWeight).length
+    val percentageOfPageWeightAlerts = if(numberOfPagesTested > 0){
+      numberOfPageWeightAlerts.toDouble/(numberOfPagesTested * 100)
+    } else {
+      0.0
+    }
+    val numberOfPageSpeedAlerts = combinedResultsList.filter(_.alertStatusPageSpeed).length
+    val percentageOfPageSpeedAlerts = if(numberOfPagesTested > 0){
+      numberOfPageSpeedAlerts.toDouble/(numberOfPagesTested * 100)
+    } else {
+      0.0
+    }
+
+    val runSummaryCSVString: String = jobStart + "," +
+      jobFinish + "," +
+      timeTaken + "," +
+      articles.length + "," +
+      liveBlogs.length + "," +
+      interactives.length + "," +
+      numberOfPagesTested + "," +
+      pagesToRetest.length + "," +
+      articleUrls.length + "," +
+      liveBlogUrls.length + "," +
+      interactiveUrls.length + "," +
+      numberOfPageWeightAlerts + "," +
+      percentageOfPageWeightAlerts + "," +
+      numberOfPageSpeedAlerts + "," +
+      percentageOfPageSpeedAlerts + "," +
+      articlePageWeightAlertList.length + "," +
+      liveBlogPageWeightAlertList.length + "," +
+      interactivePageWeightAlertList.length + "," +
+      newInteractiveAlertsList.length + "," +
+      newArticlePageWeightAlertsList + "," +
+      newLiveBlogPageWeightAlertsList + "," +
+      newInteractivePageWeightAlertsList + "," +
+      newInteractiveAlertsList + "," +
+      listOfDupes.length + "\n"
+
+    val runlogList = s3Interface.getCSVFileFromS3(runLog).take(1000)
+    val runlogToWrite = runSummaryCSVString :: runlogList
+    if(!iamTestingLocally){
+      s3Interface.writeFileToS3(runLog, runlogToWrite.mkString)
+    }
+
+    println("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.")
+    println("Breakdown of articles returned from CAPI\n"+ 
+      articles.length + " Article pages returned from CAPI\n" +
+      liveBlogs.length + " LiveBlog pages returned from CAPI\n" +
+      interactives.length + " Interactive pages returned")
+    println("Number of pages tested: " + numberOfPagesTested + " pages.")
+    println("Breakdown of pages seen as needing testing: \n" +
       pagesToRetest.length + " pages retested from previous run\n" +
-      articleUrls.length + " Article pages returned from CAPI\n" +
-      liveBlogUrls.length + " LiveBlog pages returned from CAPI\n" +
-      interactiveUrls.length + " Interactive pages returned from CAPI")
+      articleUrls.length + " Article pages returned from CAPI seen as untested\n" +
+      liveBlogUrls.length + " LiveBlog pages returned from CAPI seen as untested\n" +
+      interactiveUrls.length + " Interactive pages returned from CAPI seen as untested")
+    println("Number of pageWeight Alerts found by job: " + numberOfPageWeightAlerts)
+    println("This is roughly " + percentageOfPageWeightAlerts + "% of pages tested")
+    println("Number of pageSpeed Alerts found by job: " + numberOfPageSpeedAlerts)
+    println("This is roughly " + percentageOfPageSpeedAlerts + "% of pages tested")
     println("Breakdown of alerts: \n" +
       articlePageWeightAlertList.length + " Article pageWeight alerts\n" +
       liveBlogPageWeightAlertList.length + " LiveBlog pageWeight alerts\n" +
       interactivePageWeightAlertList.length + " Interactive pageWeight alerts\n" +
       interactiveAlertList.length + " Interactive weight or perfromance alerts.")
+    println(listOfDupes.length + " Duplicate test results found")
   }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
@@ -609,7 +663,7 @@ object App {
 
     val resultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
-      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields,element.wptResultUrl)
+      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields, element.wptResultUrl)
       println("getting result for page element")
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
       println("result received\n setting headline")
@@ -628,9 +682,11 @@ object App {
     val testResults = resultsList.map(element => element.testResults).toList
     val resultsWithAlerts: List[PerformanceResultsObject] = testResults.map(element => setAlertStatus(element, averages))
 
-
-    //Confirm alert status by retesting alerting urls
-    println("Confirming any items that have an alert")
+    resultsWithAlerts
+  }
+    //Confirm alert status by retesting alerting urls - this has been removed as an attempt to reduce excessive load on the revised
+    // - much cheaper and less powerful testing agents
+    /*println("Confirming any items that have an alert")
     val confirmedTestResults = resultsWithAlerts.map(x => {
       if (x.alertStatusPageWeight || (x.timeFirstPaintInMs == -1)) {
         val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, urlFragments, wptBaseUrl, wptApiKey ,wptLocation)
@@ -645,7 +701,8 @@ object App {
         x
     })
     confirmedTestResults
-  }
+
+  }*/
 
   def confirmAlert(initialResult: PerformanceResultsObject, averages: PageAverageObject, urlFragments: List[String],wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject = {
     val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)

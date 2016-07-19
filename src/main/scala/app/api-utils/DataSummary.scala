@@ -59,7 +59,7 @@ look through data - what are the main embeds
   val previousResultsHandler = previousResultsObject
 
   val resultsFromRun: List[PerformanceResultsObject] = latestResults
-  val previousResults: List[PerformanceResultsObject] = previousResultsHandler.fullResultsList
+  val previousResults: List[PerformanceResultsObject] = previousResultsHandler.previousResults
   val allResults: List[PerformanceResultsObject] = resultsFromRun ::: previousResults
   val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = previousResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageWeight)
   val hasPreviouslyAlertedOnSpeed: List[PerformanceResultsObject] = previousResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageSpeed)
