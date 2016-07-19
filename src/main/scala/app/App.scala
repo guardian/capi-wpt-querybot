@@ -572,11 +572,11 @@ object App {
     val timeTaken = (jobFinish.getMillis - jobStart.getMillis).toDouble / (1000 * 60)
     val numberOfPagesTested = urlsToSend.length
     println("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.")
-    println(""Number of pages tested: " + numberOfPagesTested + " pages.")
+    println("Number of pages tested: " + numberOfPagesTested + " pages.")
     println("Breakdown of articles returned from CAPI\n"+ 
       articles.length + " Article pages returned from CAPI\n" +
       liveBlogs.length + " LiveBlog pages returned from CAPI\n" +
-      interactives.length + " Interactive pages returned"))
+      interactives.length + " Interactive pages returned")
     println("Breakdown of pages seen as needing testing: \n" +
       pagesToRetest.length + " pages retested from previous run\n" +
       articleUrls.length + " Article pages returned from CAPI seen as untested\n" +
