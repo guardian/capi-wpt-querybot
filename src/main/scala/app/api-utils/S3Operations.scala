@@ -268,6 +268,20 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     }
   }
 
+  def getCSVFileFromS3(fileName: String): List[String] = {
+    if (doesFileExist(fileName)) {
+      val s3Response = s3Client.getObject(new GetObjectRequest(s3BucketName, fileName))
+      val objectData = s3Response.getObjectContent
+      val myData = scala.io.Source.fromInputStream(objectData).getLines()
+      val resultsIterator = for (line <- myData) yield {
+      line
+      }
+      resultsIterator.toList
+    }else{
+      val emptyList: List[String] = List()
+      emptyList
+    }
+  }
 
   def getVisualsFileFromS3(fileName:String): String = {
     if (doesFileExist(fileName)) {

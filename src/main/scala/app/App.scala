@@ -65,7 +65,7 @@ object App {
 
     val alertsThatHaveBeenFixed = "alertsthathavebeenfixed.csv"
     val duplicateResultList = "duplicateresultsfromlastrun.csv"
-
+    val runLog = "runLog.csv"
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
@@ -571,17 +571,65 @@ object App {
     val jobFinish = DateTime.now()
     val timeTaken = (jobFinish.getMillis - jobStart.getMillis).toDouble / (1000 * 60)
     val numberOfPagesTested = urlsToSend.length
+    val numberOfPageWeightAlerts = combinedResultsList.filter(_.alertStatusPageWeight).length
+    val percentageOfPageWeightAlerts = if(numberOfPagesTested > 0){
+      numberOfPageWeightAlerts.toDouble/(numberOfPagesTested * 100)
+    } else {
+      0.0
+    }
+    val numberOfPageSpeedAlerts = combinedResultsList.filter(_.alertStatusPageSpeed).length
+    val percentageOfPageSpeedAlerts = if(numberOfPagesTested > 0){
+      numberOfPageSpeedAlerts.toDouble/(numberOfPagesTested * 100)
+    } else {
+      0.0
+    }
+
+    val runSummaryCSVString: String = jobStart + "," +
+      jobFinish + "," +
+      timeTaken + "," +
+      articles.length + "," +
+      liveBlogs.length + "," +
+      interactives.length + "," +
+      numberOfPagesTested + "," +
+      pagesToRetest.length + "," +
+      articleUrls.length + "," +
+      liveBlogUrls.length + "," +
+      interactiveUrls.length + "," +
+      numberOfPageWeightAlerts + "," +
+      percentageOfPageWeightAlerts + "," +
+      numberOfPageSpeedAlerts + "," +
+      percentageOfPageSpeedAlerts + "," +
+      articlePageWeightAlertList.length + "," +
+      liveBlogPageWeightAlertList.length + "," +
+      interactivePageWeightAlertList.length + "," +
+      newInteractiveAlertsList.length + "," +
+      newArticlePageWeightAlertsList + "," +
+      newLiveBlogPageWeightAlertsList + "," +
+      newInteractivePageWeightAlertsList + "," +
+      newInteractiveAlertsList + "," +
+      listOfDupes.length + "\n"
+
+    val runlogList = s3Interface.getCSVFileFromS3(runLog).take(1000)
+    val runlogToWrite = runSummaryCSVString :: runlogList
+    if(!iamTestingLocally){
+      s3Interface.writeFileToS3(runLog, runlogToWrite.mkString)
+    }
+
     println("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.")
-    println("Number of pages tested: " + numberOfPagesTested + " pages.")
     println("Breakdown of articles returned from CAPI\n"+ 
       articles.length + " Article pages returned from CAPI\n" +
       liveBlogs.length + " LiveBlog pages returned from CAPI\n" +
       interactives.length + " Interactive pages returned")
+    println("Number of pages tested: " + numberOfPagesTested + " pages.")
     println("Breakdown of pages seen as needing testing: \n" +
       pagesToRetest.length + " pages retested from previous run\n" +
       articleUrls.length + " Article pages returned from CAPI seen as untested\n" +
       liveBlogUrls.length + " LiveBlog pages returned from CAPI seen as untested\n" +
       interactiveUrls.length + " Interactive pages returned from CAPI seen as untested")
+    println("Number of pageWeight Alerts found by job: " + numberOfPageWeightAlerts)
+    println("This is roughly " + percentageOfPageWeightAlerts + "% of pages tested")
+    println("Number of pageSpeed Alerts found by job: " + numberOfPageSpeedAlerts)
+    println("This is roughly " + percentageOfPageSpeedAlerts + "% of pages tested")
     println("Breakdown of alerts: \n" +
       articlePageWeightAlertList.length + " Article pageWeight alerts\n" +
       liveBlogPageWeightAlertList.length + " LiveBlog pageWeight alerts\n" +
