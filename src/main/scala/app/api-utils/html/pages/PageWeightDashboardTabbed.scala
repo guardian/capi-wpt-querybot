@@ -96,13 +96,13 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
 
 
   //HTML_PAGE
-  val HTML_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_TABS_LIST +
+/*  val HTML_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_TABS_LIST +
     HTML_TAB_CONTENT + HTML_LASTRUN_TAB_CONTENT_HEADER + generateLastRunData() + HTML_TAB_CONTENT_FOOTER +
     HTML_TODAY_TAB_CONTENT_HEADER + generateDailyRunData() + HTML_TAB_CONTENT_FOOTER +
     HTML_LONGTERM_TAB_CONTENT_HEADER + generateLongTermRunData() + HTML_TAB_CONTENT_FOOTER +
     HTML_EDITORIALEMBEDS_TAB_CONTENT_HEADER + generateEditorialEmbedSummary + HTML_TAB_CONTENT_FOOTER +
     HTML_FOOTER
-
+*/
 
     //page generation methods
 /*    def generateHTMLTable(resultsList: List[PerformanceResultsObject]): String = {
@@ -144,7 +144,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
     }
   }*/
 
-  def generateLastRunData(): String = {
+ /* def generateLastRunData(): String = {
     "<div><h2>Data from Last Successful Run</h2> </div>\n" +
     "<div>" +
       "<p>Job started at: " + jobStartTime + "</p>\n" +
@@ -223,7 +223,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
       HTML_PAGE
     }
 
-
+*/
     //  def initialisePageForArticle: String = {
     //    hTMLPageHeader + hTMLTitleArticle + hTMLJobStarted
     //  }

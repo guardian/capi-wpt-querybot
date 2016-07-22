@@ -163,6 +163,10 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + editorialElementList.map(element => "," + element.toCSVString()).mkString + fillRemainingGapsAndNewline()
   }
 
+  def toCSVStringTestOutput(): String = {
+    printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + editorialElementList.map(element => "," + element.toCSVString()).mkString + "\n"
+  }
+
   def toFullHTMLTableCells(): String = {
     "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" +  "<td>" + timeFirstPaintInMs.toString + "ms </td><td>" +  timeDocCompleteInSec.toString + "s </td><td>" + mBInDocComplete + "MB </td><td>" + timeFullyLoadedInSec.toString + "s </td><td>" + mBInFullyLoaded + "MB </td><td> $(US)" + estUSPrePaidCost + "</td><td> $(US)" + estUSPostPaidCost + "</td><td>" + speedIndex.toString + " </td><td> " + genTestResultString() + "</td>"
   }
@@ -299,6 +303,16 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
      None
     }
   }
+
+ def timeLastLaunchedAsCAPITime(): CapiDateTime = {
+   if(pageLastUpdated.nonEmpty) {
+     pageLastUpdated.get
+   } else {
+     firstPublished.getOrElse(new CapiDateTime {
+       override def dateTime: Long = DateTime.parse(timeOfTest).getMillis
+     })
+   }
+ }
 
  def printTimeLastLaunched(): String = {
      if(pageLastUpdated.nonEmpty) {

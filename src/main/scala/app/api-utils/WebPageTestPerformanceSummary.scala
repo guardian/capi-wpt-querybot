@@ -1,6 +1,5 @@
-package app.api-utils
+package app.api
 
-- utils
 
 /**
  * Created by mmcnamara on 14/07/16.

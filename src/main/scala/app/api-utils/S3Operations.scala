@@ -177,13 +177,13 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           data(19).toBoolean)
         //todo - get element list
         val elementArray = data.drop(20)
-        println("**** Element Array pulled from file \n" + "length = " + elementArray.length)
+ //       println("**** Element Array pulled from file \n" + "length = " + elementArray.length)
         if ((elementArray(2).toInt > 0) && (data(9).toInt > -1)){
-        println("calling getElementListFromArray")
+ //       println("calling getElementListFromArray")
         val elementList = getElementListFromArray(elementArray)
         if(elementList.nonEmpty) {
             {
-              println("calling populateEditorialElementsList.")
+ //             println("calling populateEditorialElementsList.")
 //             println("calling populateEditorialElementsList. \n elementList to be passed is:\n" + elementList.map(element => element.toHTMLRowString() + "\n"))
             result.populateEditorialElementList(elementList)
             }
@@ -209,12 +209,12 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
    // println("\n\n\n\n  **************** elementArray: **************** \n"+ elementArray.map(element => element.toString + "\n").mkString + "\n\n\n\n\n\n" )
     if(elementArray.nonEmpty){
       val length = elementArray.length
-      println("element Array length = " + elementArray.length)
+//      println("element Array length = " + elementArray.length)
       var index = 0
       var elementList: List[PageElementFromHTMLTableRow] = List()
       while(index < length-1){
-        println("index = " + index)
-        println("building element")
+//        println("index = " + index)
+//        println("building element")
  /*       println("\n\n\n\n******* building element \n " +
           "Index" + elementArray(index) + "\n" +
           "Index +1" + elementArray(index+1) + "\n" +

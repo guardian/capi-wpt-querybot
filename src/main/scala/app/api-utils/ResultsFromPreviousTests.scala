@@ -40,7 +40,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
       for (result <- previousResults if result.testUrl.contains(page._2) && result.mostRecentUpdate < page._1.get.lastModified.getOrElse(new CapiDateTime {
         override def dateTime: Long = 0
       }).dateTime) yield page}).distinct
-    println("pages that have been updated since last test: \n" + testedPagesBothSourcesThatHaveChangedSinceLastTest.map(_._2 + "\n").mkString)
+   // println("pages that have been updated since last test: \n" + testedPagesBothSourcesThatHaveChangedSinceLastTest.map(_._2 + "\n").mkString)
     pagesNotYetTested ::: testedPagesBothSourcesThatHaveChangedSinceLastTest
     }
 
@@ -181,7 +181,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     val resultsWithElementListAdded: List[PerformanceResultsObject] = resultsWithNoPageElements.flatMap(result => {
       for (urlSet <- urlAndResults if urlSet._1.contains(result.testUrl)) yield {
         if(urlSet._1.contains("wpt.gu-web.net")){
-          val newResult = getResult(urlSet._1, wptBaseUrl, wptApiKey, urlFragments)
+          val newResult = getResult("Unknown URL",urlSet._1, wptBaseUrl, wptApiKey, urlFragments)
           newResult.headline = result.headline
           newResult.pageType = result.pageType
           newResult.firstPublished = result.firstPublished
@@ -194,7 +194,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
           newResult
         } else {
           if (result.typeOfTest.contains("Desktop")) {
-            val newResult = getResult(urlSet._2, wptBaseUrl, wptApiKey, urlFragments)
+            val newResult = getResult(urlSet._1, urlSet._2, wptBaseUrl, wptApiKey, urlFragments)
             newResult.headline = result.headline
             newResult.pageType = result.pageType
             newResult.firstPublished = result.firstPublished
@@ -209,7 +209,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
             println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
             newResult
           } else {
-            val newResult = getResult(urlSet._3, wptBaseUrl, wptApiKey, urlFragments)
+            val newResult = getResult(urlSet._1, urlSet._3, wptBaseUrl, wptApiKey, urlFragments)
             newResult.headline = result.headline
             newResult.pageType = result.pageType
             newResult.firstPublished = result.firstPublished
@@ -240,6 +240,62 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   }
 
 
+  def countResultsWithNoElements(): Int = {
+    previousResults.count(_.editorialElementList.isEmpty)
+  }
+
+  def reAddPageElementsToPastResults(): List[PerformanceResultsObject] = {
+    //Create new S3 Client
+    val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
+    val s3BucketName = "capi-wpt-querybot"
+    val configFileName = "config.conf"
+    val emailFileName = "addresses.conf"
+
+    println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
+    val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
+    var configArray: Array[String] = Array("", "", "", "", "", "")
+    var urlFragments: List[String] = List()
+
+    println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
+    val returnTuple = s3Interface.getConfig
+    configArray = Array(returnTuple._1,returnTuple._2,returnTuple._3,returnTuple._4,returnTuple._5,returnTuple._6,returnTuple._7)
+    urlFragments = returnTuple._8
+
+    val contentApiKey: String = configArray(0)
+    val wptBaseUrl: String = configArray(1)
+    val wptApiKey: String = configArray(2)
+    val wptLocation: String = configArray(3)
+
+
+    val repairedResultsList = previousResults.map(result => {if(result.editorialElementList.isEmpty) {
+      val newResult = try {
+        getResult(result.testUrl, result.friendlyResultUrl, wptBaseUrl, wptApiKey, urlFragments)
+      }
+      catch {
+        case _: Throwable => {
+          println("Page failed for some reason")
+          result
+        }
+      }
+      newResult.headline = result.headline
+      newResult.pageType = result.pageType
+      newResult.firstPublished = result.firstPublished
+      newResult.pageLastUpdated = result.pageLastUpdated
+      newResult.liveBloggingNow = result.liveBloggingNow
+      newResult.alertStatusPageWeight = result.alertStatusPageWeight
+      newResult.alertStatusPageSpeed = result.alertStatusPageSpeed
+      newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
+      newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
+      newResult
+
+    } else {
+      result
+    }})
+    repairedResultsList
+  }
+
+
+
   def sendResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String, String)] = {
     val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
     val resultList: List[(String, String, String)] = urlList.map(url => {
@@ -254,14 +310,17 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     resultList
   }
 
-  def getResult(friendlyUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String] ): PerformanceResultsObject = {
-    val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
+  def getResult(pageUrl: String, friendlyUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String] ): PerformanceResultsObject = {
+    val xmlResultUrl = {if(friendlyUrl.contains("xmlResult")){
+      friendlyUrl
+    } else {
+      friendlyUrl.replaceAll("result","xmlResult")
+    }
+    }
     val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
-    val result: PerformanceResultsObject = wpt.getResults(xmlResultUrl)
+    val result: PerformanceResultsObject = wpt.getResults(pageUrl, xmlResultUrl)
     result
   }
-
-
 
 
 }
