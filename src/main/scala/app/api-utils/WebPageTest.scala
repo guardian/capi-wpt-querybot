@@ -20,18 +20,42 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
   val wptResponseFormat:String = "xml"
   implicit val httpClient = new OkHttpClient()
 
+  val msmaxTime: Int = 6000000
+  val msTimeBetweenPings: Int = 30000
+  val maxCount: Int = roundAt(0)(msmaxTime.toDouble / msTimeBetweenPings).toInt
+
+  val msmaxTimeForMultipleTests: Int = 1200000
+  val msTimeBetweenPingsForMultipleTests: Int = 5000
+  val maxCountForMultipleTests: Int = roundAt(0)(msmaxTimeForMultipleTests.toDouble / msTimeBetweenPingsForMultipleTests).toInt
+
+
+  var numberOfPagesSent: Int = 0
+  var numberOfTestResultsSought: Int = 0
+  var numberOfSuccessfulTests: Int = 0
+  var numberOfFailedTests: Int = 0
+  var numberOfTestTimeOuts: Int = 0
+  var averageIteratorCount: Int = 0
+
+  var numberOfMultipleTestRequests: Int = 0
+  var totalNumberOfTestsSentByMultipleRequests: Int = 0
+  var numberOfTestResultsSoughtByMultipleTests: Int = 0
+  var numberOfSuccessfulTestsForMultipleTests: Int = 0
+  var numberOfFailedTestsForMultipleTests: Int = 0
+  var numberOfTestTimeOutsForMultipleTests: Int = 0
+  var averageIteratorCountForMultipleTests: Int = 0
+
   def desktopChromeCableTest(gnmPageUrl:String, highPriority: Boolean = false): PerformanceResultsObject = {
     println("Sending desktop webpagetest request to WPT API")
     if (highPriority) {
       val resultPage: String = sendHighPriorityPage(gnmPageUrl)
       println("Accessing results at: " + resultPage)
-      val testResults: PerformanceResultsObject = getResults(resultPage)
+      val testResults: PerformanceResultsObject = getResults(gnmPageUrl, resultPage)
       println("Results returned")
       testResults
     }else {
       val resultPage: String = sendPage(gnmPageUrl)
       println("Accessing results at: " + resultPage)
-      val testResults: PerformanceResultsObject = getResults(resultPage)
+      val testResults: PerformanceResultsObject = getResults(gnmPageUrl, resultPage)
       println("Results returned")
       testResults
     }
@@ -42,12 +66,12 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     if(highPriority){
       val resultPage: String = sendHighPriorityMobile3GPage(gnmPageUrl, wptLocation)
       println("Accessing results at: " + resultPage)
-      val testResults: PerformanceResultsObject = getResults(resultPage)
+      val testResults: PerformanceResultsObject = getResults(gnmPageUrl, resultPage)
       testResults
     }else {
       val resultPage: String = sendMobile3GPage(gnmPageUrl, wptLocation)
       println("Accessing results at: " + resultPage)
-      val testResults: PerformanceResultsObject = getResults(resultPage)
+      val testResults: PerformanceResultsObject = getResults(gnmPageUrl, resultPage)
       testResults
     }
   }
@@ -75,6 +99,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     println("response received: \n" + responseXML.text)
     val resultPage: String =  (responseXML \\ "xmlUrl").text
     println(resultPage)
+    numberOfPagesSent += 1
     resultPage
   }
 
@@ -101,6 +126,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     println("response received: \n" + responseXML.text)
     val resultPage: String =  (responseXML \\ "xmlUrl").text
     println(resultPage)
+    numberOfPagesSent += 1
     resultPage
   }
 
@@ -130,6 +156,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     val responseXML: Elem = scala.xml.XML.loadString(response.body.string)
     println("response received: \n" + responseXML.text)
     val resultPage: String =  (responseXML \\ "xmlUrl").text
+    numberOfPagesSent += 1
     resultPage
   }
 
@@ -159,12 +186,14 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     val responseXML: Elem = scala.xml.XML.loadString(response.body.string)
     println("response received: \n" + responseXML.text)
     val resultPage: String =  (responseXML \\ "xmlUrl").text
+    numberOfPagesSent += + 1
     resultPage
   }
 
 
-  def getResults(resultUrl: String):PerformanceResultsObject = {
+  def getResults(pageUrl: String, resultUrl: String):PerformanceResultsObject = {
     println("Requesting result url:" + resultUrl)
+    numberOfTestResultsSought += 1
     val request: Request = new Request.Builder()
       .url(resultUrl)
       .get()
@@ -173,44 +202,55 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     println("Processing response and checking if results are ready")
     var testResults: Elem = scala.xml.XML.loadString(response.body.string)
     var iterator: Int = 0
-    val msmaxTime: Int = 6000000
-    val msTimeBetweenPings: Int = 30000
-    val maxCount: Int = roundAt(0)(msmaxTime.toDouble / msTimeBetweenPings).toInt
-    while (((testResults \\ "statusCode").text.toInt != 200) && (iterator < maxCount)) {
+    while (((testResults \\ "statusCode").text.toInt != 200) && ((testResults \\ "statusCode").text.toInt != 404) && (iterator < maxCount)) {
       println(DateTime.now + " " + (testResults \\ "statusCode").text + " statusCode response - test not ready. " + iterator + " of " + maxCount + " attempts\n")
       Thread.sleep(msTimeBetweenPings)
       iterator += 1
       response = httpClient.newCall(request).execute()
       testResults = scala.xml.XML.loadString(response.body.string)
     }
+    averageIteratorCount = ((averageIteratorCount * (numberOfTestResultsSought - 1)) + iterator) / numberOfTestResultsSought
     if ((testResults \\ "statusCode").text.toInt == 200) {
       //Add one final request as occasionally 200 code comes before the data we want.
-//      Thread.sleep(5000)
+      //      Thread.sleep(5000)
       response = httpClient.newCall(request).execute()
       testResults = scala.xml.XML.loadString(response.body.string)
       if ((testResults \\ "response" \ "data" \ "successfulFVRuns").text.toInt > 0) {
         println("\n" + DateTime.now + " statusCode == 200: Page ready after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds\n Refining results")
-        try{
+        try {
           val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
-          refineResults(testResults, elementsList)
+          numberOfSuccessfulTests += 1
+          refineResults(pageUrl, testResults, elementsList)
         } catch {
           case _: Throwable => {
             println("Page failed for some reason")
-            failedTestUnknown(resultUrl, testResults)
+            numberOfFailedTests += 1
+            failedTestUnknown(pageUrl, testResults)
           }
         }
       } else {
         println(DateTime.now + " Test results show 0 successful runs ")
-        failedTestNoSuccessfulRuns(resultUrl, testResults)
+        numberOfFailedTests += 1
+        failedTestNoSuccessfulRuns(pageUrl, testResults)
       }
     } else {
-      println(DateTime.now + " Test timed out after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds")
-      failedTestTimeout(resultUrl, testResults)
+      if ((testResults \\ "statusCode").text.toInt == 404) {
+        println(DateTime.now + " Test returned 404 error. Test ID: " + resultUrl + " is not valid")
+        numberOfFailedTests += 1
+        numberOfTestTimeOuts += 1
+        failedTestUnknown(pageUrl, testResults)
+      } else {
+        println(DateTime.now + " Test timed out after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds")
+        numberOfFailedTests += 1
+        numberOfTestTimeOuts += 1
+        failedTestTimeout(pageUrl, testResults)
+      }
     }
   }
 
-  def refineResults(rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
+  def refineResults(pageUrl: String, rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
     println("parsing the XML results")
+    numberOfTestResultsSought += 1
     try {
       val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
       val testType: String = if ((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")) {
@@ -245,14 +285,15 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       result
     } catch {
       case _: Throwable => {
-        println("Page failed for some reason")
-        failedTestUnknown("Unknown - Exception occurred during refineResults", rawXMLResult)
+        println("Page failed for some reason while refining results")
+        failedTestUnknown(pageUrl, rawXMLResult)
       }
     }
   }
 
   def testMultipleTimes(url: String, typeOfTest: String, wptLocation: String, testCount: Int): PerformanceResultsObject = {
       println("Alert registered on url: " + url + "\n" + "verify by retesting " + testCount + " times and taking median value")
+      numberOfMultipleTestRequests += testCount
       if(typeOfTest.contains("Desktop")){
         println("Forming desktop webpage test query to confirm alert status")
 //        val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&runs=" + testCount + "&priority=1" + "&url=" + url + "#noads"
@@ -277,7 +318,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
         val responseXML: Elem = scala.xml.XML.loadString(response.body.string)
         val resultPage: String =  (responseXML \\ "xmlUrl").text
         println(resultPage)
-        val testResultObject: PerformanceResultsObject = getMultipleResults(resultPage)
+        val testResultObject: PerformanceResultsObject = getMultipleResults(url, resultPage)
         testResultObject
     }
     else{
@@ -307,13 +348,14 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
         val responseXML: Elem = scala.xml.XML.loadString(response.body.string)
         val resultPage: String =  (responseXML \\ "xmlUrl").text
         println(resultPage)
-        val testResultObject: PerformanceResultsObject = getMultipleResults(resultPage)
+        val testResultObject: PerformanceResultsObject = getMultipleResults(url, resultPage)
         testResultObject
       }
   }
 
 
-  def getMultipleResults(resultUrl: String): PerformanceResultsObject = {
+  def getMultipleResults(pageUrl: String, resultUrl: String): PerformanceResultsObject = {
+    numberOfTestResultsSoughtByMultipleTests += 1
     println("Requesting url:" + resultUrl)
     val request: Request = new Request.Builder()
       .url(resultUrl)
@@ -323,16 +365,14 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     println("Processing response and checking if results are ready")
     var testResults: Elem = scala.xml.XML.loadString(response.body.string)
     var iterator: Int = 0
-    val msmaxTime: Int = 1200000
-    val msTimeBetweenPings: Int = 5000
-    val maxCount: Int = roundAt(0)(msmaxTime.toDouble / msTimeBetweenPings).toInt
-    while (((testResults \\ "statusCode").text.toInt != 200) && (iterator < maxCount)) {
-      println(DateTime.now + " " + (testResults \\ "statusCode").text + " statusCode response - test not ready. " + iterator + " of " + maxCount + " attempts\n")
-      Thread.sleep(msTimeBetweenPings)
+    while (((testResults \\ "statusCode").text.toInt != 200) && (iterator < maxCountForMultipleTests)) {
+      println(DateTime.now + " " + (testResults \\ "statusCode").text + " statusCode response - test not ready. " + iterator + " of " + maxCountForMultipleTests + " attempts\n")
+      Thread.sleep(msTimeBetweenPingsForMultipleTests)
       iterator += 1
       response = httpClient.newCall(request).execute()
       testResults = scala.xml.XML.loadString(response.body.string)
     }
+    averageIteratorCountForMultipleTests = ((averageIteratorCountForMultipleTests * (numberOfTestResultsSoughtByMultipleTests - 1)) + iterator)/numberOfTestResultsSoughtByMultipleTests
     if ((testResults \\ "statusCode").text.toInt == 200) {
       println("Add one final request as occasionally 200 code comes before the data we want.")
       Thread.sleep(15000)
@@ -342,24 +382,29 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
         println("\n" + DateTime.now + " statusCode == 200: Page ready after " + roundAt(0)(((iterator + 1) * msTimeBetweenPings).toDouble / 1000).toInt + " seconds\n Refining results")
         try {
           val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
-          refineMultipleResults(testResults, elementsList)
+          numberOfSuccessfulTestsForMultipleTests += 1
+          refineMultipleResults(pageUrl, testResults, elementsList)
         } catch {
           case _: Throwable => {
             println("Page failed for some reason")
-            failedTestUnknown(resultUrl, testResults)
+            numberOfFailedTestsForMultipleTests += 1
+            failedTestUnknown(pageUrl, testResults)
           }
         }
       } else {
         println(DateTime.now + " Test results show 0 successful runs ")
-        failedTestNoSuccessfulRuns(resultUrl, testResults)
+        numberOfFailedTestsForMultipleTests += 1
+        failedTestNoSuccessfulRuns(pageUrl, testResults)
       }
     } else {
       println(DateTime.now + " Test timed out after " + roundAt(0)(((iterator + 1) * msTimeBetweenPings) / 1000).toInt + " seconds")
-      failedTestTimeout(resultUrl, testResults)
+      numberOfFailedTestsForMultipleTests +=1
+      numberOfTestTimeOutsForMultipleTests += 2
+      failedTestTimeout(pageUrl, testResults)
     }
   }
 
-  def refineMultipleResults(rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
+  def refineMultipleResults(pageUrl: String, rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
     println("parsing the XML results")
     try {
       val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
@@ -395,7 +440,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     } catch {
       case _: Throwable => {
         println("Page failed for some reason")
-        failedTestUnknown("Unknown - Exception occurred during refineMultipleresults", rawXMLResult)
+        failedTestUnknown(pageUrl, rawXMLResult)
       }
     }
   }
@@ -476,6 +521,28 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
 
   def roundAt(p: Int)(n: Double): Double = { val s = math pow (10, p); (math round n * s) / s }
 
+
+
+  def returnSummary(): Array[Int] = {
+    val summaryArray: Array[Int] = Array (msmaxTime,
+          msTimeBetweenPings,
+          msmaxTimeForMultipleTests,
+          msTimeBetweenPingsForMultipleTests,
+          numberOfPagesSent,
+          numberOfTestResultsSought,
+          numberOfSuccessfulTests,
+          numberOfFailedTests,
+          numberOfTestTimeOuts,
+          averageIteratorCount,
+          numberOfMultipleTestRequests,
+          totalNumberOfTestsSentByMultipleRequests,
+          numberOfTestResultsSoughtByMultipleTests,
+          numberOfSuccessfulTestsForMultipleTests,
+          numberOfFailedTestsForMultipleTests,
+          numberOfTestTimeOutsForMultipleTests,
+          averageIteratorCountForMultipleTests)
+      summaryArray
+  }
 }
 
 

@@ -25,65 +25,77 @@ abstract  class PageElement {
     val brightcove = List("bcsecure", "player.h-cdn.com")
     val cnn = List("cnn.com","z.cdn.turner.com")
     val dailymotion = List("dailymotion","dmcdn")
+    val documentCloud = List("documentcloud")
+    val facebook = List("facebook","fbcdn")
     val formstack = List("formstack")
     val googlemaps = List("maps.google.com", "maps.gstatic.com", "maps.googleapis.com", "www.google.com/maps")
+    val guardianAudio = List("audio.guim")
     val guardianComments = List("comment-permalink","profile.theguardian.com", "avatar.guim.co.uk/user")
     val guardianVideos = List("cdn.theguardian.tv")
-    val guardianImages = List("i.guim.co.uk/img/media/")
+    val guardianImages = List("i.guim.co.uk/img","media.guim.co.uk")
+    val guardianUpload = List("uploads.guim.co.uk")
     val guardianWitnessImage = List("n0tice-static.s3.amazonaws.com/image/")
     val guardianWitnessVideo = List("https://n0tice-static.s3.amazonaws.com/video/thumbnails", "googlevideo.com")
     val hulu = List("hulu", "embed.ly")
     val infostrada = List("infostrada")
+    val instagram = List("instagram","instagramstatic","cdninstagram")
+    val interactive = List("interactive.guim.co.uk")
+    val otherAudio = List(".mp3")
+    val otherGif = List(".gif", ".GIF")
+    val otherImage = List(".jpg", ".png", ".jpeg", ".JPEG", ".JPG", ".PNG")
+    val otherVideo = List(".mp4")
+    val parliamentLiveTv = List("parliamentlive.tv", "kaltura")
     val scribd = List("scribd")
     val soundCloud = List("sndcdn.com", "soundcloud")
     val spotify = List("scdn.co", "spotify")
-    val twitter = List("twitter","twimg.com")
+    val twitter = List("twitter","twimg.com","pbs.twimg.com")
+    val uStream = List("ustream")
+    val vevo = List("vevo.com")
     val vimeo = List("vimeocdn", "vimeo.com")
     val vine = List("vine.co")
     val youTube = List("ytimg")
-    val parliamentLiveTv = List("parliamentlive.tv", "kaltura")
-    val facebook = List("facebook","fbcdn")
-    val instagram = List("instagram","instagramstatic","cdninstagram")
-    val uStream = List("ustream")
-    val documentCloud = List("documentcloud")
-    val otherAudio = List(".mp3")
-    val otherVideo = List(".mp4")
 
     var returnString = "unknownElement"
 
-    if(listContainsText(resource, otherAudio)){returnString = "Audio Embed"}
-    if(listContainsText(resource, otherVideo)){returnString = "Video Embed"}
-    if(listContainsText(resource, audioBoom)){returnString = "audioBoom"}
-    if(listContainsText(resource, brightcove)){returnString = "brightcove"}
-    if(listContainsText(resource, cnn)){returnString = "cnn"}
-    if(listContainsText(resource, dailymotion)){returnString = "dailymotion"}
-    if(listContainsText(resource, formstack)){returnString = "formstack"}
-    if(listContainsText(resource, googlemaps)){returnString = "googlemaps"}
-    if(listContainsText(resource, guardianComments)){returnString = "guardianComments"}
-    if(listContainsText(resource, guardianVideos)){returnString = "guardianVideos"}
-    if(listContainsText(resource, guardianImages)){returnString = "guardianImages"}
-    if(listContainsText(resource, guardianWitnessImage)){returnString = "guardianWitnessImage"}
-    if(listContainsText(resource, guardianWitnessVideo)){returnString = "guardianWitnessVideo"}
-    if(listContainsText(resource, hulu)){returnString = "hulu"}
-    if(listContainsText(resource, infostrada)){returnString = "infostrada"}
-    if(listContainsText(resource, scribd)){returnString = "scribd"}
-    if(listContainsText(resource, soundCloud)){returnString = "soundCloud"}
-    if(listContainsText(resource, spotify)){returnString = "spotify"}
-    if(listContainsText(resource, twitter)){returnString = "twitter"}
-    if(listContainsText(resource, vimeo)){returnString = "vimeo"}
-    if(listContainsText(resource, vine)){returnString = "vine"}
-    if(listContainsText(resource, youTube)){returnString = "youTube"}
-    if(listContainsText(resource, parliamentLiveTv)){returnString = "parliamentLiveTv"}
-    if(listContainsText(resource, facebook)){returnString = "facebook"}
-    if(listContainsText(resource, instagram)){returnString = "instagram"}
-    if(listContainsText(resource, uStream)){returnString = "uStream"}
-    if(listContainsText(resource, documentCloud)){returnString = "documentCloud"}
-
+    if(textContainsTextFromList(resource, otherAudio)){returnString = "Audio Embed"}
+    if(textContainsTextFromList(resource, otherGif)){returnString = "Gif Embed"}
+    if(textContainsTextFromList(resource, otherImage)){returnString = "Image Embed"}
+    if(textContainsTextFromList(resource, otherVideo)){returnString = "Video Embed"}
+    if(textContainsTextFromList(resource, audioBoom)){returnString = "audioBoom"}
+    if(textContainsTextFromList(resource, brightcove)){returnString = "brightcove"}
+    if(textContainsTextFromList(resource, cnn)){returnString = "cnn"}
+    if(textContainsTextFromList(resource, dailymotion)){returnString = "dailymotion"}
+    if(textContainsTextFromList(resource, documentCloud)){returnString = "documentCloud"}
+    if(textContainsTextFromList(resource, facebook)){returnString = "facebook"}
+    if(textContainsTextFromList(resource, formstack)){returnString = "formstack"}
+    if(textContainsTextFromList(resource, googlemaps)){returnString = "googlemaps"}
+    if(textContainsTextFromList(resource, guardianAudio)){returnString = "guardianAudio"}
+    if(textContainsTextFromList(resource, guardianComments)){returnString = "guardianComments"}
+    if(textContainsTextFromList(resource, guardianVideos)){returnString = "guardianVideos"}
+    if(textContainsTextFromList(resource, guardianImages)){returnString = "guardianImages"}
+    if(textContainsTextFromList(resource, guardianUpload)){returnString = "guardianUpload"}
+    if(textContainsTextFromList(resource, guardianWitnessImage)){returnString = "guardianWitnessImage"}
+    if(textContainsTextFromList(resource, guardianWitnessVideo)){returnString = "guardianWitnessVideo"}
+    if(textContainsTextFromList(resource, hulu)){returnString = "hulu"}
+    if(textContainsTextFromList(resource, infostrada)){returnString = "infostrada"}
+    if(textContainsTextFromList(resource, instagram)){returnString = "instagram"}
+    if(textContainsTextFromList(resource, interactive)){returnString = "interactive"}
+    if(textContainsTextFromList(resource, parliamentLiveTv)){returnString = "parliamentLiveTv"}
+    if(textContainsTextFromList(resource, scribd)){returnString = "scribd"}
+    if(textContainsTextFromList(resource, soundCloud)){returnString = "soundCloud"}
+    if(textContainsTextFromList(resource, spotify)){returnString = "spotify"}
+    if(textContainsTextFromList(resource, twitter)){returnString = "twitter"}
+    if(textContainsTextFromList(resource, uStream)){returnString = "uStream"}
+    if(textContainsTextFromList(resource, vevo)){returnString = "vevo"}
+    if(textContainsTextFromList(resource, vimeo)){returnString = "vimeo"}
+    if(textContainsTextFromList(resource, vine)){returnString = "vine"}
+    if(textContainsTextFromList(resource, youTube)){returnString = "youTube"}
+    if(returnString.contains("formstack")){println("formstack element found")}
     returnString
   }
 
-  def listContainsText(text: String, stringList: List[String]): Boolean = {
-    val checkList = stringList.map(stringText => stringText.contains(text))
+  def textContainsTextFromList(text: String, stringList: List[String]): Boolean = {
+    val checkList = stringList.map(stringText => text.contains(stringText))
     checkList.contains(true)
   }
 

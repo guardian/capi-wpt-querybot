@@ -61,7 +61,7 @@ object App {
     val frontsCSVName = "accumulatedFrontsPerformanceData.csv"
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
-
+    val resultsFromPreviousTestsWrite = "resultsFromPreviousTestsTestOutput.csv"
 
     val alertsThatHaveBeenFixed = "alertsthathavebeenfixed.csv"
     val duplicateResultList = "duplicateresultsfromlastrun.csv"
@@ -450,7 +450,8 @@ object App {
 
     //record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
-    val resultsToRecord = (combinedResultsForFile ::: previousTestResultsHandler.oldResults).distinct
+
+    val resultsToRecord = orderListByDatePublished(combinedResultsForFile ::: previousTestResultsHandler.oldResults.distinct)
     //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
     println("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
@@ -495,7 +496,7 @@ object App {
       s3Interface.writeFileToS3(interactiveDashboardFilename, interactiveDashboard.toString())
       s3Interface.writeFileToS3(interactiveDashboardDesktopFilename, interactiveDashboardDesktop.toString())
       s3Interface.writeFileToS3(interactiveDashboardMobileFilename, interactiveDashboardMobile.toString())
-      s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
+      s3Interface.writeFileToS3(resultsFromPreviousTestsWrite, resultsToRecordCSVString)
       s3Interface.writeFileToS3(alertsThatHaveBeenFixed, pageWeightAlertsFixedCSVString)
       s3Interface.writeFileToS3(duplicateResultList, listOfDupes.map(_.toCSVString()).mkString)
     }
@@ -665,7 +666,7 @@ object App {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
       val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields, element.wptResultUrl)
       println("getting result for page element")
-      newElement.testResults = wpt.getResults(newElement.wptResultUrl)
+      newElement.testResults = wpt.getResults(newElement.pageUrl,newElement.wptResultUrl)
       println("result received\n setting headline")
       newElement.testResults.setHeadline(newElement.headline)
       println("headline set\n setting pagetype")
@@ -819,6 +820,19 @@ object App {
     (validListOfPairs, missingFromDesktop ::: missingFromMobile)
   }
 
+  def orderListByDatePublished(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    println("orderListByWeightCalled with " + list.length + "elements")
+    val validatedList: (List[PerformanceResultsObject], List[PerformanceResultsObject]) = returnValidListOfPairs(list)
+    println("validated list has " + validatedList._1.length + " paired items, and " + validatedList._2.length + " leftover items")
+    val tupleList: List[(PerformanceResultsObject,PerformanceResultsObject)] = listSinglesToPairs(validatedList._1)
+    println("tuple List returned " + tupleList.length + " tuples")
+    println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")
+    val sortedTuples = sortByDatePublished(tupleList)
+    val recombinedSortedList = (sortedTuples ::: validatedList._2).sortWith(_.timeLastLaunchedAsCAPITime().dateTime >= _.timeLastLaunchedAsCAPITime().dateTime)
+    recombinedSortedList
+  }
+
+
   def orderListByWeight(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
     println("orderListByWeightCalled with " + list.length + "elements")
       val validatedList = returnValidListOfPairs(list)
@@ -892,8 +906,9 @@ object App {
       makeList(sortedTupleList)
     }
     else {
-        println("sortByWeight has noElements in list. Passing back empty list")
-        List()
+      println("sortByWeight has noElements in list. Passing back empty list")
+      val emptyList: List[PerformanceResultsObject] = List()
+      emptyList
     }
   }
 
@@ -904,11 +919,22 @@ object App {
     }
     else {
       println("sortByWeight has noElements in list. Passing back empty list")
-      List()
+      val emptyList: List[PerformanceResultsObject] = List()
+      emptyList
     }
   }
 
-
+  def sortByDatePublished(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[PerformanceResultsObject] = {
+    if(list.nonEmpty){
+      val sortedTupleList = sortTupleListByDatePublished(list)
+      makeList(sortedTupleList)
+    }
+    else {
+      println("sortByDatePublished has noElements in list. Passing back empty list")
+      val emptyList: List[PerformanceResultsObject] = List()
+      emptyList
+    }
+  }
 
   def listSinglesToPairs(list: List[PerformanceResultsObject]): List[(PerformanceResultsObject, PerformanceResultsObject)] = {
     if (list.nonEmpty && list.length % 2 == 0) {
@@ -969,6 +995,12 @@ object App {
     list.sortWith{(leftE:(PerformanceResultsObject, PerformanceResultsObject),rightE:(PerformanceResultsObject, PerformanceResultsObject)) =>
       leftE._1.speedIndex + leftE._2.speedIndex > rightE._1.speedIndex + rightE._2.speedIndex}
   }
+
+  def sortTupleListByDatePublished(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[(PerformanceResultsObject,PerformanceResultsObject)] = {
+    list.sortWith{(leftE:(PerformanceResultsObject, PerformanceResultsObject),rightE:(PerformanceResultsObject, PerformanceResultsObject)) =>
+      leftE._1.timeLastLaunchedAsCAPITime().dateTime + leftE._2.timeLastLaunchedAsCAPITime().dateTime >= rightE._1.timeLastLaunchedAsCAPITime().dateTime + rightE._2.timeLastLaunchedAsCAPITime().dateTime}
+  }
+
 
   def applyAnchorId(resultsObjectList: List[PerformanceResultsObject], lastIDAssigned: Int): (List[PerformanceResultsObject], Int) = {
     var iterator = lastIDAssigned + 1
