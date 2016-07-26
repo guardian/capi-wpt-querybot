@@ -305,14 +305,21 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
  def timeLastLaunchedAsCAPITime(): CapiDateTime = {
-   if(pageLastUpdated.nonEmpty) {
+   if(pageLastUpdated.getOrElse(newCapiDateTime(0)).dateTime > 0){
      pageLastUpdated.get
    } else {
-     firstPublished.getOrElse(new CapiDateTime {
-       override def dateTime: Long = DateTime.parse(timeOfTest).getMillis
-     })
+     firstPublished.getOrElse(newCapiDateTime(DateTime.parse(timeOfTest).getMillis))
    }
  }
+
+  def timeLastLaunchedAsLong(): Long = {
+    if(pageLastUpdated.getOrElse(newCapiDateTime(0)).dateTime > 0){
+      pageLastUpdated.get.dateTime
+    } else {
+      firstPublished.getOrElse(newCapiDateTime(DateTime.parse(timeOfTest).getMillis)).dateTime
+    }
+  }
+
 
  def printTimeLastLaunched(): String = {
      if(pageLastUpdated.nonEmpty) {
@@ -333,6 +340,12 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
        "Unknown"
      }
    }
+
+  def newCapiDateTime(time: Long): CapiDateTime = {
+    new CapiDateTime {
+      override def dateTime: Long = time
+    }
+  }
  
 
   def cleanString(inputString: String): String = {

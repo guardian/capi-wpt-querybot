@@ -61,7 +61,7 @@ object App {
     val frontsCSVName = "accumulatedFrontsPerformanceData.csv"
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
-    val resultsFromPreviousTestsWrite = "resultsFromPreviousTestsTestOutput.csv"
+//    val resultsFromPreviousTestsWrite = "resultsFromPreviousTestsTestOutput.csv"
 
     val alertsThatHaveBeenFixed = "alertsthathavebeenfixed.csv"
     val duplicateResultList = "duplicateresultsfromlastrun.csv"
@@ -249,6 +249,8 @@ object App {
     val combinedLiveBlogList: List[(Option[ContentFields], String)] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
     val combinedInteractiveList: List[(Option[ContentFields], String)] = previousInteractiveReTestContentFieldsAndUrl ::: newOrChangedInteractives
 
+    //create sorter object - contains functions for ordering lists of Performance Results Objects
+    val sorter = new ListSorter
 
     //obtain results for articles
     if (combinedArticleList.nonEmpty) {
@@ -266,8 +268,8 @@ object App {
       println("Total number of results gathered so far " + combinedResultsList.length + "pages")
 
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
-      val sortedByWeightArticleResultsList = orderListByWeight(articleResultsWithAnchor)
-      val sortedBySpeedArticleResultsList = orderListBySpeed(articleResultsWithAnchor)
+      val sortedByWeightArticleResultsList = sorter.orderListByWeight(articleResultsWithAnchor)
+      val sortedBySpeedArticleResultsList = sorter.orderListBySpeed(articleResultsWithAnchor)
       if (sortedByWeightArticleResultsList.isEmpty || sortedBySpeedArticleResultsList.isEmpty) {
         println("Sorting algorithm for articles has returned empty list. Aborting")
         System exit 1
@@ -311,7 +313,7 @@ object App {
       combinedResultsList = combinedResultsList ::: liveBlogResultsWithAnchor
       println("\n \n \n liveBlog tests complete. \n tested " + liveBlogResultsWithAnchor.length + "pages")
       println("Total number of results gathered so far " + combinedResultsList.length + "pages")
-      val sortedLiveBlogResultsList = orderListByWeight(liveBlogResultsWithAnchor)
+      val sortedLiveBlogResultsList = sorter.orderListByWeight(liveBlogResultsWithAnchor)
       if (sortedLiveBlogResultsList.isEmpty) {
         println("Sorting algorithm for Liveblogs has returned empty list. Aborting")
         System exit 1
@@ -356,7 +358,7 @@ object App {
       combinedResultsList = combinedResultsList ::: interactiveResultsWithAnchor
       println("\n \n \n interactive tests complete. \n tested " + interactiveResultsWithAnchor.length + "pages")
       println("Total number of results gathered so far " + combinedResultsList.length + "pages")
-      val sortedInteractiveResultsList = orderListByWeight(interactiveResultsWithAnchor)
+      val sortedInteractiveResultsList = sorter.orderListByWeight(interactiveResultsWithAnchor)
       if (sortedInteractiveResultsList.isEmpty) {
         println("Sorting algorithm has returned empty list. Aborting")
         System exit 1
@@ -398,7 +400,7 @@ object App {
       pageWeightAnchorId = getAnchorId._2
 
       //      combinedResultsList = combinedResultsList ::: frontsResultsWithAnchor
-      val sortedFrontsResultsList = orderListByWeight(frontsResultsWithAnchor)
+      val sortedFrontsResultsList = sorter.orderListByWeight(frontsResultsWithAnchor)
       if(sortedFrontsResultsList.isEmpty) {
         println("Sorting algorithm for fronts has returned empty list. Aborting")
         System exit 1
@@ -429,15 +431,15 @@ object App {
       println("CAPI query found no Fronts")
     }*/
 
-    val sortedByWeightCombinedResults: List[PerformanceResultsObject] = orderListByWeight(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
+    val sortedByWeightCombinedResults: List[PerformanceResultsObject] = sorter.orderListByWeight(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Desktop")) yield result
     val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
     println("\n \n \n Combining lists of results and sorting for dashboard pages.")
     println("length of sorted By Weight Combined List is: " + sortedByWeightCombinedResults.length)
     //Generate lists for sortByWeight combined pages
 
-    val sortedByWeightCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResultsByWeight(combinedDesktopResultsList)
-    val sortedCombinedByWeightMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsByWeight(combinedMobileResultsList)
+    val sortedByWeightCombinedDesktopResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsByWeight(combinedDesktopResultsList)
+    val sortedCombinedByWeightMobileResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsByWeight(combinedMobileResultsList)
 
     println("length of sorted By Weight Mobile List is: " + sortedByWeightCombinedDesktopResults.length)
     println("length of sorted By Weight Combined List is: " + sortedCombinedByWeightMobileResults.length)
@@ -451,24 +453,24 @@ object App {
     //record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
 
-    val resultsToRecord = orderListByDatePublished(combinedResultsForFile ::: previousTestResultsHandler.oldResults.distinct)
+    val resultsToRecord = sorter.orderListByDatePublished(combinedResultsForFile ::: previousTestResultsHandler.oldResults.distinct)
     //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
     println("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 
     //Generate Lists for sortBySpeed combined pages
-    val sortedBySpeedCombinedResults: List[PerformanceResultsObject] = orderListBySpeed(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
-    val sortedBySpeedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedDesktopResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
-    val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedMobileResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
+    val sortedBySpeedCombinedResults: List[PerformanceResultsObject] = sorter.orderListBySpeed(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
+    val sortedBySpeedCombinedDesktopResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsBySpeed(combinedDesktopResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
+    val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsBySpeed(combinedMobileResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
 
     //Generate Lists for interactive pages
     val combinedInteractiveResultsList = for (result <- combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
     val interactiveDesktopResults = for (result <- combinedDesktopResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
     val interactiveMobileResults = for (result <- combinedMobileResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
 
-    val sortedInteractiveCombinedResults: List[PerformanceResultsObject] = orderInteractivesBySpeed(combinedInteractiveResultsList)
-    val sortedInteractiveDesktopResults: List[PerformanceResultsObject] = sortHomogenousInteractiveResultsBySpeed(interactiveDesktopResults)
-    val sortedInteractiveMobileResults: List[PerformanceResultsObject] = sortHomogenousInteractiveResultsBySpeed(interactiveMobileResults)
+    val sortedInteractiveCombinedResults: List[PerformanceResultsObject] = sorter.orderInteractivesBySpeed(combinedInteractiveResultsList)
+    val sortedInteractiveDesktopResults: List[PerformanceResultsObject] = sorter.sortHomogenousInteractiveResultsBySpeed(interactiveDesktopResults)
+    val sortedInteractiveMobileResults: List[PerformanceResultsObject] = sorter.sortHomogenousInteractiveResultsBySpeed(interactiveMobileResults)
 
     val dotcomPageSpeedDashboard = new PageSpeedDashboardTabbed(sortedBySpeedCombinedResults, sortedBySpeedCombinedDesktopResults, sortedBySpeedCombinedMobileResults)
     val interactiveDashboard = new InteractiveDashboardTabbed(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
@@ -496,7 +498,7 @@ object App {
       s3Interface.writeFileToS3(interactiveDashboardFilename, interactiveDashboard.toString())
       s3Interface.writeFileToS3(interactiveDashboardDesktopFilename, interactiveDashboardDesktop.toString())
       s3Interface.writeFileToS3(interactiveDashboardMobileFilename, interactiveDashboardMobile.toString())
-      s3Interface.writeFileToS3(resultsFromPreviousTestsWrite, resultsToRecordCSVString)
+      s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
       s3Interface.writeFileToS3(alertsThatHaveBeenFixed, pageWeightAlertsFixedCSVString)
       s3Interface.writeFileToS3(duplicateResultList, listOfDupes.map(_.toCSVString()).mkString)
     }
@@ -808,7 +810,7 @@ object App {
     //   val AlertConfirmationTestResult: PerformanceResultsObject = setAlertStatusPageWeight(webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount), averages)
     webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount)
   }
-
+/*
   //This is to resolve issues where there is a missing Desktop or Mobile test so the tuple sorting gets borked - it wont give a perfect sort in this case, but better than the current state of things.
   def returnValidListOfPairs(list: List[PerformanceResultsObject]): (List[PerformanceResultsObject],List[PerformanceResultsObject]) = {
     val desktopList = for (result <- list if result.typeOfTest.contains("Desktop")) yield result
@@ -821,7 +823,7 @@ object App {
   }
 
   def orderListByDatePublished(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
-    println("orderListByWeightCalled with " + list.length + "elements")
+    println("orderListByDatePublished called with " + list.length + "elements")
     val validatedList: (List[PerformanceResultsObject], List[PerformanceResultsObject]) = returnValidListOfPairs(list)
     println("validated list has " + validatedList._1.length + " paired items, and " + validatedList._2.length + " leftover items")
     val tupleList: List[(PerformanceResultsObject,PerformanceResultsObject)] = listSinglesToPairs(validatedList._1)
@@ -1000,7 +1002,7 @@ object App {
     list.sortWith{(leftE:(PerformanceResultsObject, PerformanceResultsObject),rightE:(PerformanceResultsObject, PerformanceResultsObject)) =>
       leftE._1.timeLastLaunchedAsCAPITime().dateTime + leftE._2.timeLastLaunchedAsCAPITime().dateTime >= rightE._1.timeLastLaunchedAsCAPITime().dateTime + rightE._2.timeLastLaunchedAsCAPITime().dateTime}
   }
-
+*/
 
   def applyAnchorId(resultsObjectList: List[PerformanceResultsObject], lastIDAssigned: Int): (List[PerformanceResultsObject], Int) = {
     var iterator = lastIDAssigned + 1

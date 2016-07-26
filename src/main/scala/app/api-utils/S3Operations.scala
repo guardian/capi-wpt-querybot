@@ -160,48 +160,53 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       val objectData = s3Response.getObjectContent
       val myData = scala.io.Source.fromInputStream(objectData).getLines()
       val resultsIterator = for (line <- myData) yield {
-        val data: Array[String] = line.split(",")
-        var result = new PerformanceResultsObject(data(1),
-          data(7),
-          data(8),
-          data(9).toInt,
-          data(10).toInt,
-          data(11).toInt,
-          data(12).toInt,
-          data(13).toInt,
-          data(14).toInt,
-          data(15).toInt,
-          data(16),
-          data(17).toBoolean,
-          data(18).toBoolean,
-          data(19).toBoolean)
-        //todo - get element list
-        val elementArray = data.drop(20)
- //       println("**** Element Array pulled from file \n" + "length = " + elementArray.length)
-        if ((elementArray(2).toInt > 0) && (data(9).toInt > -1)){
- //       println("calling getElementListFromArray")
-        val elementList = getElementListFromArray(elementArray)
-        if(elementList.nonEmpty) {
-            {
- //             println("calling populateEditorialElementsList.")
-//             println("calling populateEditorialElementsList. \n elementList to be passed is:\n" + elementList.map(element => element.toHTMLRowString() + "\n"))
-            result.populateEditorialElementList(elementList)
+            val data: Array[String] = line.split(",")
+            var result = new PerformanceResultsObject(data(1),
+                data(7),
+                data(8),
+                data(9).toInt,
+                data(10).toInt,
+                data(11).toInt,
+                data(12).toInt,
+                data(13).toInt,
+                data(14).toInt,
+                data(15).toInt,
+                data(16),
+                data(17).toBoolean,
+                data(18).toBoolean,
+                data(19).toBoolean)
+            //todo - get element list
+            val elementArray = data.drop(20)
+            println("**** Element Array pulled from file \n" + "length = " + elementArray.length)
+            if ((elementArray(2).toInt > 0) && (data(9).toInt > -1)){
+            println("calling getElementListFromArray")
+            val elementList = getElementListFromArray(elementArray)
+            if(elementList.nonEmpty) {
+                  println("calling populateEditorialElementsList.")
+//                println("calling populateEditorialElementsList. \n elementList to be passed is:\n" + elementList.map(element => element.toHTMLRowString() + "\n"))
+                result.populateEditorialElementList(elementList)
+
+              }else{
+                  println("returned list from getElementListFromArray is empty")
+              }
+            } else {
+              println("Data in element array is not valid.\n")
+              println("elementArray(2).toInt gives: " + elementArray(2).toInt)
+              println("data(9).toInt gives: " + data(9).toInt)
             }
-          }
-        }
-        result.setHeadline(Option(data(2)))
-        result.setPageType(data(3))
-        val firstPublishedTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
-        result.setPageLastUpdated(firstPublishedTime)
-        val lastUpdateTime: Option[CapiDateTime] = result.stringtoCAPITime(data(5))
-        result.setPageLastUpdated(lastUpdateTime)
-        result.setLiveBloggingNow(data(6))
-        result
+            result.setHeadline(Option(data(2)))
+            result.setPageType(data(3))
+            val firstPublishedTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
+            result.setPageLastUpdated(firstPublishedTime)
+            val lastUpdateTime: Option[CapiDateTime] = result.stringtoCAPITime(data(5))
+            result.setPageLastUpdated(lastUpdateTime)
+            result.setLiveBloggingNow(data(6))
+            result
       }
       resultsIterator.toList
     } else {
-      val emptyList: List[PerformanceResultsObject] = List()
-      emptyList
+    val emptyList: List[PerformanceResultsObject] = List()
+    emptyList
     }
   }
 
