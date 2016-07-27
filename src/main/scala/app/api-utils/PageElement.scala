@@ -178,27 +178,26 @@ abstract  class PageElement {
     val contentDownloadClassname: String = "reqDownload"
     val bytesDownloadedClassname: String = "reqBytes"
     val errorStatusCodeClassname: String = "reqResult"
-    val iPClassname: String = "ReqIP"
+    val iPClassname: String = "reqIP"
 
-    val returnString= "<tr>" + "<td class=\"" + requestNumberClassname + "\">0</td>" +
+    val returnString= "<tr>" +
+      "<td class=\"" + requestNumberClassname + "\">0</td>" +
       "<td class=\"" + resourceClassname + "\">" + "<a href=\"" + resource + "\">" + resource + "</a>" + "</td>" +
       "<td class=\"" + contentTypeClassname + "\">" + contentType + "</td>" +
-      "<td class=\"" + requestStartClassname + "\">" + requestStart + "</td>" +
-      "<td class=\"" + dnsLookupClassname + "\">" + dnsLookUp + "</td>" +
-      "<td class=\"" + initialConnectionClassname + "\">" + initialConnection + "</td>" +
-      "<td class=\"" + sslNegotiationClassname + "\">" + sslNegotiation + "</td>" +
-      "<td class=\"" + timeToFirstByteClassname + "\">" + timeToFirstByte + "</td>" +
-      "<td class=\"" + contentDownloadClassname + "\">" + contentDownload + "</td>" +
+      "<td class=\"" + requestStartClassname + "\">" + requestStart + " ms" + "</td>" +
+      "<td class=\"" + dnsLookupClassname + "\">" + dnsLookUp + " ms" + "</td>" +
+      "<td class=\"" + initialConnectionClassname + "\">" + initialConnection + " ms" + "</td>" +
+      "<td class=\"" + sslNegotiationClassname + "\">" + sslNegotiation + " ms" + "</td>" +
+      "<td class=\"" + timeToFirstByteClassname + "\">" + timeToFirstByte + " ms" + "</td>" +
+      "<td class=\"" + contentDownloadClassname + "\">" + contentDownload + " ms" + "</td>" +
       "<td class=\"" + bytesDownloadedClassname + "\">" + (bytesDownloaded.toDouble/1024) + " KB</td>" +
       "<td class=\"" + errorStatusCodeClassname + "\">" + errorStatusCode + "</td>" +
       "<td class=\"" + iPClassname + "\">" + iP + "</td>" +
       "</tr>"
-    println("returning element as HTML String")
     returnString
   }
 
   def convertToPageElementFromHTMLTableRow():PageElementFromHTMLTableRow = {
-    println("converting PageElement to be from HTMLROW.")
     new PageElementFromHTMLTableRow(returnAsHTMLString())
   }
 
