@@ -101,14 +101,6 @@ object App {
     //Initialize Interactive email alerts lists - these will be used to generate emails
     var interactiveAlertList: List[PerformanceResultsObject] = List()
 
-    // var articleCSVResults: String = ""
-    //  var liveBlogCSVResults: String = ""
-    // var interactiveCSVResults: String = ""
-    //  var videoCSVResults: String = ""
-    //  var audioCSVResults: String = ""
-    //  var frontsCSVResults: String = ""
-
-
     //Create new S3 Client
     println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
@@ -165,7 +157,9 @@ object App {
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     /*    val localInput = new LocalFileOperations
     val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
-    val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
+    val testResultRepairHandler = new ResultsFromPreviousTests(previousResults)
+    val previousTestResultsHandler = new ResultsFromPreviousTests(testResultRepairHandler.reAddPageElementsToPastResults())
+    //    val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
     println("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
     //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()

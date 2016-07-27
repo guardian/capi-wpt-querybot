@@ -44,7 +44,10 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   val interactiveSampleFileName = "interactivesamples.conf"
   val visualsPagesFileName = "visuals.conf"
 
-  val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+ val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+// val resultsFromPreviousTests = "resultsFromPreviousTestsShortened.csv"
+//val resultsFromPreviousTests = "shortenedresultstest.csv"
+  val outputFile = "shortenedresultstest.csv"
 
   //Create new S3 Client
   val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
@@ -148,27 +151,28 @@ val capiResult5: (Option[ContentFields],String) = (Option(makeContentStub(Option
 
 val capiResultList1New: List[(Option[ContentFields],String)] = List(capiResult1, capiResult2, capiResult3, capiResult5)
 val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiResult1, capiResult2, capiResult3, capiResult4, capiResult5)
-
+*/
+/*
 "A previous results object" should "have a list of pages with deduped active alerts and live liveblogs from the last 24 hours" in {
   println("prevResults.dedupedPreviousResultsToRestest.length == " + prevResults.dedupedPreviousResultsToRestest.length)
   assert(prevResults.dedupedPreviousResultsToRestest.length == 3)
-}
+}*/
 
-"Passing a list of CAPI results to previous results object" should "return elements that have not been tested already" in {
+/*"Passing a list of CAPI results to previous results object" should "return elements that have not been tested already" in {
   println("prevResults.returnPagesNotYetTested(capiResultList1New).length == " + prevResults.returnPagesNotYetTested(capiResultList1New).length)
   assert(prevResults.returnPagesNotYetTested(capiResultList1New).length == 1)
-}
+}*/
 
-"A list of CAPI results contains an item that has been tested but has since been modified" should "be returned too" in {
+/*"A list of CAPI results contains an item that has been tested but has since been modified" should "be returned too" in {
   println("prevResults.returnPagesNotYetTested(capiResultList1New1Update).length == " + prevResults.returnPagesNotYetTested(capiResultList1New1Update).length)
 //    println("urls returned == " +  prevResults.returnPagesNotYetTested(capiResultList1New1Update).map(_._2))
   assert(prevResults.returnPagesNotYetTested(capiResultList1New1Update).length == 2)
-}
+}*/
 
-"All lists in previous results object" should "be conistent in number" in {
+/*"All lists in previous results object" should "be conistent in number" in {
   assert(prevResults.checkConsistency())
 }
-
+*/
 /*  "messing with capi queries etc " should "gimmie what I want what I really really want" in {
 
   val iamTestingLocally = false
@@ -313,9 +317,9 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
   //val listofLargeInteractives: List[String] = s3Interface.getUrls(interactiveSampleFileName)
 
   //obtain list of items previously alerted on
-  val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
-  /*    val localInput = new LocalFileOperations
-  val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
+  //val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+  //    val localInput = new LocalFileOperations
+  //val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)
   val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
   println("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
   val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
@@ -390,6 +394,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
   println("size of liveblog urls from CAPI = " + liveBlogUrls.length)
   println("size of interactive urls from CAPI = " + interactiveUrls.length)
 }
+*/
 
 /*  "Remove duplicates function" should "work as expected" in {
   //Create new S3 Client
@@ -453,8 +458,8 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
   }
   assert(allIsWell)
 }*/
-
-/*  "Getting data from results file" should " allow me to repopulate data from tests" in {
+/*
+  "Getting data from results file" should " allow me to repopulate data from tests" in {
   //Create new S3 Client
   val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
   val s3BucketName = "capi-wpt-querybot"
@@ -489,7 +494,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
   val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
   val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
 
-  val resurrectedResults: List[PerformanceResultsObject] = previousTestResultsHandler.fullResultsList.map(result => {
+  val resurrectedResults: List[PerformanceResultsObject] = previousTestResultsHandler.previousResults.map(result => {
     val newResult = getResult(result.testUrl, result.friendlyResultUrl, wptBaseUrl, wptApiKey, urlFragments)
     newResult.headline = result.headline
     newResult.pageType = result.pageType
@@ -508,10 +513,81 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
   val resultsToRecordCSVString: String = resurrectedResults.map(_.toCSVString()).mkString
   s3Interface.writeFileToS3(resultsFromPreviousTestsTestVersion, resultsToRecordCSVString)
   assert(s3Interface.doesFileExist(resultsFromPreviousTestsTestVersion))
-}*/
+}
 */
-*/
-"Data Summary object " should " be able to produce a data summary from the results object" in {
+
+  "vals in previous results object " should " be correct" in {
+    val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val testResultsHandler = new ResultsFromPreviousTests(previousResults)
+    println("\n\n\n ***** There are " + testResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
+    println("resultsFromLast24Hours == " + testResultsHandler.resultsFromLast24Hours.length)
+    println("oldResults == " + testResultsHandler.oldResults.length)
+    println("previousResultsToRetest == " + testResultsHandler.previousResultsToRetest.length)
+    println("recentButNoRetestRequired == " + testResultsHandler.recentButNoRetestRequired.length)
+    println("desktopPreviousResultsToReTest == " + testResultsHandler.desktopPreviousResultsToReTest.length)
+    println("mobilePreviousResultsToReTest == " + testResultsHandler.mobilePreviousResultsToReTest.length)
+    println("dedupedMobilePreviousResultsToRetest == " + testResultsHandler.dedupedMobilePreviousResultsToRetest.length)
+    println("dedupedPreviousResultsToRestest == " + testResultsHandler.dedupedPreviousResultsToRestest.length)
+    println("resultsWithNoPageElements == " + testResultsHandler.resultsWithNoPageElements.length)
+
+    val result = previousResults.tail.tail.head
+    println("\n\n\n ******* checking contents of first editorial element: ")
+    println("length of editorial elements list == " + result.editorialElementList.length)
+    println("resource for first 3 elements == " + result.editorialElementList.head.resource + "\n" +
+    result.editorialElementList.tail.head.resource + "\n" +
+    result.editorialElementList.tail.tail.head.resource)
+    println("info for first 3 elements == ")
+    println("\nElement 1")
+    println(result.editorialElementList.head.resource + "\n" +
+      result.editorialElementList.head.contentType + "\n" +
+      result.editorialElementList.head.requestStart + "\n" +
+      result.editorialElementList.head.dnsLookUp + "\n" +
+      result.editorialElementList.head.initialConnection + "\n" +
+      result.editorialElementList.head.sslNegotiation + "\n" +
+      result.editorialElementList.head.timeToFirstByte + "\n" +
+      result.editorialElementList.head.contentDownload + "\n" +
+      result.editorialElementList.head.bytesDownloaded + "\n" +
+      result.editorialElementList.head.errorStatusCode + "\n" +
+      result.editorialElementList.head.iP)
+
+    println("\nElement 2")
+    println(result.editorialElementList.tail.head.resource + "\n" +
+      result.editorialElementList.tail.head.contentType + "\n" +
+      result.editorialElementList.tail.head.requestStart + "\n" +
+      result.editorialElementList.tail.head.dnsLookUp + "\n" +
+      result.editorialElementList.tail.head.initialConnection + "\n" +
+      result.editorialElementList.tail.head.sslNegotiation + "\n" +
+      result.editorialElementList.tail.head.timeToFirstByte + "\n" +
+      result.editorialElementList.tail.head.contentDownload + "\n" +
+      result.editorialElementList.tail.head.bytesDownloaded + "\n" +
+      result.editorialElementList.tail.head.errorStatusCode + "\n" +
+      result.editorialElementList.tail.head.iP)
+
+    println("\nElement 3")
+    println(result.editorialElementList.tail.head.resource + "\n" +
+      result.editorialElementList.tail.tail.head.contentType + "\n" +
+      result.editorialElementList.tail.tail.head.requestStart + "\n" +
+      result.editorialElementList.tail.tail.head.dnsLookUp + "\n" +
+      result.editorialElementList.tail.tail.head.initialConnection + "\n" +
+      result.editorialElementList.tail.tail.head.sslNegotiation + "\n" +
+      result.editorialElementList.tail.tail.head.timeToFirstByte + "\n" +
+      result.editorialElementList.tail.tail.head.contentDownload + "\n" +
+      result.editorialElementList.tail.tail.head.bytesDownloaded + "\n" +
+      result.editorialElementList.tail.tail.head.errorStatusCode + "\n" +
+      result.editorialElementList.tail.tail.head.iP)
+
+    println("Output of CSV String print: \n" + result.toCSVString())
+
+
+   // val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults,testResultsHandler)
+   // dataSummary.printSummaryDataToScreen()
+    s3Interface.writeFileToS3(outputFile, previousResults.map(_.toCSVString()).mkString)
+    assert(true)
+  }
+
+
+/*
+  "Data Summary object " should " be able to produce a data summary from the results object" in {
  val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
     println("\n\n\n ***** There are " + testResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
@@ -520,7 +596,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     dataSummary.printSummaryDataToScreen()
     assert(true)
   }
-
+*/
  /* "results written with full element list" should "be able to be read in" in {
     val s3TestFile = "testResultsWithFullElementList.csv"
     println("length of results file: " + previousResults.length)
@@ -550,7 +626,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     assert(numberOfEmptyElementLists == 0)
   }*/
 
-  "I" should "be able to get a list of resutls with no elements" in {
+ /* "I" should "be able to get a list of resutls with no elements" in {
     val previousResultsHandler = new ResultsFromPreviousTests(previousResults.take(500))
     val listWithElements = previousResultsHandler.previousResults.filter(_.editorialElementList.nonEmpty)
     val listWithNoElements = previousResultsHandler.previousResults.filter(_.editorialElementList.isEmpty)
@@ -569,7 +645,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     println("length of broken results list = "+ resultsWeHaveBroken.length)
     assert(resultsWithElementList.length > listWithElements.length && resultsWithElementList.head.editorialElementList.nonEmpty)
 
-  }
+  }*/
 
   def getResult(pageUrl: String, friendlyUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String] ): PerformanceResultsObject = {
     val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
@@ -577,6 +653,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     val result: PerformanceResultsObject = wpt.getResults(pageUrl, xmlResultUrl)
     result
   }
+
 
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {

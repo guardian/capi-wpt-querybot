@@ -84,6 +84,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     .addPathSegment("/runtest.php")
     .addQueryParameter("f", wptResponseFormat)
     .addQueryParameter("k", apiKey)
+    .addQueryParameter("priority", "3")
     .addQueryParameter("url", gnmPageUrl + fragments)
     .build()
 
@@ -140,6 +141,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     .addPathSegment("/runtest.php")
     .addQueryParameter("f", wptResponseFormat)
     .addQueryParameter("k", apiKey)
+    .addQueryParameter("priority", "3")
     .addQueryParameter("mobile", "1")
     .addQueryParameter("mobileDevice", "Nexus5")
     .addQueryParameter("location", wptLocation + ":Chrome.3G")
