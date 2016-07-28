@@ -157,9 +157,7 @@ object App {
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     /*    val localInput = new LocalFileOperations
     val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
-    val testResultRepairHandler = new ResultsFromPreviousTests(previousResults)
-    val previousTestResultsHandler = new ResultsFromPreviousTests(testResultRepairHandler.reAddPageElementsToPastResults())
-    //    val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
+    val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
     println("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
     //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
