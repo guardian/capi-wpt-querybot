@@ -61,11 +61,17 @@ object App {
     val frontsCSVName = "accumulatedFrontsPerformanceData.csv"
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
-//    val resultsFromPreviousTestsWrite = "resultsFromPreviousTestsTestOutput.csv"
+    val pageWeightAlertsFromPreviousTests = "/alerts/pageWeightAlertsFromPreviousTests.csv"
+    val interactiveAlertsFromPreviousTests = "/alerts/interactiveAlertsFromPreviousTests.csv"
 
     val alertsThatHaveBeenFixed = "alertsthathavebeenfixed.csv"
     val duplicateResultList = "duplicateresultsfromlastrun.csv"
     val runLog = "runLog.csv"
+
+    // summary files
+    val runSummaryFile = "/runLogs/runSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
+    val pageWeightAlertSummaryFile = "/runLogs/pageWeightAlertSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
+    val interactiveAlertSummaryFile = "/runLogs/interactiveAlertSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
@@ -161,6 +167,8 @@ object App {
     println("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
     //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
+    val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
+    val previousInteractiveAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(interactiveAlertsFromPreviousTests)
 
     //validate list handling
     val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
@@ -445,7 +453,8 @@ object App {
     //record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
 
-    val resultsToRecord = sorter.orderListByDatePublished(combinedResultsForFile ::: previousTestResultsHandler.oldResults.distinct)
+    val resultsToRecord = sorter.orderListByDatePublished(combinedResultsForFile) ::: previousTestResultsHandler.oldResults
+
     //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
     println("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
@@ -563,6 +572,14 @@ object App {
     } else {
       println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
     }
+
+    val newPageWeightAlerts = newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList
+    // write pageWeight alerts results file
+    s3Interface.writeFileToS3(pageWeightAlertsFromPreviousTests, (newPageWeightAlerts ::: previousPageWeightAlerts).map(_.toCSVString()).mkString )
+    //write interactive alerts results file
+    s3Interface.writeFileToS3(interactiveAlertsFromPreviousTests, (newInteractiveAlertsList ::: previousInteractiveAlerts).map(_.toCSVString()).mkString )
+
+
     val jobFinish = DateTime.now()
     val timeTaken = (jobFinish.getMillis - jobStart.getMillis).toDouble / (1000 * 60)
     val numberOfPagesTested = urlsToSend.length
@@ -578,6 +595,17 @@ object App {
     } else {
       0.0
     }
+
+    //generate summaries
+        val resultSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, combinedResultsList, previousTestResultsHandler)
+        val pageWeightAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newPageWeightAlerts, new ResultsFromPreviousTests(previousPageWeightAlerts))
+        val interactiveAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newInteractiveAlertsList, new ResultsFromPreviousTests(previousInteractiveAlerts))
+        //write summaries to files
+        println("writing run summary data to new file")
+        s3Interface.writeFileToS3(runSummaryFile, resultSummary.summaryDataToString())
+        s3Interface.writeFileToS3(pageWeightAlertSummaryFile, pageWeightAlertsSummary.summaryDataToString())
+        s3Interface.writeFileToS3(interactiveAlertSummaryFile, interactiveAlertsSummary.summaryDataToString())
+
 
     val runSummaryCSVString: String = jobStart + "," +
       jobFinish + "," +
