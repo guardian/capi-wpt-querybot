@@ -131,7 +131,7 @@ class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
   override val mobileTimeDocCompleteInMs: Int = 15 * 1000
   override val mobileKBInDocComplete: Double = 3000
   override val mobileTimeFullyLoadedInMs: Int = 20 * 1000
-  override val mobileKBInFullyLoaded: Double = 3072
+  override val mobileKBInFullyLoaded: Double = 4096
   override val mobileEstUSPrePaidCost: Double = 0.40
   override val mobileEstUSPostPaidCost: Double = 0.30
   override val mobileSpeedIndex: Int = 4500
