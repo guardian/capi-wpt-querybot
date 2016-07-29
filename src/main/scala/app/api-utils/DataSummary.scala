@@ -394,5 +394,213 @@ look through data - what are the main embeds
  }
 
 
+  def summaryDataToString(): String ={
+    "\n\n\n\n ****************** SUMMARY DATA ********************\n" + "\n" +
+    "Job Summary: \n" + "\n" +
+    "jobStarted at: " + jobStartedTime.toDateTime + "\n" +
+    "jobFinished at: " + jobFinishTime.toDateTime + "\n" +
+    "Duration of Run: " + durationOfRunMin + " minutes."  + "\n" +
+    "Number of pages from CAPI queries: " + numberOfPagesFromCAPI + "\n" +
+    "Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun + "\n" +
+    "Number of pages tested: " + numberOfPagesSentToWPT + "\n" +
+    "**** \n\n" + "\n" +
+    "*************Element Summary:****************************\n" + "\n" +
+    "numberOfPagesExamined: " + allResults.length + "\n" +
+    "AudioBoom: \n" + "\n" +
+    "Number of Pages with Audioboom embed: " + pagesWithAudioBoomEmbed.length + "\n" +
+    "Number of Pages with Audioboom embed that alerted for pageWeight: " + pagesWithAudioBoomEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Audioboom embed that alerted for pageSpeed: " + pagesWithAudioBoomEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of AudioBoom embed: " + audioBoom.map(_.bytesDownloaded).sum.toDouble/(audioBoom.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Brightcove: \n" + "\n" +
+    "Number of Pages with Brightcove embed: " + pagesWithBrightcoveEmbed.length  + "\n" +
+    "Number of Pages with Brightcove embed that alerted for pageWeight: " + pagesWithBrightcoveEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Brightcove embed that alerted for pageSpeed: " + pagesWithBrightcoveEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Brightcove embed: " + brightcove.map(_.bytesDownloaded).sum.toDouble/(brightcove.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "CNN: \n" + "\n" +
+    "Number of Pages with CNN embed: " + pagesWithCNNEmbed.length  + "\n" +
+    "Number of Pages with CNN embed that alerted for pageWeight: " + pagesWithCNNEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with CNN embed that alerted for pageSpeed: " + pagesWithCNNEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of CNN embed: " + cnn.map(_.bytesDownloaded).sum.toDouble/(cnn.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "DailyMotion: \n" + "\n" +
+    "Number of Pages with DailyMotion embed: " + pagesWithDailyMotionEmbed.length  + "\n" +
+    "Number of Pages with DailyMotion embed that alerted for pageWeight: " + pagesWithDailyMotionEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with DailyMotion embed that alerted for pageSpeed: " + pagesWithDailyMotionEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of DailyMotion embed: " + dailymotion.map(_.bytesDownloaded).sum.toDouble/(dailymotion.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Document Cloud: \n" + "\n" +
+    "Number of Pages with Document Cloud embed: " + pagesWithDocumentCloudEmbed.length  + "\n" +
+    "Number of Pages with Document Cloud embed that alerted for pageWeight: " + pagesWithDocumentCloudEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Document Cloud embed that alerted for pageSpeed: " + pagesWithDocumentCloudEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Document Cloud embed: " + documentCloud.map(_.bytesDownloaded).sum.toDouble/(documentCloud.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Facebook: \n" + "\n" +
+    "Number of Pages with Facebook embed: " + pagesWithFacebookEmbed.length  + "\n" +
+    "Number of Pages with Facebook embed that alerted for pageWeight: " + pagesWithFacebookEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Facebook embed that alerted for pageSpeed: " + pagesWithFacebookEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Facebook embed: " + facebook.map(_.bytesDownloaded).sum.toDouble/(facebook.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "FormStack: \n" + "\n" +
+    "Number of Pages with FormStack embed: " + pagesWithFormStackEmbed.length  + "\n" +
+    "Number of Pages with FormStack embed that alerted for pageWeight: " + pagesWithFormStackEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with FormStack embed that alerted for pageSpeed: " + pagesWithFormStackEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of FormStack embed: " + formstack.map(_.bytesDownloaded).sum.toDouble/(formstack.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Gif embed: \n" + "\n" +
+    "Number of Pages with Gif embed: " + pagesWithGifEmbed.length  + "\n" +
+    "Number of Pages with Gif embed that alerted for pageWeight: " + pagesWithGifEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Gif embed that alerted for pageSpeed: " + pagesWithGifEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Gif embed: " + gif.map(_.bytesDownloaded).sum.toDouble/(gif.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "GoogleMaps: \n" + "\n" +
+    "Number of Pages with GoogleMaps embed: " + pagesWithGoogleMapsEmbed.length  + "\n" +
+    "Number of Pages with GoogleMaps embed that alerted for pageWeight: " + pagesWithGoogleMapsEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with GoogleMaps embed that alerted for pageSpeed: " + pagesWithGoogleMapsEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of GoogleMaps embed: " + googlemaps.map(_.bytesDownloaded).sum.toDouble/(googlemaps.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Guardian Audio: \n" + "\n" +
+    "Number of Pages with Guardian Audio embed: " + pagesWithGuardianAudio.length  + "\n" +
+    "Number of Pages with Guardian Audio embed that alerted for pageWeight: " + pagesWithGuardianAudio.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Guardian Audio embed that alerted for pageSpeed: " + pagesWithGuardianAudio.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Guardian Audio embed: " + guardianAudio.map(_.bytesDownloaded).sum.toDouble/(guardianAudio.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Guardian Comments: \n" + "\n" +
+    "Number of Pages with Guardian Comments embed: " + pagesWithGuardianCommentsEmbed.length  + "\n" +
+    "Number of Pages with Guardian Comments embed that alerted for pageWeight: " + pagesWithGuardianCommentsEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Guardian Comments embed that alerted for pageSpeed: " + pagesWithGuardianCommentsEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Guardian Comments embed: " + guardianComments.map(_.bytesDownloaded).sum.toDouble/(guardianComments.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Guardian Videos: \n" + "\n" +
+    "Number of Pages with Guardian Videos embed: " + pagesWithGuardianVideos.length  + "\n" +
+    "Number of Pages with Guardian Videos embed that alerted for pageWeight: " + pagesWithGuardianVideos.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Guardian Videos embed that alerted for pageSpeed: " + pagesWithGuardianVideos.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Guardian Videos embed: " + guardianVideos.map(_.bytesDownloaded).sum.toDouble/(guardianVideos.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Guardian Images: \n" + "\n" +
+    "Number of Pages with Guardian Images embed: " + pagesWithGuardianImages.length  + "\n" +
+    "Number of Pages with Guardian Images embed that alerted for pageWeight: " + pagesWithGuardianImages.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Guardian Images embed that alerted for pageSpeed: " + pagesWithGuardianImages.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Guardian Images embed: " + guardianImages.map(_.bytesDownloaded).sum.toDouble/(guardianImages.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Guardian Upload: \n" + "\n" +
+    "Number of Pages with Guardian Upload embed: " + pagesWithGuardianUpload.length  + "\n" +
+    "Number of Pages with Guardian Upload embed that alerted for pageWeight: " + pagesWithGuardianUpload.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Guardian Upload embed that alerted for pageSpeed: " + pagesWithGuardianUpload.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Guardian Upload embed: " + guardianUpload.map(_.bytesDownloaded).sum.toDouble/(guardianUpload.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Guardian Witness Image: \n" + "\n" +
+    "Number of Pages with Guardian Witness Image embed: " + pagesWithGuardianWitnessImageEmbed.length  + "\n" +
+    "Number of Pages with Guardian Witness Image embed that alerted for pageWeight: " + pagesWithGuardianWitnessImageEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Guardian Witness Image embed that alerted for pageSpeed: " + pagesWithGuardianWitnessImageEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Guardian Witness Image embed: " + guardianWitnessImage.map(_.bytesDownloaded).sum.toDouble/(guardianWitnessImage.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Guardian Witness Video: \n" + "\n" +
+    "Number of Pages with Guardian Witness Video embed: " + pagesWithGuardianWitnessVideoEmbed.length  + "\n" +
+    "Number of Pages with Guardian Witness Video embed that alerted for pageWeight: " + pagesWithGuardianWitnessVideoEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Guardian Witness Video embed that alerted for pageSpeed: " + pagesWithGuardianWitnessVideoEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Guardian Witness Video embed: " + guardianWitnessVideo.map(_.bytesDownloaded).sum.toDouble/(guardianWitnessVideo.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Hulu: \n" + "\n" +
+    "Number of Pages with Hulu embed: " + pagesWithHuluEmbed.length  + "\n" +
+    "Number of Pages with Hulu embed that alerted for pageWeight: " + pagesWithHuluEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Hulu embed that alerted for pageSpeed: " + pagesWithHuluEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Hulu embed: " + hulu.map(_.bytesDownloaded).sum.toDouble/(hulu.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Image Embed: \n" + "\n" +
+    "Number of Pages with Image Embed embed: " + pagesWithImageEmbed.length  + "\n" +
+    "Number of Pages with Image Embed embed that alerted for pageWeight: " + pagesWithImageEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Image Embed embed that alerted for pageSpeed: " + pagesWithImageEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Image Embed embed: " + imageEmbed.map(_.bytesDownloaded).sum.toDouble/(imageEmbed.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Instagram: \n" + "\n" +
+    "Number of Pages with Instagram embed: " + pagesWithInstagramEmbed.length  + "\n" +
+    "Number of Pages with Instagram embed that alerted for pageWeight: " + pagesWithInstagramEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Instagram embed that alerted for pageSpeed: " + pagesWithInstagramEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Instagram embed: " + instagram.map(_.bytesDownloaded).sum.toDouble/(instagram.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "InfoStrada: \n" + "\n" +
+    "Number of Pages with InfoStrada embed: " + pagesWithInfoStradaEmbed.length  + "\n" +
+    "Number of Pages with InfoStrada embed that alerted for pageWeight: " + pagesWithInfoStradaEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with InfoStrada embed that alerted for pageSpeed: " + pagesWithInfoStradaEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of InfoStrada embed: " + infostrada.map(_.bytesDownloaded).sum.toDouble/(infostrada.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "ParliamentLive TV: \n" + "\n" +
+    "Number of Pages with ParliamentLive TV embed: " + pagesWithParliamentLiveTvEmbed.length  + "\n" +
+    "Number of Pages with ParliamentLive TV embed that alerted for pageWeight: " + pagesWithParliamentLiveTvEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with ParliamentLive TV embed that alerted for pageSpeed: " + pagesWithParliamentLiveTvEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of ParliamentLive TV embed: " + parliamentLiveTv.map(_.bytesDownloaded).sum.toDouble/(parliamentLiveTv.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Scribd: \n" + "\n" +
+    "Number of Pages with Scribd embed: " + pagesWithScribdEmbed.length  + "\n" +
+    "Number of Pages with Scribd embed that alerted for pageWeight: " + pagesWithScribdEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Scribd embed that alerted for pageSpeed: " + pagesWithScribdEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Scribd embed: " + scribd.map(_.bytesDownloaded).sum.toDouble/(scribd.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "SoundCloud: \n" + "\n" +
+    "Number of Pages with SoundCloud embed: " + pagesWithSoundCloudEmbed.length  + "\n" +
+    "Number of Pages with SoundCloud embed that alerted for pageWeight: " + pagesWithSoundCloudEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with SoundCloud embed that alerted for pageSpeed: " + pagesWithSoundCloudEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of SoundCloud embed: " + soundCloud.map(_.bytesDownloaded).sum.toDouble/(soundCloud.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Spotify: \n" + "\n" +
+    "Number of Pages with Spotify embed: " + pagesWithSpotifyEmbed.length  + "\n" +
+    "Number of Pages with Spotify embed that alerted for pageWeight: " + pagesWithSpotifyEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Spotify embed that alerted for pageSpeed: " + pagesWithSpotifyEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Spotify embed: " + spotify.map(_.bytesDownloaded).sum.toDouble/(spotify.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Twitter: \n" + "\n" +
+    "Number of Pages with Twitter embed: " + pagesWithTwitterEmbed.length  + "\n" +
+    "Number of Pages with Twitter embed that alerted for pageWeight: " + pagesWithTwitterEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Twitter embed that alerted for pageSpeed: " + pagesWithTwitterEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Twitter embed: " + twitter.map(_.bytesDownloaded).sum.toDouble/(twitter.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "UStream: \n" + "\n" +
+    "Number of Pages with UStream embed: " + pagesWithUStreamEmbed.length  + "\n" +
+    "Number of Pages with UStream embed that alerted for pageWeight: " + pagesWithUStreamEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with UStream embed that alerted for pageSpeed: " + pagesWithUStreamEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of UStream embed: " + uStream.map(_.bytesDownloaded).sum.toDouble/(uStream.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Vevo: \n" + "\n" +
+    "Number of Pages with Vevo embed: " + pagesWithVevoEmbed.length  + "\n" +
+    "Number of Pages with Vevo embed that alerted for pageWeight: " + pagesWithVevoEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Vevo embed that alerted for pageSpeed: " + pagesWithVevoEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Vevo embed: " + vevo.map(_.bytesDownloaded).sum.toDouble/(vevo.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Vimeo: \n" + "\n" +
+    "Number of Pages with Vimeo embed: " + pagesWithVimeoEmbed.length  + "\n" +
+    "Number of Pages with Vimeo embed that alerted for pageWeight: " + pagesWithVimeoEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Vimeo embed that alerted for pageSpeed: " + pagesWithVimeoEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Vimeo embed: " + vimeo.map(_.bytesDownloaded).sum.toDouble/(vimeo.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "YouTube: \n" + "\n" +
+    "Number of Pages with YouTube embed: " + pagesWithYouTubeEmbed.length  + "\n" +
+    "Number of Pages with YouTube embed that alerted for pageWeight: " + pagesWithYouTubeEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Youtube embed that alerted for pageSpeed: " + pagesWithYouTubeEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of YouTube embed: " + youTube.map(_.bytesDownloaded).sum.toDouble/(youTube.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Audio MP3: \n" + "\n" +
+    "Number of Pages with Audio MP3 embeds: " + pagesWithMP3Embed.length  + "\n" +
+    "Number of Pages with  Audio MP3 embeds that alerted for pageWeight: " + pagesWithMP3Embed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Audio MP3 embeds that alerted for pageSpeed: " + pagesWithMP3Embed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Audio MP3 embeds: " + mP3.map(_.bytesDownloaded).sum.toDouble/(mP3.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Video MP4: \n" + "\n" +
+    "Number of Pages with Video MP4 embeds: " + pagesWithMP4Embed.length  + "\n" +
+    "Number of Pages with  Video MP4 embeds that alerted for pageWeight: " + pagesWithMP4Embed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with Video MP4 embeds that alerted for pageSpeed: " + pagesWithMP4Embed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of Video MP4 embeds: " + mP4.map(_.bytesDownloaded).sum.toDouble/(mP4.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "Unknown Embed: \n" + "\n" +
+    "Number of Pages with unknown embeds: " + pagesWithUnknownEmbed.length  + "\n" +
+    "Number of Pages with  unknown embeds that alerted for pageWeight: " + pagesWithUnknownEmbed.count(_.alertStatusPageWeight) + "\n" +
+    "Number of Pages with unknown embeds that alerted for pageSpeed: " + pagesWithUnknownEmbed.count(_.alertStatusPageSpeed) + "\n" +
+    "Average size of unknown embeds: " + unknownElement.map(_.bytesDownloaded).sum.toDouble/(unknownElement.length * 1024) + " kB" + "\n" +
+    "\n\n" + "\n" +
+    "\n ****************************************************\n\n\n\n"
+  }
+
+
 
 }

@@ -1,5 +1,5 @@
 import app.api.{ListSorter, S3Operations}
-import app.apiutils.{ResultsFromPreviousTests, LocalFileOperations, PerformanceResultsObject}
+import app.apiutils.{ListSorter, ResultsFromPreviousTests, LocalFileOperations, PerformanceResultsObject}
 import com.gu.contentapi.client.model.v1.CapiDateTime
 import org.joda.time.DateTime
 import org.scalatest._
@@ -45,6 +45,7 @@ import org.scalatest._
     val visualsPagesFileName = "visuals.conf"
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+
 
     //Create new S3 Client
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
