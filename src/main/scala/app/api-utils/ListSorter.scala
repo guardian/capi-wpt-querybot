@@ -175,7 +175,9 @@ class ListSorter {
         println("make tuple has odd number of items in list"); tupleList
       }
       else {
-        makeTuple(tupleList ::: List((restOfList.head, restOfList.tail.head)), restOfList.tail.tail)
+        val innerList = tupleList ::: List((restOfList.head, restOfList.tail.head))
+        val innerRestOfList = restOfList.tail.tail
+        makeTuple(innerList, innerRestOfList)
       }
     }
   }

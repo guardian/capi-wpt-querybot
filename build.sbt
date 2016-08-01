@@ -38,12 +38,12 @@ libraryDependencies ++= Seq(
   "com.google.apis" % "google-api-services-gmail" % "v1-rev37-1.21.0",
   // javax
   "javax.mail" % "mail" % "1.5.0-b01",
-  "io.argonaut" %% "argonaut" % "6.1"
+  "io.argonaut" %% "argonaut" % "6.1")
   // courier (email library) dependencies
   //"me.lessis" %% "courier" % "0.1.3",
   //mock java mail - for testing emails
   //"org.jvnet.mock-javamail" % "mock-javamail" % "1.9" % "test"
-)
+
 
 assemblyMergeStrategy in assembly := {
     case PathList("META-INF", xs @ _*) => MergeStrategy.discard
