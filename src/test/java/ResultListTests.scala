@@ -516,7 +516,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
 }
 */
 
-  "vals in previous results object " should " be correct" in {
+/*  "vals in previous results object " should " be correct" in {
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
     println("\n\n\n ***** There are " + testResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
@@ -583,10 +583,10 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
    // dataSummary.printSummaryDataToScreen()
     s3Interface.writeFileToS3(outputFile, previousResults.map(_.toCSVString()).mkString)
     assert(true)
-  }
+  }*/
 
 
-/*
+
   "Data Summary object " should " be able to produce a data summary from the results object" in {
  val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
@@ -594,9 +594,14 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
 
     val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults,testResultsHandler)
     dataSummary.printSummaryDataToScreen()
+    //write summaries to files
+    val runSummaryFile = "runSummarytest.txt"
+    println("writing run summary data to new file")
+    s3Interface.writeFileToS3(runSummaryFile, dataSummary.summaryDataToString())
+
     assert(true)
   }
-*/
+
  /* "results written with full element list" should "be able to be read in" in {
     val s3TestFile = "testResultsWithFullElementList.csv"
     println("length of results file: " + previousResults.length)

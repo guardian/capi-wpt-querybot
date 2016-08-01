@@ -478,7 +478,7 @@ object App {
     val interactiveDashboardDesktop = new InteractiveDashboardDesktop(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
     val interactiveDashboardMobile = new InteractiveDashboardMobile(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
 
-    val pageWeightAlertsPreviouslyFixed = s3Interface.getResultsFileFromS3("alertsthathavebeenfixed.csv")
+    val pageWeightAlertsPreviouslyFixed = s3Interface.getResultsFileFromS3(alertsThatHaveBeenFixed)
     val pageWeightAlertsFixedThisRun = for (alert <- previousTestResultsHandler.hasPreviouslyAlertedOnWeight if !(articlePageWeightAlertList ::: liveBlogPageWeightAlertList ::: interactivePageWeightAlertList).map(result => (result.testUrl, result.typeOfTest)).contains((alert.testUrl, alert.typeOfTest))) yield alert
     val pageWeightAlertsFixedCSVString = (pageWeightAlertsFixedThisRun ::: pageWeightAlertsPreviouslyFixed).map(_.toCSVString()).mkString
 
@@ -605,6 +605,8 @@ object App {
         s3Interface.writeFileToS3(runSummaryFile, resultSummary.summaryDataToString())
         s3Interface.writeFileToS3(pageWeightAlertSummaryFile, pageWeightAlertsSummary.summaryDataToString())
         s3Interface.writeFileToS3(interactiveAlertSummaryFile, interactiveAlertsSummary.summaryDataToString())
+
+
 
 
     val runSummaryCSVString: String = jobStart + "," +
