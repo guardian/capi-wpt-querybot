@@ -82,9 +82,12 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   }
   println("config values ok")
   val contentApiKey: String = configArray(0)
-  val wptBaseUrl: String = configArray(1)
+  val wptBaseUrl: String = "http://www.webpagetest.org"
+  val wptApiKey: String = "A.71eac614164a5b92db820e529c3a62d8"
+  val wptLocation: String = "ec2-eu-central-1"
+/*  val wptBaseUrl: String = configArray(1)
   val wptApiKey: String = configArray(2)
-  val wptLocation: String = configArray(3)
+  val wptLocation: String = configArray(3)*/
   val emailUsername: String = configArray(4)
   val emailPassword: String = configArray(5)
   val visualsApiUrl: String = configArray(6)
@@ -587,7 +590,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
 
 
 
-  "Data Summary object " should " be able to produce a data summary from the results object" in {
+/*  "Data Summary object " should " be able to produce a data summary from the results object" in {
  val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
     println("\n\n\n ***** There are " + testResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
@@ -600,7 +603,22 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     s3Interface.writeFileToS3(runSummaryFile, dataSummary.summaryDataToString())
 
     assert(true)
-  }
+  }*/
+
+/*  "previous alerts file" should "be repaired" in {
+    val previousAlertsInput = "alerts/alerts.csv"
+    val previousAlertsOutput = "alerts/pageWeightAlertsFromPreviousTests.csv"
+
+    println("getting input file")
+    val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(previousAlertsInput)
+    println("repairing file")
+    val unknownResults = previousResults.filter(_.typeOfTest.contains("Unknown"))
+    val knownResults = previousResults.filter(!_.typeOfTest.contains("Unknown"))
+    val fixedUnknownResults = getResultPages(unknownResults, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
+    val combinedResults = knownResults ::: fixedUnknownResults
+    s3Interface.writeFileToS3(previousAlertsOutput, combinedResults.map(_.toCSVString()).mkString)
+    assert(!combinedResults.map(_.timeToFirstByte).contains(-2))
+  }*/
 
  /* "results written with full element list" should "be able to be read in" in {
     val s3TestFile = "testResultsWithFullElementList.csv"
@@ -735,4 +753,105 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     contentStub
   }
 
+  def getResultPages(results: List[PerformanceResultsObject], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[PerformanceResultsObject] = {
+    val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
+    val desktopResultList: List[PerformanceResultsObject] = results.map(page => {
+      val testresultpage =  wpt.sendPage(page.testUrl)
+      val newResult = wpt.getResults(page.testUrl, testresultpage)
+      newResult.headline = page.headline
+      newResult.pageType = page.pageType
+      newResult.firstPublished = page.firstPublished
+      newResult.pageLastUpdated = page.pageLastUpdated
+      newResult.liveBloggingNow = page.liveBloggingNow
+      setAlertStatus(newResult)
+    })
+    val mobileResultList: List[PerformanceResultsObject] = results.map(page => {
+      val testresultpage =  wpt.sendMobile3GPage(page.testUrl, wptLocation)
+      val newResult = wpt.getResults(page.testUrl, testresultpage)
+      newResult.headline = page.headline
+      newResult.pageType = page.pageType
+      newResult.firstPublished = page.firstPublished
+      newResult.pageLastUpdated = page.pageLastUpdated
+      newResult.liveBloggingNow = page.liveBloggingNow
+      setAlertStatus(newResult)
+    })
+    val combinedResults = desktopResultList ::: mobileResultList
+    combinedResults.sortWith(_.testUrl > _.testUrl)
+  }
+
+  def setAlertStatus(resultObject: PerformanceResultsObject): PerformanceResultsObject = {
+    //  Add results to string which will eventually become the content of our results file
+    val averages = {
+      if (resultObject.pageType.contains("Article")) {
+        new ArticleDefaultAverages("Color does not apply")
+      } else {
+        if (resultObject.pageType.contains("LiveBlog")) {
+          new LiveBlogDefaultAverages("Color does not apply")
+        } else {
+          new InteractiveDefaultAverages("Color does not apply")
+        }
+      }
+    }
+
+    if (resultObject.typeOfTest == "Desktop") {
+      if (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded) {
+        println("PageWeight Alert Set")
+        resultObject.pageWeightAlertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
+        resultObject.alertStatusPageWeight = true
+      }
+      else {
+        println("PageWeight Alert not set")
+        resultObject.alertStatusPageWeight = false
+      }
+      if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) ||
+        (resultObject.speedIndex >= averages.desktopSpeedIndex)) {
+        println("PageSpeed alert set")
+        resultObject.alertStatusPageSpeed = true
+        if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) && (resultObject.speedIndex >= averages.desktopSpeedIndex)) {
+          resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) and time till page looks loaded (SpeedIndex) are unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+        } else {
+          if (resultObject.speedIndex >= averages.desktopSpeedIndex) {
+            resultObject.pageSpeedAlertDescription = "Time till page looks loaded (SpeedIndex) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+          }
+          else {
+            resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+          }
+        }
+      } else {
+        println("PageSpeed alert not set")
+        resultObject.alertStatusPageSpeed = false
+      }
+    } else {
+      //checking if status of mobile test needs an alert
+      if (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {
+        println("PageWeight Alert Set")
+        resultObject.pageWeightAlertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
+        resultObject.alertStatusPageWeight = true
+      }
+      else {
+        println("PageWeight Alert not set")
+        resultObject.alertStatusPageWeight = false
+      }
+      if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) ||
+        (resultObject.speedIndex >= averages.mobileSpeedIndex)) {
+        println("PageSpeed alert set")
+        resultObject.alertStatusPageSpeed = true
+        if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) && (resultObject.speedIndex >= averages.mobileSpeedIndex)) {
+          resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) and time till page looks loaded (SpeedIndex) are unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+        } else {
+          if (resultObject.speedIndex >= averages.mobileSpeedIndex) {
+            resultObject.pageSpeedAlertDescription = "Time till page looks loaded (SpeedIndex) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+          }
+          else {
+            resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+          }
+        }
+      } else {
+        println("PageSpeed alert not set")
+        resultObject.alertStatusPageSpeed = false
+      }
+    }
+    println("Returning test result with alert flags set to relevant values")
+    resultObject
+  }
 }
