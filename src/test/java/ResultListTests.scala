@@ -82,12 +82,9 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   }
   println("config values ok")
   val contentApiKey: String = configArray(0)
-  val wptBaseUrl: String = "http://www.webpagetest.org"
-  val wptApiKey: String = "A.71eac614164a5b92db820e529c3a62d8"
-  val wptLocation: String = "ec2-eu-central-1"
-/*  val wptBaseUrl: String = configArray(1)
+  val wptBaseUrl: String = configArray(1)
   val wptApiKey: String = configArray(2)
-  val wptLocation: String = configArray(3)*/
+  val wptLocation: String = configArray(3)
   val emailUsername: String = configArray(4)
   val emailPassword: String = configArray(5)
   val visualsApiUrl: String = configArray(6)
