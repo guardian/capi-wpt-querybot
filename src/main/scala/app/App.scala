@@ -61,17 +61,17 @@ object App {
     val frontsCSVName = "accumulatedFrontsPerformanceData.csv"
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
-    val pageWeightAlertsFromPreviousTests = "/alerts/pageWeightAlertsFromPreviousTests.csv"
-    val interactiveAlertsFromPreviousTests = "/alerts/interactiveAlertsFromPreviousTests.csv"
+    val pageWeightAlertsFromPreviousTests = "alerts/pageWeightAlertsFromPreviousTests.csv"
+    val interactiveAlertsFromPreviousTests = "alerts/interactiveAlertsFromPreviousTests.csv"
 
     val alertsThatHaveBeenFixed = "alertsthathavebeenfixed.csv"
     val duplicateResultList = "duplicateresultsfromlastrun.csv"
     val runLog = "runLog.csv"
 
     // summary files
-    val runSummaryFile = "/runLogs/runSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
-    val pageWeightAlertSummaryFile = "/runLogs/pageWeightAlertSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
-    val interactiveAlertSummaryFile = "/runLogs/interactiveAlertSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
+    val runSummaryFile = "runLogs/runSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
+    val pageWeightAlertSummaryFile = "runLogs/pageWeightAlertSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
+    val interactiveAlertSummaryFile = "runLogs/interactiveAlertSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
