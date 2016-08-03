@@ -41,6 +41,9 @@ object App {
     val editorialPageweightFilename = "editorialpageweightdashboard.html"
     val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
     val editorialMobilePageweightFilename = "editorialpageweightdashboardmobile.html"
+    val currentDataSummaryPage = "summarypage.html"
+    val currentPageWeightAlertSummaryPage = "pageweightalertsummarypage.html"
+    val currentInteractiveSummaryPage = "interactivesummarypage.html"
 
     val dotcomPageSpeedFilename = "dotcompagespeeddashboard.html"
 
@@ -600,7 +603,17 @@ object App {
         val resultSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, combinedResultsList, previousTestResultsHandler)
         val pageWeightAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newPageWeightAlerts, new ResultsFromPreviousTests(previousPageWeightAlerts))
         val interactiveAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newInteractiveAlertsList, new ResultsFromPreviousTests(previousInteractiveAlerts))
-        //write summaries to files
+
+    //generate summary pages
+        val summaryHTMLPage = new SummaryPage(resultSummary)
+        val pageWeightAlertSummaryHTMLPage = new SummaryPage(pageWeightAlertsSummary)
+        val interactiveAlertSummaryHTMLPage = new SummaryPage(interactiveAlertsSummary)
+    //write summary pages to file
+        s3Interface.writeFileToS3(currentDataSummaryPage, summaryHTMLPage.toString())
+        s3Interface.writeFileToS3(currentPageWeightAlertSummaryPage, pageWeightAlertSummaryHTMLPage.toString())
+        s3Interface.writeFileToS3(currentInteractiveSummaryPage, interactiveAlertSummaryHTMLPage.toString())
+
+    //write summaries to files
         println("writing run summary data to new file")
         s3Interface.writeFileToS3(runSummaryFile, resultSummary.summaryDataToString())
         s3Interface.writeFileToS3(pageWeightAlertSummaryFile, pageWeightAlertsSummary.summaryDataToString())
