@@ -149,7 +149,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
       "Number of mobile records " + numberOfMobileRecords + "\n \n \n")
     HTML_PAGE
   }
-  
+
     //  def initialisePageForArticle: String = {
     //    hTMLPageHeader + hTMLTitleArticle + hTMLJobStarted
     //  }
