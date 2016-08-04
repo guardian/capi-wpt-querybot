@@ -255,10 +255,12 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     numberOfTestResultsSought += 1
     try {
       val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
-      val testType: String = if ((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")) {
-        "Android/3G"
-      } else {
-        "Desktop"
+      val testType: String = {
+        if ((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")) {
+          "Android/3G"
+        } else {
+          "Desktop"
+        }
       }
       val testSummaryPage: String = (rawXMLResult \\ "response" \ "data" \ "summary").text.toString
       val timeToFirstByte: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "TTFB").text.toInt
@@ -278,8 +280,11 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
 
       println("Creating PerformanceResultsObject")
       val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, testSummaryPage, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
+      println("sorting page element list")
       val sortedElementList = sortPageElementList(elementsList)
+      println("populating full element list")
       result.fullElementList = sortedElementList
+      println("populating editorial element list")
       result.populateEditorialElementList(sortedElementList)
       println("Result string: " + result.toHTMLSimpleTableCells())
       println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
