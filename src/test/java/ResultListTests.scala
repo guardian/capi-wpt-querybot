@@ -90,7 +90,7 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   val visualsApiUrl: String = configArray(6)
 
   //obtain list of items previously alerted on
-  val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+//  val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
   /*    val localInput = new LocalFileOperations
 
 
@@ -667,12 +667,21 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
 
   }*/
 
+  "refining results for a result" should "yield the result in question" in {
+    val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
+    val result = wpt.getResults("https://www.theguardian.com/dorset-cereals-bnb-awards/2016/aug/05/hay-barton-bb-a-taste-of-cornish-hospitality", "http://wpt.gu-web.net/xmlResult/160805_S5_BK/")
+    println("result received")
+    println(result.toCSVString())
+    result.timeToFirstByte should be > 0
+  }
+
   def getResult(pageUrl: String, friendlyUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String] ): PerformanceResultsObject = {
     val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
     val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
     val result: PerformanceResultsObject = wpt.getResults(pageUrl, xmlResultUrl)
     result
   }
+
 
 
 

@@ -106,18 +106,23 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def populateEditorialElementList(elementList: List[PageElementFromHTMLTableRow]): Boolean = {
     val trimmedList = trimToEditorialElements(elementList)
-    if(trimmedList.head.bytesDownloaded < trimmedList.tail.head.bytesDownloaded){
-      println("Error: Attempt to feed an unordered list of page elements to Performance Results Object")
-      false
-    } else {
-      var workingList = trimmedList
-      var roomInTheList: Boolean = true
-      while(workingList.nonEmpty && roomInTheList) {
-        roomInTheList = addtoElementList(workingList.head)
-        workingList = workingList.tail
-      }
+    if(trimmedList.isEmpty){
       true
+    } else {
+      if(trimmedList.head.bytesDownloaded < trimmedList.tail.head.bytesDownloaded){
+        println("Error: Attempt to feed an unordered list of page elements to Performance Results Object")
+        false
+      } else {
+        var workingList = trimmedList
+        var roomInTheList: Boolean = true
+        while(workingList.nonEmpty && roomInTheList) {
+          roomInTheList = addtoElementList(workingList.head)
+          workingList = workingList.tail
+        }
+        true
+      }
     }
+
   }
 
 
