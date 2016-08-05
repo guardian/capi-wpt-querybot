@@ -43,6 +43,7 @@ look through data - what are the main embeds
   //last run - number of pages pulled from capi
   val numberOfPagesFromCAPI: Int = numberOfPagesFromCapi
   val numberOfPagesSentToWPT: Int = numberOfPagesTested
+  val numberOfFailedTests = latestResults.count(_.timeToFirstByte < 0)
 /*  - number of pageWeight alerts raised on non-interactive content
     - number of pageSpeed alerts raised on non-interactive content
     - number of page speed alerts raised where content was underweight
@@ -195,6 +196,7 @@ look through data - what are the main embeds
    println("Number of pages from CAPI queries: " + numberOfPagesFromCAPI)
    println("Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun)
    println("Number of pages tested: " + numberOfPagesSentToWPT)
+   println("Number of failed tests: " + numberOfFailedTests)
    println("**** \n\n")
    println("*************Element Summary:****************************\n")
    println("numberOfPagesExamined: " + allResults.length )
@@ -402,6 +404,7 @@ look through data - what are the main embeds
       "Number of pages from CAPI queries: " + numberOfPagesFromCAPI + "\n" +
       "Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun + "\n" +
       "Number of pages tested: " + numberOfPagesSentToWPT + "\n" +
+      "Number of failed tests: " + numberOfFailedTests + "\n" +
       "**** \n\n" + "\n"
     val elementSummary: String = "*************Element Summary:****************************\n" + "\n" +
       "numberOfPagesExamined: " + allResults.length + "\n"
