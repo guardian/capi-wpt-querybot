@@ -219,17 +219,17 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       testResults = scala.xml.XML.loadString(response.body.string)
       if ((testResults \\ "response" \ "data" \ "successfulFVRuns").text.toInt > 0) {
         println("\n" + DateTime.now + " statusCode == 200: Page ready after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds\n Refining results")
-        try {
+  //      try {
           val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
           numberOfSuccessfulTests += 1
           refineResults(pageUrl, testResults, elementsList)
-        } catch {
+ /*       } catch {
           case _: Throwable => {
             println("Page failed for some reason")
             numberOfFailedTests += 1
             failedTestUnknown(pageUrl, testResults)
           }
-        }
+        }*/
       } else {
         println(DateTime.now + " Test results show 0 successful runs ")
         numberOfFailedTests += 1
@@ -253,7 +253,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
   def refineResults(pageUrl: String, rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
     println("parsing the XML results")
     numberOfTestResultsSought += 1
-    try {
+   // try {
       val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
       val testType: String = {
         if ((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")) {
@@ -285,17 +285,19 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       println("populating full element list")
       result.fullElementList = sortedElementList
       println("populating editorial element list")
+      println("list length: " + sortedElementList.length)
+      println("list contains: \n" + sortedElementList.map(_.toHTMLRowString() + "\n").mkString)
       result.populateEditorialElementList(sortedElementList)
       println("Result string: " + result.toHTMLSimpleTableCells())
       println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
       println("Returning PerformanceResultsObject")
       result
-    } catch {
+    /*} catch {
       case _: Throwable => {
         println("Page failed for some reason while refining results")
         failedTestUnknown(pageUrl, rawXMLResult)
       }
-    }
+    }*/
   }
 
   def testMultipleTimes(url: String, typeOfTest: String, wptLocation: String, testCount: Int): PerformanceResultsObject = {
