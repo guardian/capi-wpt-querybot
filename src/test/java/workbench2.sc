@@ -43,3 +43,7 @@ println(capiTimeToString(capitime2))
 
 println(capiTimeToString(capitime3))
 
+
+val now = DateTime.now()
+val hour = now.hourOfDay.getAsString
+

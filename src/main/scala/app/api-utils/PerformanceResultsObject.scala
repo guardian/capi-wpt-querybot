@@ -104,25 +104,9 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def returnFullElementListByWeight(): List[PageElementFromHTMLTableRow] = {fullElementList.sortWith(_.bytesDownloaded > _.bytesDownloaded)}
 
-  def populateEditorialElementList(elementList: List[PageElementFromHTMLTableRow]): Boolean = {
+  def populateEditorialElementList(elementList: List[PageElementFromHTMLTableRow]): Unit = {
     val trimmedList = trimToEditorialElements(elementList)
-    if(trimmedList.isEmpty){
-      true
-    } else {
-      if(trimmedList.head.bytesDownloaded < trimmedList.tail.head.bytesDownloaded){
-        println("Error: Attempt to feed an unordered list of page elements to Performance Results Object")
-        false
-      } else {
-        var workingList = trimmedList
-        var roomInTheList: Boolean = true
-        while(workingList.nonEmpty && roomInTheList) {
-          roomInTheList = addtoElementList(workingList.head)
-          workingList = workingList.tail
-        }
-        true
-      }
-    }
-
+    editorialElementList = trimmedList.take(editorialElementListMaxSize)
   }
 
 

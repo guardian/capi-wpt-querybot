@@ -72,9 +72,12 @@ object App {
     val runLog = "runLog.csv"
 
     // summary files
-    val runSummaryFile = "runLogs/runSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
-    val pageWeightAlertSummaryFile = "runLogs/pageWeightAlertSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
-    val interactiveAlertSummaryFile = "runLogs/interactiveAlertSummary" + jobStart.hourOfDay() + jobStart.dayOfMonth() + ".txt"
+
+    val jobStartHour = jobStart.hourOfDay.getAsString
+    val jobStartDayOfMonth = jobStart.dayOfMonth.getAsString
+    val runSummaryFile = "runLogs/runSummary" + jobStartDayOfMonth + jobStartHour + ".txt"
+    val pageWeightAlertSummaryFile = "runLogs/pageWeightAlertSummary" + jobStartDayOfMonth + jobStartHour + ".txt"
+    val interactiveAlertSummaryFile = "runLogs/interactiveAlertSummary" + jobStartDayOfMonth + jobStartHour + ".txt"
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
@@ -434,6 +437,7 @@ object App {
       println("CAPI query found no Fronts")
     }*/
 
+    println("length of recent but no retest required list: " + previousTestResultsHandler.recentButNoRetestRequired)
     val sortedByWeightCombinedResults: List[PerformanceResultsObject] = sorter.orderListByWeight(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Desktop")) yield result
     val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
@@ -448,6 +452,8 @@ object App {
     println("length of sorted By Weight Combined List is: " + sortedCombinedByWeightMobileResults.length)
     //  strip out errors
     val errorFreeSortedByWeightCombinedResults = for (result <- sortedByWeightCombinedResults if result.speedIndex > 0) yield result
+    println("length of errorFreeSortedByWeightCombinedResults: " + errorFreeSortedByWeightCombinedResults.length)
+    println((sortedByWeightCombinedResults.length - errorFreeSortedByWeightCombinedResults.length) + " records have been lost due to error")
 
     val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
     val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
@@ -456,10 +462,12 @@ object App {
     //record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
 
+    println("combinedResultsForFile length = " + combinedResultsForFile)
     val resultsToRecord = sorter.orderListByDatePublished(combinedResultsForFile) ::: previousTestResultsHandler.oldResults
 
     //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
     println("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
+    println("of these " + previousTestResultsHandler.oldResults.length + " are from old results")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 
     //Generate Lists for sortBySpeed combined pages

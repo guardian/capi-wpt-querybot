@@ -93,11 +93,18 @@ import org.scalatest._
 
     "OrderedByDateLastPublished called on a list of results " should "return a list ordered by dateLastPublished" in {
       val reorderedList = sorter.orderListByDatePublished(previousResults)
-      assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == previousResults.length)
+      assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == previousResults.length)
     }
 
     "OrderedByPageWeight called on a list of results " should "return a list ordered by pageWeight" in {
       val reorderedList = sorter.orderListByWeight(previousResults)
       assert((reorderedList.head.bytesInFullyLoaded > reorderedList.tail.head.bytesInFullyLoaded) && (reorderedList.head.bytesInFullyLoaded > reorderedList.last.bytesInFullyLoaded) && reorderedList.length == previousResults.length)
+    }
+
+    "OrderByDatePublished called on large list" should "return same number of records" in {
+      val sizeOfResults = previousResults.length
+      val sortedList = sorter.orderListByDatePublished(previousResults)
+      val sizeOfSortedList = sortedList.length
+      sizeOfSortedList shouldEqual sizeOfResults
     }
   }
