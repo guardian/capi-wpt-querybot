@@ -468,7 +468,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       .get()
       .build()
     val response: Response = httpClient.newCall(request).execute()
-    val responseString:String = response.body().string()
+    val responseString:String = response.body.string()
     val tableString: String = trimToHTMLTable(responseString)
     val pageElementList: List[PageElementFromHTMLTableRow] = generatePageElementList(tableString)
     println("List generated - contains: " + pageElementList.length + " elements.")
