@@ -464,7 +464,7 @@ object App {
     //record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
 
-    println("combinedResultsForFile length = " + combinedResultsForFile)
+    println("combinedResultsForFile length = " + combinedResultsForFile.length)
     val resultsToRecord = sorter.orderListByDatePublished(combinedResultsForFile) ::: previousTestResultsHandler.oldResults
 
     //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
