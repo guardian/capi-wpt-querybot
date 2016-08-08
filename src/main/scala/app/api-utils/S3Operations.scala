@@ -277,7 +277,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     }
 
   def writeFileToS3(fileName:String, outputString: String): Unit ={
-    println(DateTime.now + " Writing the following to S3:\n" + outputString + "\n")
+    println(DateTime.now + " Writing the following file to S3:\n" + fileName + "\n")
     s3Client.putObject(new PutObjectRequest(s3BucketName, fileName, createOutputFile(fileName, outputString)))
     val acl: AccessControlList = s3Client.getObjectAcl(bucket, fileName)
     acl.grantPermission(GroupGrantee.AllUsers, Permission.Read)
