@@ -441,8 +441,9 @@ object App {
     val sortedByWeightCombinedResults: List[PerformanceResultsObject] = sorter.orderListByWeight(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Desktop")) yield result
     val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
+    val combinedListLength = sortedByWeightCombinedResults.length
     println("\n \n \n Combining lists of results and sorting for dashboard pages.")
-    println("length of sorted By Weight Combined List is: " + sortedByWeightCombinedResults.length)
+    println("length of sorted By Weight Combined List is: " + combinedListLength)
     //Generate lists for sortByWeight combined pages
 
     val sortedByWeightCombinedDesktopResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsByWeight(combinedDesktopResultsList)
@@ -452,7 +453,8 @@ object App {
     println("length of sorted By Weight Combined List is: " + sortedCombinedByWeightMobileResults.length)
     //  strip out errors
     val errorFreeSortedByWeightCombinedResults = for (result <- sortedByWeightCombinedResults if result.speedIndex > 0) yield result
-    println("length of errorFreeSortedByWeightCombinedResults: " + errorFreeSortedByWeightCombinedResults.length)
+    val errorFreeCombinedListLength = errorFreeSortedByWeightCombinedResults.length
+    println("length of errorFreeSortedByWeightCombinedResults: " + errorFreeCombinedListLength)
     println((sortedByWeightCombinedResults.length - errorFreeSortedByWeightCombinedResults.length) + " records have been lost due to error")
 
     val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
@@ -682,6 +684,8 @@ object App {
       interactivePageWeightAlertList.length + " Interactive pageWeight alerts\n" +
       interactiveAlertList.length + " Interactive weight or perfromance alerts.")
     println(listOfDupes.length + " Duplicate test results found")
+    println("length of sorted By Weight Combined List is: " + combinedListLength)
+    println("length of errorFreeSortedByWeightCombinedResults: " + errorFreeCombinedListLength)
   }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
