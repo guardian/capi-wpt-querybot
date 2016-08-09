@@ -71,7 +71,7 @@ class PageAverageObject(dtfp: Int, dtdc: Int, dsdc: Int, dtfl: Int, dsfl: Int, d
 
 
 class ArticleDefaultAverages(averageColor: String) extends PageAverageObject {
-  override val desktopTimeFirstPaintInMs: Int = (1.5 * 1000).toInt
+  override val desktopTimeFirstPaintInMs: Int = (2 * 1000).toInt
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 2 * 1024
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
@@ -117,7 +117,7 @@ class ArticleDefaultAverages(averageColor: String) extends PageAverageObject {
 }
 
 class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
-  override val desktopTimeFirstPaintInMs: Int = (1.5 * 1000).toInt
+  override val desktopTimeFirstPaintInMs: Int = (2 * 1000).toInt
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 3200
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
@@ -163,7 +163,7 @@ class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
 }
 
 class InteractiveDefaultAverages(averageColor: String) extends PageAverageObject {
-  override val desktopTimeFirstPaintInMs: Int = (1.5 * 1000).toInt
+  override val desktopTimeFirstPaintInMs: Int = (2 * 1000).toInt
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 2900
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
@@ -212,7 +212,7 @@ class InteractiveDefaultAverages(averageColor: String) extends PageAverageObject
 
 
 class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
-  override val desktopTimeFirstPaintInMs: Int = (1.5 * 1000).toInt
+  override val desktopTimeFirstPaintInMs: Int = (2 * 1000).toInt
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 3 * 1024
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
