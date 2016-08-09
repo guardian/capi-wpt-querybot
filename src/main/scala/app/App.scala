@@ -686,6 +686,7 @@ object App {
     println(listOfDupes.length + " Duplicate test results found")
     println("length of sorted By Weight Combined List is: " + combinedListLength)
     println("length of errorFreeSortedByWeightCombinedResults: " + errorFreeCombinedListLength)
+    println("length of elements list in first result: " + sortedByWeightCombinedResults.head.fullElementList.length)
   }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
