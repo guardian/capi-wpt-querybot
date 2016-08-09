@@ -478,7 +478,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
 
   def trimToHTMLTable(pageHTML: String): String = {
     //    val responseStringXML: Elem = scala.xml.XML.loadString(response.body.string)
-    val responseStringOuterTableStart: Int = pageHTML.indexOf("<table id=\"tableDetails\" class=\"details center\">")
+    val responseStringOuterTableStart: Int = pageHTML.indexOf("<table class=\"tableDetails details center\">")
     val responseStringOuterTableEnd: Int = pageHTML.indexOf("</table>", responseStringOuterTableStart)
     val outerTableString: String = pageHTML.slice(responseStringOuterTableStart, responseStringOuterTableEnd)
     val innerTableStart: Int = outerTableString.indexOf("<tbody>")
