@@ -74,10 +74,10 @@ object App {
     // summary files
 
     val jobStartHour = jobStart.hourOfDay.getAsString
-    val jobStartDayOfMonth = jobStart.dayOfMonth.getAsString
-    val runSummaryFile = "runLogs/runSummary" + jobStartDayOfMonth + jobStartHour + ".txt"
-    val pageWeightAlertSummaryFile = "runLogs/pageWeightAlertSummary" + jobStartDayOfMonth + jobStartHour + ".txt"
-    val interactiveAlertSummaryFile = "runLogs/interactiveAlertSummary" + jobStartDayOfMonth + jobStartHour + ".txt"
+    val jobStartDayOfWeek = jobStart.dayOfWeek.getAsString
+    val runSummaryFile = "runLogs/runSummary" + jobStartDayOfWeek + "_" + jobStartHour + ".txt"
+    val pageWeightAlertSummaryFile = "runLogs/pageWeightAlertSummary" + jobStartDayOfWeek + "_" + jobStartHour + ".txt"
+    val interactiveAlertSummaryFile = "runLogs/interactiveAlertSummary" + jobStartDayOfWeek + "_" + jobStartHour + ".txt"
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
