@@ -75,9 +75,11 @@ object App {
 
     val jobStartHour = jobStart.hourOfDay.getAsString
     val jobStartDayOfWeek = jobStart.dayOfWeek.getAsString
+
     val runSummaryFile = "runLogs/runSummary" + jobStartDayOfWeek + "_" + jobStartHour + ".txt"
     val pageWeightAlertSummaryFile = "runLogs/pageWeightAlertSummary" + jobStartDayOfWeek + "_" + jobStartHour + ".txt"
     val interactiveAlertSummaryFile = "runLogs/interactiveAlertSummary" + jobStartDayOfWeek + "_" + jobStartHour + ".txt"
+
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
@@ -628,6 +630,7 @@ object App {
         s3Interface.writeFileToS3(runSummaryFile, resultSummary.summaryDataToString())
         s3Interface.writeFileToS3(pageWeightAlertSummaryFile, pageWeightAlertsSummary.summaryDataToString())
         s3Interface.writeFileToS3(interactiveAlertSummaryFile, interactiveAlertsSummary.summaryDataToString())
+
 
 
 

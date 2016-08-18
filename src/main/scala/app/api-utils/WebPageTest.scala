@@ -167,7 +167,6 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
 
   def sendHighPriorityMobile3GPage(gnmPageUrl:String, wptLocation: String): String = {
     println("Forming mobile 3G webpage test query")
-//    val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&mobile=1&mobileDevice=Nexus5&location=" + wptLocation + ":Chrome.3G" + "&priority=1" + "&url=" + gnmPageUrl + "noads"
     val getUrl: HttpUrl = new HttpUrl.Builder()
       .scheme("http")
       .host(apihost)
@@ -218,22 +217,22 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     averageIteratorCount = ((averageIteratorCount * (numberOfTestResultsSought - 1)) + iterator) / numberOfTestResultsSought
     if ((testResults \\ "statusCode").text.toInt == 200) {
       //Add one final request as occasionally 200 code comes before the data we want.
-      //      Thread.sleep(5000)
+      Thread.sleep(3000)
       response = httpClient.newCall(request).execute()
       testResults = scala.xml.XML.loadString(response.body.string)
       if ((testResults \\ "response" \ "data" \ "successfulFVRuns").text.toInt > 0) {
         println("\n" + DateTime.now + " statusCode == 200: Page ready after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds\n Refining results")
-  //      try {
+        try {
           val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
           numberOfSuccessfulTests += 1
           refineResults(pageUrl, testResults, elementsList)
- /*       } catch {
+        } catch {
           case _: Throwable => {
             println("Page failed for some reason")
             numberOfFailedTests += 1
             failedTestUnknown(pageUrl, testResults)
           }
-        }*/
+        }
       } else {
         println(DateTime.now + " Test results show 0 successful runs ")
         numberOfFailedTests += 1
@@ -257,7 +256,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
   def refineResults(pageUrl: String, rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
     println("parsing the XML results")
     numberOfTestResultsSought += 1
-   // try {
+    try {
       val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
       val testType: String = {
         if ((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")) {
@@ -296,12 +295,12 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
       println("Returning PerformanceResultsObject")
       result
-    /*} catch {
+    } catch {
       case _: Throwable => {
         println("Page failed for some reason while refining results")
         failedTestUnknown(pageUrl, rawXMLResult)
       }
-    }*/
+    }
   }
 
   def testMultipleTimes(url: String, typeOfTest: String, wptLocation: String, testCount: Int): PerformanceResultsObject = {
@@ -309,7 +308,6 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       numberOfMultipleTestRequests += testCount
       if(typeOfTest.contains("Desktop")){
         println("Forming desktop webpage test query to confirm alert status")
-//        val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&runs=" + testCount + "&priority=1" + "&url=" + url + "#noads"
         val getUrl: HttpUrl = new HttpUrl.Builder()
           .scheme("http")
           .host(apihost)
@@ -336,7 +334,6 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     }
     else{
         println("Forming mobile 3G webpage test query to confirm alert status")
-//        val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&mobile=1&mobileDevice=Nexus5&location=" + wptLocation + ":Chrome.3G" + "&priority=1" + "&url=" + url + "#noads"
         val getUrl: HttpUrl = new HttpUrl.Builder()
           .scheme("http")
           .host(apihost)
