@@ -59,7 +59,7 @@
 */
     //Page Tables
     val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"elementSummary\">"+ "\n" +
-      "<thead>" + "\n" +
+      "<thead>" + "\n" + "<caption> Summary of Editorial Embeds from " + dataSummary.previousResults.length + " tested pages</caption>" +
       "<tr>" + "<th>Type of Embed</th>" + "<th>Number of pages with this embed-type</th>" + "<th>Number of pages that alerted for pageWeight</th>" + "<th>Chance of this embed-type triggering a pageWeight alert</th>" + "<th>Number of Pages that alerted for pageSpeed</th>" + "<th>Chance of this embed-type triggering a pageSpeed alert</th>" + "<th>Average Size of this embed-type (KB)</th>" + "<th>Average Time to First Paint of a page with this embed-type</th>" + "<th>Average SpeedIndex of a page with this embed-type</th>" +  "</tr>"+ "\n" +
       "</thead>" +"\n" +
       "<tbody>"
