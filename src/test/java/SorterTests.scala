@@ -107,6 +107,13 @@ import org.scalatest._
       val reorderedList = sorter.orderListByDatePublished(resultsFromLastTest)
       s3Interface.writeFileToS3(resultsFromSorterTest2, reorderedList.map(_.toCSVString()).mkString)
       assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == previousResults.length)
+    }
+
+    "OrderedByDateLastPublished called on a list of results that is 24 hour old" should "return a list ordered by dateLastPublished" in {
+      val resultsFromLastTest: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromSorterTest1)
+      val reorderedList = sorter.orderListByDatePublished(resultsFromLastTest)
+      s3Interface.writeFileToS3(resultsFromSorterTest2, reorderedList.map(_.toCSVString()).mkString)
+      assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == previousResults.length)
     }*/
 
 

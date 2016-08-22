@@ -397,49 +397,7 @@ object App {
       println("CAPI query found no interactives")
     }
 
-    /*if (frontsUrls.nonEmpty) {
-      println("Generating average values for fronts")
-      val frontsAverages: PageAverageObject = new FrontsDefaultAverages(averageColor)
-      frontsResults = frontsResults.concat(frontsAverages.toHTMLString)
-
-      val frontsResultsList = listenForResultPages(fronts, "Front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(frontsResultsList, pageWeightAnchorId)
-      val frontsResultsWithAnchor = getAnchorId._1
-      pageWeightAnchorId = getAnchorId._2
-
-      //      combinedResultsList = combinedResultsList ::: frontsResultsWithAnchor
-      val sortedFrontsResultsList = sorter.orderListByWeight(frontsResultsWithAnchor)
-      if(sortedFrontsResultsList.isEmpty) {
-        println("Sorting algorithm for fronts has returned empty list. Aborting")
-        System exit 1
-      }
-      val frontsHTMLResults: List[String] = sortedFrontsResultsList.map(x => htmlString.generateHTMLRow(x))
-      //Create a list of alerting pages and write to string
-      frontsPageWeightAlertList = for (result <- sortedFrontsResultsList if result.alertStatusPageWeight) yield result
-
-      // write fronts results to string
-      frontsResults = frontsResults.concat(frontsHTMLResults.mkString)
-      frontsResults = frontsResults + htmlString.closeTable + htmlString.closePage
-      //write fronts results to file
-      if (!iamTestingLocally) {
-        println(DateTime.now + " Writing fronts results to S3")
-        s3Interface.writeFileToS3(frontsOutputFilename, frontsResults)
-      }
-      else {
-        val outputWriter = new LocalFileOperations
-        val writeSuccess: Int = outputWriter.writeLocalResultFile(frontsOutputFilename, frontsResults)
-        if (writeSuccess != 0) {
-          println("problem writing local outputfile")
-          System exit 1
-        }
-      }
-      println("Fronts Performance Test Complete")
-
-    } else {
-      println("CAPI query found no Fronts")
-    }*/
-
-    println("length of recent but no retest required list: " + previousTestResultsHandler.recentButNoRetestRequired)
+    println("length of recent but no retest required list: " + previousTestResultsHandler.recentButNoRetestRequired.length)
     val sortedByWeightCombinedResults: List[PerformanceResultsObject] = sorter.orderListByWeight(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Desktop")) yield result
     val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
@@ -553,6 +511,18 @@ object App {
 
     }
 
+    //todo - remove this after data obtained
+    val currentHour = DateTime.now().hourOfDay.get
+    if(currentHour == 22 || currentHour == 23) {
+      s3Interface.writeFileToS3("resultsFromPreviousTestsBeforeMidnight.csv", resultsToRecordCSVString)
+    }
+    if(currentHour == 0) {
+      s3Interface.writeFileToS3("resultsFromPreviousTestsAfterMidnight.csv", resultsToRecordCSVString)
+    }
+    if(currentHour == 1) {
+      s3Interface.writeFileToS3("resultsFromPreviousTestsAt1AM.csv", resultsToRecordCSVString)
+    }
+
 
 
     //check if alert items have already been sent in earlier run
@@ -598,13 +568,13 @@ object App {
     val jobFinish = DateTime.now()
     val timeTaken = (jobFinish.getMillis - jobStart.getMillis).toDouble / (1000 * 60)
     val numberOfPagesTested = urlsToSend.length
-    val numberOfPageWeightAlerts = combinedResultsList.filter(_.alertStatusPageWeight).length
+    val numberOfPageWeightAlerts = combinedResultsList.count(_.alertStatusPageWeight)
     val percentageOfPageWeightAlerts = if(numberOfPagesTested > 0){
       numberOfPageWeightAlerts.toDouble/(numberOfPagesTested * 100)
     } else {
       0.0
     }
-    val numberOfPageSpeedAlerts = combinedResultsList.filter(_.alertStatusPageSpeed).length
+    val numberOfPageSpeedAlerts = combinedResultsList.count(_.alertStatusPageSpeed)
     val percentageOfPageSpeedAlerts = if(numberOfPagesTested > 0){
       numberOfPageSpeedAlerts.toDouble/(numberOfPagesTested * 100)
     } else {
