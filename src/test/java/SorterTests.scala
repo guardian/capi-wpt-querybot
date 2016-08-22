@@ -45,6 +45,9 @@ import org.scalatest._
     val visualsPagesFileName = "visuals.conf"
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    val resultsFromSorterTest1 = "resultsFromPreviousTestsSorter1.csv"
+    val resultsFromSorterTest2 = "resultsFromPreviousTestsSorter2.csv"
+
 
     //Create new S3 Client
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
@@ -91,10 +94,21 @@ import org.scalatest._
     val previousResultsHandler = new ResultsFromPreviousTests(previousResults)
     val sorter = new ListSorter
 
-    "OrderedByDateLastPublished called on a list of results " should "return a list ordered by dateLastPublished" in {
+/*    "OrderedByDateLastPublished called on a list of results " should "return a list ordered by dateLastPublished" in {
       val reorderedList = sorter.orderListByDatePublished(previousResults)
+      println("First Record pageLastUpdated: " + previousResults.head.pageLastUpdated.isEmpty)
+      println("First Record first Published: " + previousResults.head.firstPublished.isEmpty)
+      s3Interface.writeFileToS3(resultsFromSorterTest1, reorderedList.map(_.toCSVString()).mkString)
       assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == previousResults.length)
     }
+
+    "OrderedByDateLastPublished called on a list of results a second time " should "return a list ordered by dateLastPublished" in {
+      val resultsFromLastTest: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromSorterTest1)
+      val reorderedList = sorter.orderListByDatePublished(resultsFromLastTest)
+      s3Interface.writeFileToS3(resultsFromSorterTest2, reorderedList.map(_.toCSVString()).mkString)
+      assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == previousResults.length)
+    }*/
+
 
     "OrderedByPageWeight called on a list of results " should "return a list ordered by pageWeight" in {
       val reorderedList = sorter.orderListByWeight(previousResults)
