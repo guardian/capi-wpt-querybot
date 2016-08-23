@@ -180,8 +180,8 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
             if ((elementArray(8).toInt > 0) && (data(9).toInt > -1)){
             val elementList = getElementListFromArray(elementArray)
             if(elementList.nonEmpty) {
+              result.fullElementList = elementList
                 result.populateEditorialElementList(elementList)
-
               }else{
                   println("returned list from getElementListFromArray is empty")
               }
