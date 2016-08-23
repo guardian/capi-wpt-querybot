@@ -2,7 +2,7 @@ package app.apiutils
 
 import com.gu.contentapi.client.GuardianContentClient
 import com.gu.contentapi.client.model.SearchQuery
-import com.gu.contentapi.client.model.v1.ContentFields
+import com.gu.contentapi.client.model.v1.{Tag, ContentFields}
 import org.joda.time.DateTime
 
 import scala.concurrent.Await
@@ -21,7 +21,7 @@ class ArticleUrls(key: String) {
 // You can do this per section, for example for the uk section:
 // http://internal.content.guardianapis.com/uk?show-most-viewed=true&page-size=0
 
-  def getUrlsForContentType(contentType: String): List[(Option[ContentFields],String)] = {
+  def getUrlsForContentType(contentType: String): List[(Option[ContentFields], Seq[Tag], String)] = {
      contentType match {
       case("Article") => getArticles(1)
       case ("LiveBlog") =>  getMinByMins(1)
@@ -30,7 +30,7 @@ class ArticleUrls(key: String) {
       case ("Audio") => getAudioPages(1)
       case("Front") => getFronts(1)
       case (_) => {
-        val emptyList: List[(Option[ContentFields], String)] = List()
+        val emptyList: List[(Option[ContentFields], Seq[Tag], String)] = List()
         emptyList
       }
     }
@@ -41,7 +41,7 @@ class ArticleUrls(key: String) {
     contentApiClient.shutdown()
   }
 
-  def getArticles(pageNumber: Int): List[(Option[ContentFields], String)] = {
+  def getArticles(pageNumber: Int): List[(Option[ContentFields], Seq[Tag],String)] = {
 
     try {
       val searchQuery = new SearchQuery()
@@ -58,8 +58,8 @@ class ArticleUrls(key: String) {
 
       val apiResponse = contentApiClient.getResponse(searchQuery)
       val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-      val articleContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
-        (result.fields, result.webUrl)
+      val articleContentAndUrl: List[(Option[ContentFields], Seq[Tag], String)] = for (result <- returnedResponse.results) yield {
+        (result.fields, result.tags, result.webUrl)
       }
       println("received " + articleContentAndUrl.length + " pages from this query")
       if (articleContentAndUrl.length < pageSize) {
@@ -72,13 +72,13 @@ class ArticleUrls(key: String) {
     } catch {
       case _: Throwable => {
         println("bad request - page is empty - returning empty list")
-        val emptyList: List[(Option[ContentFields], String)] = List()
+        val emptyList: List[(Option[ContentFields], Seq[Tag], String)] = List()
         emptyList
       }
     }
   }
 
-  def getMinByMins(pageNumber: Int): List[(Option[ContentFields],String)] = {
+  def getMinByMins(pageNumber: Int): List[(Option[ContentFields], Seq[Tag],String)] = {
   try {
     val searchQuery = new SearchQuery()
       .fromDate(from)
@@ -94,27 +94,27 @@ class ArticleUrls(key: String) {
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val liveBlogContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
-        (result.fields, result.webUrl)
+    val liveBlogContentAndUrl: List[(Option[ContentFields], Seq[Tag], String)] = for (result <- returnedResponse.results) yield {
+        (result.fields, result.tags, result.webUrl)
       }
     println("received " + liveBlogContentAndUrl.length + " pages from this query")
     if (liveBlogContentAndUrl.length < pageSize) {
       liveBlogContentAndUrl
     } else {
       Thread.sleep(2000)
-      liveBlogContentAndUrl ::: getMinByMins(pageNumber + 1)
+      liveBlogContentAndUrl
     }
   } catch {
       case _: Throwable => {
         println("bad request - page is empty - returning empty list")
-        val emptyList: List[(Option[ContentFields], String)] = List()
+        val emptyList: List[(Option[ContentFields], Seq[Tag], String)] = List()
         emptyList
       }
     }
   }
 
 
-  def getInteractives(pageNumber: Int): List[(Option[ContentFields],String)] = {
+  def getInteractives(pageNumber: Int): List[(Option[ContentFields],Seq[Tag], String)] = {
   try {
     val searchQuery = new SearchQuery()
       .fromDate(from)
@@ -130,26 +130,26 @@ class ArticleUrls(key: String) {
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val interactiveContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
-        (result.fields, result.webUrl)
+    val interactiveContentAndUrl: List[(Option[ContentFields], Seq[Tag], String)] = for (result <- returnedResponse.results) yield {
+        (result.fields, result.tags, result.webUrl)
     }
     println("received " + interactiveContentAndUrl.length + " pages from this query")
     if (interactiveContentAndUrl.length < pageSize) {
       interactiveContentAndUrl
     } else {
       Thread.sleep(2000)
-      interactiveContentAndUrl ::: getInteractives(pageNumber + 1)
+      interactiveContentAndUrl
     }
   } catch {
       case _: Throwable => {
         println("bad request - page is empty - returning empty list")
-        val emptyList: List[(Option[ContentFields], String)] = List()
+        val emptyList: List[(Option[ContentFields], Seq[Tag], String)] = List()
         emptyList
       }
     }
   }
 
-  def getFronts(pageNumber: Int): List[(Option[ContentFields],String)] = {
+  def getFronts(pageNumber: Int): List[(Option[ContentFields], Seq[Tag], String)] = {
     val listofFronts: List[String] = List("http://www.theguardian.com/uk"/*,
       "http://www.theguardian.com/us",
       "http://www.theguardian.com/au",
@@ -167,13 +167,14 @@ class ArticleUrls(key: String) {
       "http://www.theguardian.com/uk/technology",
       "http://www.theguardian.com/travel"*/)
     val emptyContentFields: Option[ContentFields] = None
-    val returnList:List[(Option[ContentFields],String)] = listofFronts.map(url => (emptyContentFields, url))
+    val emptyTags: Seq[Tag] = List()
+    val returnList:List[(Option[ContentFields], Seq[Tag], String)] = listofFronts.map(url => (emptyContentFields, emptyTags, url))
     println("CAPI Query Success - Fronts: \n" + returnList.map(element => element._2).mkString)
     returnList
   }
 
 
-  def getVideoPages(pageNumber: Int): List[(Option[ContentFields],String)] = {
+  def getVideoPages(pageNumber: Int): List[(Option[ContentFields], Seq[Tag],String)] = {
   try {
     val searchQuery = new SearchQuery()
       .fromDate(from)
@@ -189,8 +190,8 @@ class ArticleUrls(key: String) {
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val videoContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
-        (result.fields, result.webUrl)
+    val videoContentAndUrl: List[(Option[ContentFields], Seq[Tag], String)] = for (result <- returnedResponse.results) yield {
+        (result.fields, result.tags, result.webUrl)
       }
     println("received " + videoContentAndUrl.length + " pages from this query")
     if (videoContentAndUrl.length < pageSize) {
@@ -202,13 +203,13 @@ class ArticleUrls(key: String) {
   } catch {
       case _: Throwable => {
         println("bad request - page is empty - returning empty list")
-        val emptyList: List[(Option[ContentFields], String)] = List()
+        val emptyList: List[(Option[ContentFields], Seq[Tag], String)] = List()
         emptyList
       }
     }
   }
 
-  def getAudioPages(pageNumber: Int): List[(Option[ContentFields],String)] = {
+  def getAudioPages(pageNumber: Int): List[(Option[ContentFields], Seq[Tag], String)] = {
     try {
       val liveBlogSearchQuery = new SearchQuery()
         .fromDate(from)
@@ -224,8 +225,8 @@ class ArticleUrls(key: String) {
 
       val apiResponse = contentApiClient.getResponse(liveBlogSearchQuery)
       val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-      val audioContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
-          (result.fields, result.webUrl)
+      val audioContentAndUrl: List[(Option[ContentFields], Seq[Tag], String)] = for (result <- returnedResponse.results) yield {
+          (result.fields, result.tags, result.webUrl)
         }
       println("received " + audioContentAndUrl.length + " pages from this query")
       if (audioContentAndUrl.length < pageSize) {
@@ -237,7 +238,7 @@ class ArticleUrls(key: String) {
     } catch {
       case _: Throwable => {
         println("bad request - page is empty - returning empty list")
-        val emptyList: List[(Option[ContentFields], String)] = List()
+        val emptyList: List[(Option[ContentFields], Seq[Tag], String)] = List()
         emptyList
       }
     }
