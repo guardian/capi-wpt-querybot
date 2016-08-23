@@ -1,7 +1,7 @@
 package app.apiutils
 
 import app.api.S3Operations
-import com.gu.contentapi.client.model.v1.{CapiDateTime, ContentFields}
+import com.gu.contentapi.client.model.v1.{Tag, CapiDateTime, ContentFields}
 import org.joda.time.DateTime
 
 /**
@@ -33,11 +33,11 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   val resultsWithNoPageElements = (recentButNoRetestRequired ::: oldResults).filter(_.editorialElementList.isEmpty)
 
-  def returnPagesNotYetTested(list: List[(Option[ContentFields],String)]): List[(Option[ContentFields],String)] = {
-    val pagesNotYetTested: List[(Option[ContentFields],String)] = for (page <- list if !previousResults.map(_.testUrl).contains(page._2)) yield page
-    val pagesAlreadyTested:List[(Option[ContentFields],String)] = for (page <- list if previousResults.map(_.testUrl).contains(page._2)) yield page
+  def returnPagesNotYetTested(list: List[(Option[ContentFields], Seq[Tag], String)]): List[(Option[ContentFields], Seq[Tag], String)] = {
+    val pagesNotYetTested: List[(Option[ContentFields], Seq[Tag], String)] = for (page <- list if !previousResults.map(_.testUrl).contains(page._3)) yield page
+    val pagesAlreadyTested:List[(Option[ContentFields], Seq[Tag], String)] = for (page <- list if previousResults.map(_.testUrl).contains(page._3)) yield page
     val testedPagesBothSourcesThatHaveChangedSinceLastTest = pagesAlreadyTested.flatMap(page => {
-      for (result <- previousResults if result.testUrl.contains(page._2) && result.mostRecentUpdate < page._1.get.lastModified.getOrElse(new CapiDateTime {
+      for (result <- previousResults if result.testUrl.contains(page._3) && result.mostRecentUpdate < page._1.get.lastModified.getOrElse(new CapiDateTime {
         override def dateTime: Long = 0
       }).dateTime) yield page}).distinct
    // println("pages that have been updated since last test: \n" + testedPagesBothSourcesThatHaveChangedSinceLastTest.map(_._2 + "\n").mkString)

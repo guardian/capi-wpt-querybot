@@ -49,6 +49,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   var firstPublished: Option[CapiDateTime] = None
   var pageLastUpdated: Option[CapiDateTime] = None
   var liveBloggingNow: Option[Boolean] = None
+  var gLabs = false
   var anchorId: Option[String] = None
 
   var fullElementList: List[PageElementFromHTMLTableRow] = List()
@@ -65,6 +66,9 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     {liveBloggingNow = Option(true)}
     else
     {liveBloggingNow = Option(false)}
+  }
+  def setGLabs(isGLabs: String):Unit = {
+    gLabs = isGLabs.contains("True") || isGLabs.contains("true")
   }
 
   def getPageType:String = {
@@ -149,11 +153,11 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + editorialElementList.map(element => "," + element.toCSVString()).mkString + fillRemainingGapsAndNewline()
+    printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + "," + gLabs + "," + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + editorialElementList.map(element => "," + element.toCSVString()).mkString + fillRemainingGapsAndNewline()
   }
 
   def toCSVStringTestOutput(): String = {
-    printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + editorialElementList.map(element => "," + element.toCSVString()).mkString + "\n"
+    printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + "," + gLabs + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + editorialElementList.map(element => "," + element.toCSVString()).mkString + "\n"
   }
 
   def toFullHTMLTableCells(): String = {
