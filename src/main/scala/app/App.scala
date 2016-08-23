@@ -212,18 +212,11 @@ object App {
     println("Retrieved: " + audioPages.length + " audio pages")
     println((articles.length + liveBlogs.length + interactives.length + fronts.length + videoPages.length + audioPages.length) + " pages returned in total")
 
-//    val newOrChangedArticles = previousTestResultsHandler.returnPagesNotYetTested(articles)
-//    val newOrChangedLiveBlogs = previousTestResultsHandler.returnPagesNotYetTested(liveBlogs)
-//    val newOrChangedInteractives = previousTestResultsHandler.returnPagesNotYetTested(interactives)
-//    val newOrChangedVideoPages = previousTestResultsHandler.returnPagesNotYetTested(videoPages)
-//    val newOrChangedAudioPages = previousTestResultsHandler.returnPagesNotYetTested(audioPages)
-
-    val newOrChangedArticles: List[(Option[ContentFields], Seq[Tag], String)] = List()
-    val newOrChangedLiveBlogs: List[(Option[ContentFields], Seq[Tag], String)] = List()
-    val newOrChangedInteractives: List[(Option[ContentFields], Seq[Tag], String)] = List()
-    val newOrChangedVideoPages: List[(Option[ContentFields], Seq[Tag], String)] = List()
-    val newOrChangedAudioPages: List[(Option[ContentFields], Seq[Tag], String)] = List()
-
+    val newOrChangedArticles = previousTestResultsHandler.returnPagesNotYetTested(articles)
+    val newOrChangedLiveBlogs = previousTestResultsHandler.returnPagesNotYetTested(liveBlogs)
+    val newOrChangedInteractives = previousTestResultsHandler.returnPagesNotYetTested(interactives)
+    val newOrChangedVideoPages = previousTestResultsHandler.returnPagesNotYetTested(videoPages)
+    val newOrChangedAudioPages = previousTestResultsHandler.returnPagesNotYetTested(audioPages)
 
     //val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
 
