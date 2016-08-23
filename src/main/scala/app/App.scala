@@ -7,7 +7,7 @@ import java.util
 
 import app.api._
 import app.apiutils._
-import com.gu.contentapi.client.model.v1.{Office, MembershipTier, CapiDateTime, ContentFields}
+import com.gu.contentapi.client.model.v1._
 import com.typesafe.config.{Config, ConfigFactory}
 import org.joda.time.DateTime
 import sbt.complete.Completion
@@ -178,6 +178,7 @@ object App {
     val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
     val previousInteractiveAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(interactiveAlertsFromPreviousTests)
 
+
     //validate list handling
     val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
     val visualPagesString: String = s3Interface.getVisualsFileFromS3(visualsPagesFileName)
@@ -193,12 +194,12 @@ object App {
     //  Define new CAPI Query object
     val capiQuery = new ArticleUrls(contentApiKey)
     //get all content-type-lists
-    val articles: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Article")
-    val liveBlogs: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("LiveBlog")
-    val interactives: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Interactive")
-    val fronts: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Front")
-    val videoPages: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Video")
-    val audioPages: List[(Option[ContentFields], String)] = capiQuery.getUrlsForContentType("Audio")
+    val articles: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Article")
+    val liveBlogs: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("LiveBlog")
+    val interactives: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Interactive")
+    val fronts: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Front")
+    val videoPages: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Video")
+    val audioPages: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Audio")
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
 
@@ -211,11 +212,18 @@ object App {
     println("Retrieved: " + audioPages.length + " audio pages")
     println((articles.length + liveBlogs.length + interactives.length + fronts.length + videoPages.length + audioPages.length) + " pages returned in total")
 
-    val newOrChangedArticles = previousTestResultsHandler.returnPagesNotYetTested(articles)
-    val newOrChangedLiveBlogs = previousTestResultsHandler.returnPagesNotYetTested(liveBlogs)
-    val newOrChangedInteractives = previousTestResultsHandler.returnPagesNotYetTested(interactives)
-    val newOrChangedVideoPages = previousTestResultsHandler.returnPagesNotYetTested(videoPages)
-    val newOrChangedAudioPages = previousTestResultsHandler.returnPagesNotYetTested(audioPages)
+//    val newOrChangedArticles = previousTestResultsHandler.returnPagesNotYetTested(articles)
+//    val newOrChangedLiveBlogs = previousTestResultsHandler.returnPagesNotYetTested(liveBlogs)
+//    val newOrChangedInteractives = previousTestResultsHandler.returnPagesNotYetTested(interactives)
+//    val newOrChangedVideoPages = previousTestResultsHandler.returnPagesNotYetTested(videoPages)
+//    val newOrChangedAudioPages = previousTestResultsHandler.returnPagesNotYetTested(audioPages)
+
+    val newOrChangedArticles: List[(Option[ContentFields], Seq[Tag], String)] = List()
+    val newOrChangedLiveBlogs: List[(Option[ContentFields], Seq[Tag], String)] = List()
+    val newOrChangedInteractives: List[(Option[ContentFields], Seq[Tag], String)] = List()
+    val newOrChangedVideoPages: List[(Option[ContentFields], Seq[Tag], String)] = List()
+    val newOrChangedAudioPages: List[(Option[ContentFields], Seq[Tag], String)] = List()
+
 
     //val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
 
@@ -227,12 +235,12 @@ object App {
 
     //    val dedupedResultsToRetestUrls: List[String] = for (result <- nonCAPIResultsToRetest) yield result.testUrl
     val pagesToRetest: List[String] = previousResultsToRetest.map(_.testUrl)
-    val articleUrls: List[String] = for (page <- newOrChangedArticles) yield page._2
-    val liveBlogUrls: List[String] = for (page <- newOrChangedLiveBlogs) yield page._2
-    val interactiveUrls: List[String] = for (page <- newOrChangedInteractives) yield page._2
-    val frontsUrls: List[String] = for (page <- fronts) yield page._2
-    val videoUrls: List[String] = for (page <- newOrChangedVideoPages) yield page._2
-    val audioUrls: List[String] = for (page <- newOrChangedAudioPages) yield page._2
+    val articleUrls: List[String] = for (page <- newOrChangedArticles) yield page._3
+    val liveBlogUrls: List[String] = for (page <- newOrChangedLiveBlogs) yield page._3
+    val interactiveUrls: List[String] = for (page <- newOrChangedInteractives) yield page._3
+    val frontsUrls: List[String] = for (page <- fronts) yield page._3
+    val videoUrls: List[String] = for (page <- newOrChangedVideoPages) yield page._3
+    val audioUrls: List[String] = for (page <- newOrChangedAudioPages) yield page._3
 
     //get all pages from the visuals team api
 
@@ -249,13 +257,15 @@ object App {
     val previousInteractivesToRetest: List[PerformanceResultsObject] = for (result <- previousResultsToRetest if result.getPageType.contains("Interactive")) yield result
 
     // munge into proper format and merge these with the capi results
-    val previousArticlesReTestContentFieldsAndUrl = previousArticlesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), result.testUrl))
-    val previousLiveBlogReTestContentFieldsAndUrl = previousLiveBlogsToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), result.testUrl))
-    val previousInteractiveReTestContentFieldsAndUrl = previousInteractivesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), result.testUrl))
+    //todo - when we are saving and reading taglist in results - update this
+    val emptyTagList: Seq[Tag] = Seq()
+    val previousArticlesReTestContentFieldsAndUrl = previousArticlesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), emptyTagList, result.testUrl))
+    val previousLiveBlogReTestContentFieldsAndUrl = previousLiveBlogsToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), emptyTagList, result.testUrl))
+    val previousInteractiveReTestContentFieldsAndUrl = previousInteractivesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), emptyTagList, result.testUrl))
 
-    val combinedArticleList: List[(Option[ContentFields], String)] = previousArticlesReTestContentFieldsAndUrl ::: newOrChangedArticles
-    val combinedLiveBlogList: List[(Option[ContentFields], String)] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
-    val combinedInteractiveList: List[(Option[ContentFields], String)] = previousInteractiveReTestContentFieldsAndUrl ::: newOrChangedInteractives
+    val combinedArticleList: List[(Option[ContentFields], Seq[Tag], String)] = previousArticlesReTestContentFieldsAndUrl ::: newOrChangedArticles
+    val combinedLiveBlogList: List[(Option[ContentFields], Seq[Tag], String)] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
+    val combinedInteractiveList: List[(Option[ContentFields], Seq[Tag], String)] = previousInteractiveReTestContentFieldsAndUrl ::: newOrChangedInteractives
 
     //create sorter object - contains functions for ordering lists of Performance Results Objects
     val sorter = new ListSorter
@@ -421,7 +431,7 @@ object App {
     val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
     val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
 
-    //record results
+    // record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
 
     println("combinedResultsForFile length = " + combinedResultsForFile.length)
@@ -674,21 +684,21 @@ object App {
     desktopResults ::: mobileResults
   }
 
-  def listenForResultPages(capiPages: List[(Option[ContentFields],String)], contentType: String, resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String]): List[PerformanceResultsObject] = {
+  def listenForResultPages(capiPages: List[(Option[ContentFields], Seq[Tag], String)], contentType: String, resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String]): List[PerformanceResultsObject] = {
     println("ListenForResultPages called with: \n\n" +
-      " List of Urls: \n" + capiPages.map(page => page._2).mkString +
+      " List of Urls: \n" + capiPages.map(page => page._3).mkString +
       "\n\nList of WebPage Test results: \n" + resultUrlList.mkString +
       "\n\nList of averages: \n" + averages.toHTMLString + "\n")
 
     val listenerList: List[WptResultPageListener] = capiPages.flatMap(page => {
-      for (element <- resultUrlList if element._1 == page._2) yield new WptResultPageListener(element._1, contentType, page._1, element._2)
+      for (element <- resultUrlList if element._1 == page._3) yield new WptResultPageListener(element._1, contentType, page._1, page._2, element._2)
     })
 
     println("Listener List created: \n" + listenerList.map(element => "list element: \n" + "url: " + element.pageUrl + "\n" + "resulturl" + element.wptResultUrl + "\n"))
 
     val resultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
-      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields, element.wptResultUrl)
+      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields, element.tagList, element.wptResultUrl)
       println("getting result for page element")
       newElement.testResults = wpt.getResults(newElement.pageUrl,newElement.wptResultUrl)
       println("result received\n setting headline")
