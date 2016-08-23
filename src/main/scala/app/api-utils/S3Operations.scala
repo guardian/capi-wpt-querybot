@@ -161,26 +161,44 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       val myData = scala.io.Source.fromInputStream(objectData).getLines()
       val resultsIterator = for (line <- myData) yield {
             val data: Array[String] = line.split(",")
+            println("data 0: " + data(0))
+            println("data 1: " + data(1))
+            println("data 2: " + data(2))
+            println("data 3: " + data(3))
+            println("data 4: " + data(4))
+            println("data 5: " + data(5))
+            println("data 6: " + data(6))
+            println("data 7: " + data(7))
+            println("data 8: " + data(8))
+            println("data 9: " + data(9))
+            println("data 10: " + data(10))
+            println("data 11: " + data(11))
+            println("data 12: " + data(12))
+            println("data 13: " + data(13))
+            println("data 14: " + data(14))
+            println("data 15: " + data(15))
+            println("data 16: " + data(16))
+            println("data 17: " + data(17))
             var result = new PerformanceResultsObject(data(1),
-                data(7),
                 data(8),
-                data(9).toInt,
+                data(9),
                 data(10).toInt,
                 data(11).toInt,
                 data(12).toInt,
                 data(13).toInt,
                 data(14).toInt,
                 data(15).toInt,
-                data(16),
-                data(17).toBoolean,
+                data(16).toInt,
+                data(17),
                 data(18).toBoolean,
-                data(19).toBoolean)
+                data(19).toBoolean,
+                data(20).toBoolean)
             //todo - get element list
-            val elementArray = data.drop(20)
-            if ((elementArray(8).toInt > 0) && (data(9).toInt > -1)){
+            val elementArray = data.drop(21)
+            if ((elementArray(9).toInt > 0) && (data(10).toInt > -1)){
             val elementList = getElementListFromArray(elementArray)
             if(elementList.nonEmpty) {
-              result.fullElementList = elementList
+                result.fullElementList = elementList
                 result.populateEditorialElementList(elementList)
               }else{
                   println("returned list from getElementListFromArray is empty")
@@ -188,7 +206,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
             } else {
               println("Data in element array is not valid.\n")
               println("elementArray(2).toInt gives: " + elementArray(2).toInt)
-              println("data(9).toInt gives: " + data(9).toInt)
+              println("data(9).toInt gives: " + data(10).toInt)
             }
             result.setHeadline(Option(data(2)))
             result.setPageType(data(3))
@@ -197,6 +215,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
             val lastUpdateTime: Option[CapiDateTime] = result.stringtoCAPITime(data(5))
             result.setPageLastUpdated(lastUpdateTime)
             result.setLiveBloggingNow(data(6))
+            result.setGLabs(data(7))
             result
       }
       resultsIterator.toList
