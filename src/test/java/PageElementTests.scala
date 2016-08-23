@@ -22,6 +22,9 @@ import scala.io.Source
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
     var configArray: Array[String] = Array("", "", "", "", "", "")
     var urlFragments: List[String] = List()
+    val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    val resultsFromPreviousTestsInput = "resultsFromPreviousTestsTest.csv"
+    val resultsFromPreviousTestsOutput = "resultsFromPreviousTestsOutput.csv"
 
     println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
     val returnTuple = s3Interface.getConfig
@@ -32,7 +35,7 @@ import scala.io.Source
     val wptBaseUrl: String = configArray(1)
     val wptApiKey: String = configArray(2)
     val wptLocation: String = configArray(3)
-
+/*
     "A pageElementList" should "contain page elements" in {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
 
@@ -45,8 +48,8 @@ import scala.io.Source
       pageElementList.head.printElement()
       println("testing list is not empty")
       assert(pageElementList.nonEmpty)
-    }
-
+    }*/
+/*
     "A non-empty pageElementList" should "contain page elements that have non-empty values" in {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
 
@@ -73,9 +76,9 @@ import scala.io.Source
         nonEmptyElement
       })
       assert(!checkall.contains(false))
-    }
+    }*/
 
-    "A sorted pageElementList" should "be sorted in order of largest bytesDownloaded to smallest" in {
+ /*   "A sorted pageElementList" should "be sorted in order of largest bytesDownloaded to smallest" in {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
 
       var htmlString: String = ""
@@ -97,6 +100,21 @@ import scala.io.Source
       }
       if (isordered) {println("Tested list of " + counter + " elements. All are in order")}
       assert(isordered)
+    }*/
+
+    "File loaded from S3" should "have elements in its Full Element List populated" in {
+      val resultList = s3Interface.getResultsFileFromS3(resultsFromPreviousTestsInput)
+      val errorFreeResultList = resultList.filter(_.fullElementList.nonEmpty)
+      s3Interface.writeFileToS3(resultsFromPreviousTestsOutput,errorFreeResultList.map(_.toCSVString()).mkString)
+      val resultList2 = s3Interface.getResultsFileFromS3(resultsFromPreviousTestsOutput)
+      val resultListLength = resultList.length
+      val errorFreeResultListLength = errorFreeResultList.length
+      var resultList2Length = resultList2.length
+      var resultListHead = resultList.head
+      var resultList2Head = resultList2.head
+      println(resultList.head.toCSVString())
+      println(resultList.head.resultStatus)
+      assert(resultListLength == errorFreeResultListLength && resultListLength == resultList2Length && resultListHead.testUrl == resultList2Head.testUrl && resultListHead.resultStatus == resultList2Head.resultStatus)
     }
 
   /*  "A list of elements from results" should "not contain any commas" in {
