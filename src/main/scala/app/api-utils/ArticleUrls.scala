@@ -102,7 +102,7 @@ class ArticleUrls(key: String) {
       liveBlogContentAndUrl
     } else {
       Thread.sleep(2000)
-      liveBlogContentAndUrl
+      liveBlogContentAndUrl ::: getMinByMins(pageNumber + 1)
     }
   } catch {
       case _: Throwable => {
@@ -138,7 +138,7 @@ class ArticleUrls(key: String) {
       interactiveContentAndUrl
     } else {
       Thread.sleep(2000)
-      interactiveContentAndUrl
+      interactiveContentAndUrl ::: getInteractives(pageNumber + 1)
     }
   } catch {
       case _: Throwable => {
