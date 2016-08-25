@@ -117,7 +117,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
           println(previousResults.length + " results retrieved in total")
           println(resultsFromLast24Hours.length + " results for last 24 hours")
           println(previousResultsToRetest.length + " results will be elegible for retest")
-          println(dedupedPreviousResultsToRestest + " results are not duplicates and will actually be retested")
+          println(dedupedPreviousResultsToRestest.length + " results are not duplicates and will actually be retested")
           println(recentButNoRetestRequired.length + " results will be listed but not tested")
           true
     }
