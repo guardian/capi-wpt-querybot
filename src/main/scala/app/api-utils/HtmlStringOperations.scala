@@ -78,7 +78,6 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
         returnString = "<tr>" + resultsObject.toHTMLSimpleTableCells() + "</tr>"
       }
     println(DateTime.now + " returning results string to main thread")
-    println(returnString)
     returnString
 
   }
@@ -96,7 +95,6 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
       returnString = "<tr>" + resultsObject.toHTMLPageWeightTableCells() + "</tr>"
     }
     println(DateTime.now + " returning results string to main thread")
-    println(returnString)
     returnString
 
   }
@@ -116,7 +114,6 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
       returnString = "<tr>" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
     }
     println(DateTime.now + " returning results string to main thread")
-    println(returnString)
     returnString
 
   }

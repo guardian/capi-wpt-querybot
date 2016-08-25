@@ -535,7 +535,7 @@ object App {
 
     val alertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
     if (alertsToSend.nonEmpty) {
-      println("There are new pageWeight alerts to send! There are " + alertsToSend + " new alerts")
+      println("There are new pageWeight alerts to send! There are " + alertsToSend.length + " new alerts")
       val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
       val pageWeightEmailSuccess = emailer.sendPageWeightAlert(generalAlertsAddressList, pageWeightEmailAlerts.toString())
       if (pageWeightEmailSuccess)

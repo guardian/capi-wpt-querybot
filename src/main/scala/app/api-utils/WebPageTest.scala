@@ -289,10 +289,10 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       result.fullElementList = sortedElementList
       println("populating editorial element list")
       println("list length: " + sortedElementList.length)
-      println("list contains: \n" + sortedElementList.map(_.toHTMLRowString() + "\n").mkString)
+      //println("list contains: \n" + sortedElementList.map(_.toHTMLRowString() + "\n").mkString)
       result.populateEditorialElementList(sortedElementList)
-      println("Result string: " + result.toHTMLSimpleTableCells())
-      println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
+      //println("Result string: " + result.toHTMLSimpleTableCells())
+      //println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
       println("Returning PerformanceResultsObject")
       result
     } catch {
@@ -443,8 +443,8 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       val sortedElementList = sortPageElementList(elementsList)
       result.fullElementList = sortedElementList
       result.populateEditorialElementList(sortedElementList)
-      println("Result string: " + result.toHTMLSimpleTableCells())
-      println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
+      //println("Result string: " + result.toHTMLSimpleTableCells())
+      //println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
       println("Returning PerformanceResultsObject")
       result
     } catch {

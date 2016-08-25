@@ -143,7 +143,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
   // Access Methods
 
   override def toString(): String = {
-    println("\n PAGEWEIGHTDASHBOARD--MOBILE CREATED \n" +
+    println("\n PAGEWEIGHTDASHBOARD--TABBED CREATED \n" +
       "Number of combined records " + numberOfCombinedRecords +
       "Number of desktop records " + numberOfDesktopRecords +
       "Number of mobile records " + numberOfMobileRecords + "\n \n \n")
