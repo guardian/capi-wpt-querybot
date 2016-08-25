@@ -118,7 +118,7 @@ class ListSorter {
       makeList(sortedTupleList)
     }
     else {
-      println("sortByWeight has noElements in list. Passing back empty list")
+      println("sortBySpeed has noElements in list. Passing back empty list")
       val emptyList: List[PerformanceResultsObject] = List()
       emptyList
     }

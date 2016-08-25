@@ -124,6 +124,7 @@ val timeNow = DateTime.now
   val pagesWithInfoStradaEmbed = allResults.filter(pageContainsElementType(_, "infostrada"))
   val pagesWithInstagramEmbed = allResults.filter(pageContainsElementType(_, "instagram"))
   val pagesWithInteractiveEmbed = allResults.filter(pageContainsElementType(_, "interactive"))
+  val pagesWithM3U8Embed = allResults.filter(pageContainsElementType(_, "m3u8"))
   val pagesWithMP3Embed = allResults.filter(pageContainsElementType(_, "Audio Embed"))
   val pagesWithMP4Embed = allResults.filter(pageContainsElementType(_, "Video Embed"))
   val pagesWithParliamentLiveTvEmbed = allResults.filter(pageContainsElementType(_, "parliamentLiveTv"))
@@ -133,8 +134,10 @@ val timeNow = DateTime.now
   val pagesWithTwitterEmbed = allResults.filter(pageContainsElementType(_, "twitter"))
   val pagesWithUStreamEmbed = allResults.filter(pageContainsElementType(_, "uStream"))
   val pagesWithVevoEmbed = allResults.filter(pageContainsElementType(_, "vevo"))
+  val pagesWithVideo3GPEmbed = allResults.filter(pageContainsElementType(_, "3gp"))
   val pagesWithVimeoEmbed = allResults.filter(pageContainsElementType(_, "vimeo"))
   val pagesWithVineEmbed = allResults.filter(pageContainsElementType(_, "vine"))
+  val pagesWithWebPEmbed = allResults.filter(pageContainsElementType(_, "webp"))
   val pagesWithYouTubeEmbed = allResults.filter(pageContainsElementType(_, "youTube"))
   val pagesWithUnknownEmbed = allResults.filter(pageContainsElementType(_, "unknownElement"))
 
@@ -162,6 +165,7 @@ val timeNow = DateTime.now
   val infostrada: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("infostrada", List())
   val instagram: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("instagram", List())
   val interactive: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("interactive", List())
+  val m3u8: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("m3u8", List())
   val mP3: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("Audio Embed", List())
   val mP4: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("Video Embed", List())
   val parliamentLiveTv: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("parliamentLiveTv", List())
@@ -171,8 +175,10 @@ val timeNow = DateTime.now
   val twitter: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("twitter", List())
   val uStream: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("uStream", List())
   val vevo: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("vevo", List())
+  val video3GP: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("3gp", List())
   val vimeo: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("vimeo", List())
   val vine: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("vine", List())
+  val webp: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("webp", List())
   val youTube: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("youTube", List())
   val unknownElement: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("unknownElement", List())
 
@@ -199,8 +205,9 @@ val timeNow = DateTime.now
   val infostradaSummary = summariseElement("infostrada", pagesWithInfoStradaEmbed, infostrada)
   val instagramSummary = summariseElement("instagram", pagesWithInstagramEmbed, instagram)
   val interactiveSummary = summariseElement("interactive", pagesWithInteractiveEmbed, interactive)
-  val mP3Summary = summariseElement("Audio Embed", pagesWithMP3Embed, mP3)
-  val mP4Summary = summariseElement("Video Embed", pagesWithMP4Embed, mP4)
+  val m3u8Summary = summariseElement("m3u8 (iOS specific video format)", pagesWithM3U8Embed, m3u8)
+  val mP3Summary = summariseElement("mp3 video format)", pagesWithMP3Embed, mP3)
+  val mP4Summary = summariseElement("mp4 video format", pagesWithMP4Embed, mP4)
   val parliamentLiveTvSummary = summariseElement("parliamentLiveTv", pagesWithParliamentLiveTvEmbed, parliamentLiveTv)
   val scribdSummary = summariseElement("scribd", pagesWithScribdEmbed, scribd)
   val soundCloudSummary = summariseElement("soundCloud", pagesWithSoundCloudEmbed, soundCloud)
@@ -208,10 +215,12 @@ val timeNow = DateTime.now
   val twitterSummary = summariseElement("twitter", pagesWithTwitterEmbed, twitter)
   val uStreamSummary = summariseElement("uStream", pagesWithUStreamEmbed, uStream)
   val vevoSummary = summariseElement("vevo", pagesWithVevoEmbed, vevo)
+  val video3GPSummary = summariseElement("3gp video format", pagesWithVideo3GPEmbed, video3GP)
   val vimeoSummary = summariseElement("vimeo", pagesWithVimeoEmbed, vimeo)
   val vineSummary = summariseElement("vine", pagesWithVineEmbed, vine)
+  val webpSummary = summariseElement("webp video format", pagesWithWebPEmbed, webp)
   val youTubeSummary = summariseElement("youTube", pagesWithYouTubeEmbed, youTube)
-  val unknownEmbedSummary = summariseElement("unknownElement", pagesWithUnknownEmbed, unknownElement)
+  val unknownEmbedSummary = summariseElement("Unidentified element", pagesWithUnknownEmbed, unknownElement)
 
   val summaryList: List[ElementSummaryData] = List(
         audioBoomSummary,
@@ -235,6 +244,7 @@ val timeNow = DateTime.now
         infostradaSummary,
         instagramSummary,
         interactiveSummary,
+        m3u8Summary,
         mP3Summary,
         mP4Summary,
         parliamentLiveTvSummary,
@@ -244,8 +254,10 @@ val timeNow = DateTime.now
         twitterSummary,
         uStreamSummary,
         vevoSummary,
+        video3GPSummary,
         vimeoSummary,
         vineSummary,
+        webpSummary,
         youTubeSummary,
         unknownEmbedSummary
   )
@@ -276,6 +288,7 @@ val timeNow = DateTime.now
     val infoStrada = getPage(pagesWithInfoStradaEmbed)
     val instagram = getPage(pagesWithInstagramEmbed)
     val interactive = getPage(pagesWithInteractiveEmbed)
+    val m3u8 = getPage(pagesWithM3U8Embed)
     val mp3 = getPage(pagesWithMP3Embed)
     val mp4 = getPage(pagesWithMP4Embed)
     val parliamentLiveTv = getPage(pagesWithParliamentLiveTvEmbed)
@@ -285,8 +298,10 @@ val timeNow = DateTime.now
     val twitter = getPage(pagesWithTwitterEmbed)
     val uStream = getPage(pagesWithUStreamEmbed)
     val vevo = getPage(pagesWithVevoEmbed)
+    val video3GP = getPage(pagesWithVideo3GPEmbed)
     val vimeo = getPage(pagesWithVimeoEmbed)
     val vine = getPage(pagesWithVineEmbed)
+    val webp = getPage(pagesWithWebPEmbed)
     val youTube = getPage(pagesWithYouTubeEmbed)
     val unknownEmbed = getPage(pagesWithUnknownEmbed)
 
@@ -312,6 +327,7 @@ val timeNow = DateTime.now
       infoStrada,
       instagram,
       interactive,
+      m3u8,
       mp3,
       mp4,
       parliamentLiveTv,
@@ -321,8 +337,10 @@ val timeNow = DateTime.now
       twitter,
       uStream,
       vevo,
+      video3GP,
       vimeo,
       vine,
+      webp,
       youTube,
       unknownEmbed
     )

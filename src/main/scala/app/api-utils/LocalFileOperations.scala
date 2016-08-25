@@ -60,7 +60,7 @@ class LocalFileOperations {
 
   def writeLocalResultFile(outputFileName: String, results: String): Int = {
     val output: FileWriter = new FileWriter(outputFileName)
-    println(DateTime.now + " Writing the following to local file " + outputFileName + ":\n" + results)
+    println(DateTime.now + " Writing " + results.length + " rows to the following local file: " + outputFileName + "\n")
     output.write(results)
     output.close()
     println(DateTime.now + " Writing to file: " + outputFileName + " complete. \n")
@@ -105,14 +105,14 @@ class LocalFileOperations {
     }
 
   def getElementListFromArray(elementArray: Array[String]): List[PageElementFromHTMLTableRow] = {
-    println("\n\n\n\n  **************** elementArray: **************** \n"+ elementArray.map(element => element.toString + "\n").mkString + "\n\n\n\n\n\n" )
+    //println("\n\n\n\n  **************** elementArray: **************** \n"+ elementArray.map(element => element.toString + "\n").mkString + "\n\n\n\n\n\n" )
     if(elementArray.nonEmpty){
       val length = elementArray.length
-      println("element Array length = " + elementArray.length)
+      //println("element Array length = " + elementArray.length)
       var index = 0
       var elementList: List[PageElementFromHTMLTableRow] = List()
       while(index < length-1){
-        println("index = " + index)
+/*        println("index = " + index)
         println("resource = " + elementArray(index))
         println("content type = " + elementArray(index + 1))
         println("request start = " + elementArray(index + 2))
@@ -123,7 +123,7 @@ class LocalFileOperations {
         println("content download = " + elementArray(index + 7))
         println("bytes downloaded = " + elementArray(index + 8))
         println("status code = " + elementArray(index + 9))
-        println("ipaddress = " + elementArray(index + 10))
+        println("ipaddress = " + elementArray(index + 10))*/
         val newElement: PageElementFromHTMLTableRow = new PageElementFromParameters(elementArray(index),
           elementArray(index+1),
           elementArray(index+2).toInt,
@@ -138,8 +138,8 @@ class LocalFileOperations {
         elementList = elementList ::: List(newElement)
         index = index + 11
       }
-      println("\n\nElementList Populated. \nLength of list: " + elementList.length)
-      println("Element List Contents: \n" + elementList.map(element => element.toCSVString() + "\n"))
+      //println("\n\nElementList Populated. \nLength of list: " + elementList.length)
+      //println("Element List Contents: \n" + elementList.map(element => element.toCSVString() + "\n"))
       elementList
     }else{
       val emptyList: List[PageElementFromHTMLTableRow] = List()

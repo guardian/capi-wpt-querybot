@@ -17,7 +17,7 @@ class PageElementSamples(dataSummary: DataSummary, alertSummary: DataSummary) {
 
   val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
     "<head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>" + "\n" +
-    "<title>Editorial PageWeight Dashboard - [Editorial Pageweight Dashboard]</title>" + "\n" +
+    "<title>Editorial Element Sample Pages - [Editorial Element Sample Pages]</title>" + "\n" +
     "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\"/>" + "\n" +
     "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"></script>" + "\n" +
     "<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js\"></script>" + "\n" +
@@ -139,23 +139,26 @@ class PageElementSamples(dataSummary: DataSummary, alertSummary: DataSummary) {
     val row18 =  "<tr>" + "<td>" +"infoStrada: " + "</td>" + "<td>"  + returnPageSample(18) + "</td>" + "</tr>" + "\n"
     val row19 =  "<tr>" + "<td>" +"instagram: " + "</td>" + "<td>"  + returnPageSample(19) + "</td>" + "</tr>" + "\n"
     val row20 =  "<tr>" + "<td>" +"interactive: " + "</td>" + "<td>"  + returnPageSample(20) + "</td>" + "</tr>" + "\n"
-    val row21 =  "<tr>" + "<td>" +"mp3: " + "</td>" + "<td>"  + returnPageSample(21) + "</td>" + "</tr>" + "\n"
-    val row22 =  "<tr>" + "<td>" +"mp4: " + "</td>" + "<td>"  + returnPageSample(22) + "</td>" + "</tr>" + "\n"
-    val row23 =  "<tr>" + "<td>" +"parliamentLiveTv: " + "</td>" + "<td>"  + returnPageSample(23) + "</td>" + "</tr>" + "\n"
-    val row24 =  "<tr>" + "<td>" +"scribd: " + "</td>" + "<td>"  + returnPageSample(24) + "</td>" + "</tr>" + "\n"
-    val row25 =  "<tr>" + "<td>" +"soundCloud: " + "</td>" + "<td>"  + returnPageSample(25) + "</td>" + "</tr>" + "\n"
-    val row26 =  "<tr>" + "<td>" +"spotify: " + "</td>" + "<td>"  + returnPageSample(26) + "</td>" + "</tr>" + "\n"
-    val row27 =  "<tr>" + "<td>" +"twitter: " + "</td>" + "<td>"  + returnPageSample(27) + "</td>" + "</tr>" + "\n"
-    val row28 =  "<tr>" + "<td>" +"uStream: " + "</td>" + "<td>"  + returnPageSample(28) + "</td>" + "</tr>" + "\n"
-    val row29 =  "<tr>" + "<td>" +"vevo: " + "</td>" + "<td>"  + returnPageSample(29) + "</td>" + "</tr>" + "\n"
-    val row30 =  "<tr>" + "<td>" +"vimeo: " + "</td>" + "<td>"  + returnPageSample(30) + "</td>" + "</tr>" + "\n"
-    val row31 =  "<tr>" + "<td>" +"vine: " + "</td>" + "<td>"  + returnPageSample(31) + "</td>" + "</tr>" + "\n"
-    val row32 =  "<tr>" + "<td>" +"youTube: " + "</td>" + "<td>"  + returnPageSample(32) + "</td>" + "</tr>" + "\n"
-    val row33 =  "<tr>" + "<td>" +"unknownEmbed: " + "</td>" + "<td>"  + returnPageSample(33) + "</td>" + "</tr>" + "\n"
+    val row21 =  "<tr>" + "<td>" +"m3u8 (ios specific video format): " + "</td>" + "<td>"  + returnPageSample(21) + "</td>" + "</tr>" + "\n"
+    val row22 =  "<tr>" + "<td>" +"mp3 audio: " + "</td>" + "<td>"  + returnPageSample(22) + "</td>" + "</tr>" + "\n"
+    val row23 =  "<tr>" + "<td>" +"mp4 video: " + "</td>" + "<td>"  + returnPageSample(23) + "</td>" + "</tr>" + "\n"
+    val row24 =  "<tr>" + "<td>" +"parliamentLiveTv: " + "</td>" + "<td>"  + returnPageSample(24) + "</td>" + "</tr>" + "\n"
+    val row25 =  "<tr>" + "<td>" +"scribd: " + "</td>" + "<td>"  + returnPageSample(25) + "</td>" + "</tr>" + "\n"
+    val row26 =  "<tr>" + "<td>" +"soundCloud: " + "</td>" + "<td>"  + returnPageSample(26) + "</td>" + "</tr>" + "\n"
+    val row27 =  "<tr>" + "<td>" +"spotify: " + "</td>" + "<td>"  + returnPageSample(27) + "</td>" + "</tr>" + "\n"
+    val row28 =  "<tr>" + "<td>" +"twitter: " + "</td>" + "<td>"  + returnPageSample(28) + "</td>" + "</tr>" + "\n"
+    val row29 =  "<tr>" + "<td>" +"uStream: " + "</td>" + "<td>"  + returnPageSample(29) + "</td>" + "</tr>" + "\n"
+    val row30 =  "<tr>" + "<td>" +"vevo: " + "</td>" + "<td>"  + returnPageSample(30) + "</td>" + "</tr>" + "\n"
+    val row31 =  "<tr>" + "<td>" +"video format 3gp: " + "</td>" + "<td>"  + returnPageSample(31) + "</td>" + "</tr>" + "\n"
+    val row32 =  "<tr>" + "<td>" +"vimeo: " + "</td>" + "<td>"  + returnPageSample(32) + "</td>" + "</tr>" + "\n"
+    val row33 =  "<tr>" + "<td>" +"vine: " + "</td>" + "<td>"  + returnPageSample(33) + "</td>" + "</tr>" + "\n"
+    val row34 =  "<tr>" + "<td>" +"youTube: " + "</td>" + "<td>"  + returnPageSample(34) + "</td>" + "</tr>" + "\n"
+    val row35 =  "<tr>" + "<td>" +"webp video: " + "</td>" + "<td>"  + returnPageSample(35) + "</td>" + "</tr>" + "\n"
+    val row36 =  "<tr>" + "<td>" +"unknownEmbed: " + "</td>" + "<td>"  + returnPageSample(36) + "</td>" + "</tr>" + "\n"
 
     row0 + row1 + row2 + row3 + row4 + row5 + row6 + row7 + row8 + row9 + row10 + row11 + row12 + row13 + row14 + row15 + row16 +
     row17 + row18 + row19 + row20 + row21 + row22 + row23 + row24 + row25 + row26 + row27 + row28 + row29 + row30 + row31 + row32 +
-    row33
+    row33 + row34 + row35 + row36
   }
 
   def returnPageSample(index: Int): String = {
