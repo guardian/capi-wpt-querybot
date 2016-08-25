@@ -77,7 +77,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
 
     println("calling parseString on ConfigFactory object")
     val conf = ConfigFactory.parseString(configString)
-    println("conf: \n" + conf)
+    //println("conf: \n" + conf)
 
     println("returning config object")
     val generalAlerts = conf.getStringList("general.alerts").toList

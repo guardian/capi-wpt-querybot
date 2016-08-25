@@ -49,7 +49,7 @@
     //val resultsFromPreviousTests = "resultFromPreviousTestsAmalgamated.csv"
     // val resultsFromPreviousTests = "resultsFromPreviousTestsShortened.csv"
     //val resultsFromPreviousTests = "shortenedresultstest.csv"
-    val outputFile = "shortenedresultstest.csv"
+    val outputFile = "summarytest.csv"
 
     //Create new S3 Client
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
@@ -117,7 +117,7 @@
       assert(true)
     }
 
-    /*"Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
+    "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
       val resultsFromAlertList = "alerts/pageWeightAlertsFromPreviousTests.csv"
       val alertList = s3Interface.getResultsFileFromS3(resultsFromAlertList)
       val alertHandler = new ResultsFromPreviousTests(alertList)
@@ -127,7 +127,7 @@
       val samplePage = new PageElementSamples(dataSummary, alertSummary)
       s3Interface.writeFileToS3("pageElementSamplePages.html", samplePage.toString())
       assert(true)
-    }*/
+    }
 
 /*    "Not a test but I " should "be able to get a list of pages with an example of each embed" in {
 

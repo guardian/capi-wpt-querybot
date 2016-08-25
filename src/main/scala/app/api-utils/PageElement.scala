@@ -40,6 +40,7 @@ abstract  class PageElement {
     val infostrada = List("infostrada")
     val instagram = List("instagram","instagramstatic","cdninstagram")
     val interactive = List("interactive.guim.co.uk")
+    val m3u8 = List("m3u8")
     val otherAudio = List(".mp3")
     val otherGif = List(".gif", ".GIF")
     val otherImage = List(".jpg", ".png", ".jpeg", ".JPEG", ".JPG", ".PNG")
@@ -51,16 +52,24 @@ abstract  class PageElement {
     val twitter = List("twitter","twimg.com","pbs.twimg.com")
     val uStream = List("ustream")
     val vevo = List("vevo.com")
+    val video3gp = List("3gp")
     val vimeo = List("vimeocdn", "vimeo.com")
     val vine = List("vine.co")
+    val webp = List("webp")
     val youTube = List("ytimg")
 
     var returnString = "unknownElement"
 
+    //check for generic formats
     if(textContainsTextFromList(resource, otherAudio)){returnString = "Audio Embed"}
     if(textContainsTextFromList(resource, otherGif)){returnString = "Gif Embed"}
     if(textContainsTextFromList(resource, otherImage)){returnString = "Image Embed"}
     if(textContainsTextFromList(resource, otherVideo)){returnString = "Video Embed"}
+    if(textContainsTextFromList(resource, m3u8)){returnString = "m3u8"}
+    if(textContainsTextFromList(resource, video3gp)){returnString = "3gp"}
+    if(textContainsTextFromList(resource, webp)){returnString = "webp"}
+
+    //check for product specific formats (should override generic formats)
     if(textContainsTextFromList(resource, audioBoom)){returnString = "audioBoom"}
     if(textContainsTextFromList(resource, brightcove)){returnString = "brightcove"}
     if(textContainsTextFromList(resource, cnn)){returnString = "cnn"}
@@ -90,7 +99,6 @@ abstract  class PageElement {
     if(textContainsTextFromList(resource, vimeo)){returnString = "vimeo"}
     if(textContainsTextFromList(resource, vine)){returnString = "vine"}
     if(textContainsTextFromList(resource, youTube)){returnString = "youTube"}
-    if(returnString.contains("formstack")){println("formstack element found")}
     returnString
   }
 
