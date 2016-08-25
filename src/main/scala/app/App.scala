@@ -250,11 +250,9 @@ object App {
     val previousInteractivesToRetest: List[PerformanceResultsObject] = for (result <- previousResultsToRetest if result.getPageType.contains("Interactive")) yield result
 
     // munge into proper format and merge these with the capi results
-    //todo - when we are saving and reading taglist in results - update this
-    val emptyTagList: Seq[Tag] = Seq()
-    val previousArticlesReTestContentFieldsAndUrl = previousArticlesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), emptyTagList, result.testUrl))
-    val previousLiveBlogReTestContentFieldsAndUrl = previousLiveBlogsToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), emptyTagList, result.testUrl))
-    val previousInteractiveReTestContentFieldsAndUrl = previousInteractivesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), emptyTagList, result.testUrl))
+    val previousArticlesReTestContentFieldsAndUrl = previousArticlesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl))
+    val previousLiveBlogReTestContentFieldsAndUrl = previousLiveBlogsToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl))
+    val previousInteractiveReTestContentFieldsAndUrl = previousInteractivesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl))
 
     val combinedArticleList: List[(Option[ContentFields], Seq[Tag], String)] = previousArticlesReTestContentFieldsAndUrl ::: newOrChangedArticles
     val combinedLiveBlogList: List[(Option[ContentFields], Seq[Tag], String)] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
@@ -535,7 +533,7 @@ object App {
     //    val newFrontsPageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(frontsPageWeightAlertList)
     val newInteractiveAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(interactiveAlertList)
 
-    val alertsToSend = newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList
+    val alertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
     if (alertsToSend.nonEmpty) {
       println("There are new pageWeight alerts to send! There are " + alertsToSend + " new alerts")
       val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
@@ -704,6 +702,8 @@ object App {
       newElement.testResults.setPageLastUpdated(newElement.pageLastModified)
       println("Lastupdated set\n setting LiveBloggingNow")
       newElement.testResults.setLiveBloggingNow(newElement.liveBloggingNow.getOrElse(false))
+      println("liveBloggingNow set\n setting gLabs flag")
+      newElement.testResults.setGLabs(newElement.gLabs.toString)
       println("all variables set for element")
       newElement
     })
@@ -919,6 +919,51 @@ object App {
     }
   contentStub
   }
+
+  def getTagList(glabs: Boolean): List[Tag] = {
+    if(glabs){
+      val tag = new Tag {override def lastName: Option[String] = None
+
+        override def bylineImageUrl: Option[String] = None
+
+        override def `type`: TagType = TagType.Type
+
+        override def sectionId: Option[String] = None
+
+        override def bio: Option[String] = None
+
+        override def references: Seq[Reference] = Seq()
+
+        override def emailAddress: Option[String] = None
+
+        override def podcast: Option[Podcast] = None
+
+        override def apiUrl: String = ""
+
+        override def description: Option[String] = None
+
+        override def bylineLargeImageUrl: Option[String] = None
+
+        override def twitterHandle: Option[String] = None
+
+        override def sectionName: Option[String] = None
+
+        override def webTitle: String = ""
+
+        override def webUrl: String = ""
+
+        override def firstName: Option[String] = None
+
+        override def id: String = "uk-labs"
+      }
+      List(tag)
+    }
+    else{
+      val emptyTagList: List[Tag] = List()
+      emptyTagList
+    }
+  }
+
 
   def jodaDateTimetoCapiDateTime(time: DateTime): CapiDateTime = {
     new CapiDateTime {

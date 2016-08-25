@@ -253,6 +253,90 @@ val timeNow = DateTime.now
   val sortedSummaryList = summaryList.sortWith(_.percentageOfPageWeightAlerts > _.percentageOfPageWeightAlerts)
 
 
+
+  def getSamplePageArray(): Array[Option[PerformanceResultsObject]] = {
+    val audioboom = getPage(pagesWithAudioBoomEmbed)
+    val brightcove = getPage(pagesWithBrightcoveEmbed)
+    val cnn = getPage(pagesWithCNNEmbed)
+    val dailymotion = getPage(pagesWithDailyMotionEmbed)
+    val documentCloud = getPage(pagesWithDocumentCloudEmbed)
+    val facebook = getPage(pagesWithFacebookEmbed)
+    val formStack = getPage(pagesWithFormStackEmbed)
+    val gif = getPage(pagesWithGifEmbed)
+    val googleMaps = getPage(pagesWithGoogleMapsEmbed)
+    val guardianAudio = getPage(pagesWithGuardianAudio)
+    val guardianComments = getPage(pagesWithGuardianCommentsEmbed)
+    val guardianVideo = getPage(pagesWithGuardianVideos)
+    val guardianImages = getPage(pagesWithGuardianImages)
+    val guardianUpload = getPage(pagesWithGuardianUpload)
+    val guardianWitnessImage = getPage(pagesWithGuardianWitnessImageEmbed)
+    val guardianWitnessVideo = getPage(pagesWithGuardianWitnessVideoEmbed)
+    val hulu = getPage(pagesWithHuluEmbed)
+    val image = getPage(pagesWithImageEmbed)
+    val infoStrada = getPage(pagesWithInfoStradaEmbed)
+    val instagram = getPage(pagesWithInstagramEmbed)
+    val interactive = getPage(pagesWithInteractiveEmbed)
+    val mp3 = getPage(pagesWithMP3Embed)
+    val mp4 = getPage(pagesWithMP4Embed)
+    val parliamentLiveTv = getPage(pagesWithParliamentLiveTvEmbed)
+    val scribd = getPage(pagesWithScribdEmbed)
+    val soundCloud = getPage(pagesWithSoundCloudEmbed)
+    val spotify = getPage(pagesWithSpotifyEmbed)
+    val twitter = getPage(pagesWithTwitterEmbed)
+    val uStream = getPage(pagesWithUStreamEmbed)
+    val vevo = getPage(pagesWithVevoEmbed)
+    val vimeo = getPage(pagesWithVimeoEmbed)
+    val vine = getPage(pagesWithVineEmbed)
+    val youTube = getPage(pagesWithYouTubeEmbed)
+    val unknownEmbed = getPage(pagesWithUnknownEmbed)
+
+    val stringArray = Array(
+      audioboom,
+      brightcove,
+      cnn,
+      dailymotion,
+      documentCloud,
+      facebook,
+      formStack,
+      gif,
+      googleMaps,
+      guardianAudio,
+      guardianComments,
+      guardianVideo,
+      guardianImages,
+      guardianUpload,
+      guardianWitnessImage,
+      guardianWitnessVideo,
+      hulu,
+      image,
+      infoStrada,
+      instagram,
+      interactive,
+      mp3,
+      mp4,
+      parliamentLiveTv,
+      scribd,
+      soundCloud,
+      spotify,
+      twitter,
+      uStream,
+      vevo,
+      vimeo,
+      vine,
+      youTube,
+      unknownEmbed
+    )
+    stringArray
+  }
+
+  def getPage(pageList: List[PerformanceResultsObject]): Option[PerformanceResultsObject] = {
+    if (pageList.nonEmpty) {
+      Option(pageList.head)
+    } else {
+      None
+    }
+  }
+
   def sortPageElementByWeight(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
     elementList.sortWith(_.bytesDownloaded > _.bytesDownloaded)
   }
@@ -372,6 +456,7 @@ val timeNow = DateTime.now
       "<p>  </p>" +
       "</div> \n"
   }
+
 
   def roundAt(p: Int)(n: Double): Double = { val s = math pow (10, p); (math round n * s) / s }
 
