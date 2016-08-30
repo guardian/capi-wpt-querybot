@@ -177,6 +177,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
                 data(20).toBoolean)
             //todo - get element list
             val elementArray = data.drop(21)
+//            println("elementArray: " + elementArray.map(_.toString + "\n").mkString)
             if ((elementArray(9).toInt > 0) && (data(10).toInt > -1)){
             val elementList = getElementListFromArray(elementArray)
             if(elementList.nonEmpty) {
@@ -214,7 +215,8 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       var elementList: List[PageElementFromHTMLTableRow] = List()
       while(index < length-1){
         if((elementArray(index+2).length > 8) || elementArray(index+2).matches("-")){
-          val newElement: PageElementFromHTMLTableRow = new PageElementFromParameters(elementArray(index) + elementArray(index + 1),
+          val newElement: PageElementFromHTMLTableRow = new PageElementFromParameters(elementArray(index) +
+          elementArray(index + 1),
           elementArray(index + 2),
           elementArray(index + 3).toInt,
           elementArray(index + 4).toInt,
@@ -228,7 +230,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           elementList = elementList ::: List(newElement)
           index = index + 12
         }else {
-          val newElement: PageElementFromHTMLTableRow = new PageElementFromParameters(elementArray(index),
+          val newElementFromParameters = new PageElementFromParameters(elementArray(index),
             elementArray(index + 1),
             elementArray(index + 2).toInt,
             elementArray(index + 3).toInt,
@@ -238,7 +240,8 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
             elementArray(index + 7).toInt,
             elementArray(index + 8).toInt,
             elementArray(index + 9).toInt,
-            elementArray(index + 10)).convertToPageElementFromHTMLTableRow()
+            elementArray(index + 10))
+            val newElement = newElementFromParameters.convertToPageElementFromHTMLTableRow()
           elementList = elementList ::: List(newElement)
           index = index + 11
         }

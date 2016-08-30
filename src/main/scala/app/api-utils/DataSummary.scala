@@ -129,7 +129,7 @@ val timeNow = DateTime.now
   val pagesWithMP4Embed = allResults.filter(pageContainsElementType(_, "Video Embed"))
   val pagesWithParliamentLiveTvEmbed = allResults.filter(pageContainsElementType(_, "parliamentLiveTv"))
   val pagesWithScribdEmbed = allResults.filter(pageContainsElementType(_, "scribd"))
-  val pagesWithSoundCloudEmbed = allResults.filter(pageContainsElementType(_, "soundcloud"))
+  val pagesWithSoundCloudEmbed = allResults.filter(pageContainsElementType(_, "soundCloud"))
   val pagesWithSpotifyEmbed = allResults.filter(pageContainsElementType(_, "spotify"))
   val pagesWithTwitterEmbed = allResults.filter(pageContainsElementType(_, "twitter"))
   val pagesWithUStreamEmbed = allResults.filter(pageContainsElementType(_, "uStream"))
@@ -368,11 +368,19 @@ val timeNow = DateTime.now
   }
 
   def pageContainsElementType(testResult: PerformanceResultsObject, typeName: String): Boolean = {
-    val checkEditorialElementList: List[PageElementFromHTMLTableRow] = for (element <- testResult.editorialElementList if element.identifyPageElementType().contains(typeName)) yield element
-    val checkFullElementList: List[PageElementFromHTMLTableRow] = for (element <- testResult.fullElementList if element.identifyPageElementType().contains(typeName)) yield element
+    val checkEditorialElementList = testResult.editorialElementList.exists(_.determinedResourceType.contains(typeName))
+    if(typeName.contains("audioBoom") && testResult.editorialElementList.exists(_.determinedResourceType.contains("audioBoom"))) {
+      println("typeName is : " + typeName)
+      println("resource types: " + testResult.editorialElementList.map(_.determinedResourceType + "\n").mkString)
+      println("checkEditorialElementList result: " + checkEditorialElementList)
+    }
+    //val checkEditorialElementList: List[PageElementFromHTMLTableRow] = for (element <- testResult.editorialElementList if element.determinedResourceType.contains(typeName)) yield element
+    val checkFullElementList = testResult.fullElementList.exists(_.determinedResourceType.contains(typeName))
+    //val checkFullElementList: List[PageElementFromHTMLTableRow] = for (element <- testResult.fullElementList if element.determinedResourceType.contains(typeName)) yield element
     //    val checkFullElementList = result.fullElementList.map(_.identifyPageElementType().contains(typeName))
-    val result = checkEditorialElementList.nonEmpty || checkFullElementList.nonEmpty
-    result
+    //val result = checkEditorialElementList.nonEmpty || checkFullElementList.nonEmpty
+    //result
+    checkEditorialElementList || checkFullElementList
   }
 
 

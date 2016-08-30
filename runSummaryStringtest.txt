@@ -1,0 +1,419 @@
+Job Summary: 
+
+jobStarted at: 2016-08-30T15:58:33.828+01:00
+jobFinished at: 2016-08-30T16:58:33.787+01:00
+Duration of Run: 60.0 minutes.
+Number of pages from CAPI queries: 10
+Number of pages retested from previous run: 0
+Number of pages tested: 20
+Number of failed tests: 0
+**** 
+
+
+audioBoom:
+
+Number of Pages with this embed-type: 2
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 350.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 2
+Average Time to First Paint of a page with this embed-type: 1901.0 ms 
+Average SpeedIndex of a page with this embed-type: 3265.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 100 % 
+ 
+brightcove:
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+cnn:
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+dailymotion:
+
+Number of Pages with this embed-type: 2
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 627.2 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 2
+Average Time to First Paint of a page with this embed-type: 1612.0 ms 
+Average SpeedIndex of a page with this embed-type: 2803.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 100 % 
+ 
+documentCloud:
+
+Number of Pages with this embed-type: 2
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 77.24 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 1
+Average Time to First Paint of a page with this embed-type: 1747.0 ms 
+Average SpeedIndex of a page with this embed-type: 4432.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 50 % 
+ 
+facebook:
+
+Number of Pages with this embed-type: 1147
+Number of Pages with  this embed-type that alerted for pageWeight: 5
+Average Size of this embed-type: 69.98 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 108
+Average Time to First Paint of a page with this embed-type: 655.0 ms 
+Average SpeedIndex of a page with this embed-type: 1303.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 9 % 
+ 
+formstack:
+
+Number of Pages with this embed-type: 36
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 40.96 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 20
+Average Time to First Paint of a page with this embed-type: 1489.0 ms 
+Average SpeedIndex of a page with this embed-type: 2518.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 55 % 
+ 
+gif:
+
+Number of Pages with this embed-type: 7
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 5.67 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 6
+Average Time to First Paint of a page with this embed-type: 2223.0 ms 
+Average SpeedIndex of a page with this embed-type: 3297.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 85 % 
+ 
+googlemaps:
+
+Number of Pages with this embed-type: 2
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 63.23 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 2
+Average Time to First Paint of a page with this embed-type: 1563.0 ms 
+Average SpeedIndex of a page with this embed-type: 2355.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 100 % 
+ 
+guardianAudio:
+
+Number of Pages with this embed-type: 2
+Number of Pages with  this embed-type that alerted for pageWeight: 2
+Average Size of this embed-type: 1936.45 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 1
+Average Time to First Paint of a page with this embed-type: 1604.0 ms 
+Average SpeedIndex of a page with this embed-type: 2224.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 100% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 50 % 
+ 
+guardianComments:
+
+Number of Pages with this embed-type: 243
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 10.35 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 239
+Average Time to First Paint of a page with this embed-type: 2227.0 ms 
+Average SpeedIndex of a page with this embed-type: 3412.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 98 % 
+ 
+guardianVideos:
+
+Number of Pages with this embed-type: 162
+Number of Pages with  this embed-type that alerted for pageWeight: 4
+Average Size of this embed-type: 212.66 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 98
+Average Time to First Paint of a page with this embed-type: 1497.0 ms 
+Average SpeedIndex of a page with this embed-type: 2589.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 2% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 60 % 
+ 
+guardianImages:
+
+Number of Pages with this embed-type: 2227
+Number of Pages with  this embed-type that alerted for pageWeight: 8
+Average Size of this embed-type: 30.79 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 1202
+Average Time to First Paint of a page with this embed-type: 1457.0 ms 
+Average SpeedIndex of a page with this embed-type: 2426.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 53 % 
+ 
+guardianUpload:
+
+Number of Pages with this embed-type: 2
+Number of Pages with  this embed-type that alerted for pageWeight: 2
+Average Size of this embed-type: 499.44 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 1
+Average Time to First Paint of a page with this embed-type: 1660.0 ms 
+Average SpeedIndex of a page with this embed-type: 2486.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 100% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 50 % 
+ 
+guardianWitnessImage:
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+guardianWitnessVideo:
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+hulu:
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+image Embed:
+
+Number of Pages with this embed-type: 33
+Number of Pages with  this embed-type that alerted for pageWeight: 11
+Average Size of this embed-type: 333.1 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 30
+Average Time to First Paint of a page with this embed-type: 1889.0 ms 
+Average SpeedIndex of a page with this embed-type: 4468.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 33% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 90 % 
+ 
+infostrada:
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+instagram:
+
+Number of Pages with this embed-type: 12
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 89.37 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 8
+Average Time to First Paint of a page with this embed-type: 1617.0 ms 
+Average SpeedIndex of a page with this embed-type: 2518.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 66 % 
+ 
+interactive:
+
+Number of Pages with this embed-type: 88
+Number of Pages with  this embed-type that alerted for pageWeight: 1
+Average Size of this embed-type: 92.34 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 66
+Average Time to First Paint of a page with this embed-type: 1644.0 ms 
+Average SpeedIndex of a page with this embed-type: 3533.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 1% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 75 % 
+ 
+m3u8 (iOS specific video format):
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+mp3 video format):
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+mp4 video format:
+
+Number of Pages with this embed-type: 4
+Number of Pages with  this embed-type that alerted for pageWeight: 4
+Average Size of this embed-type: 2386.55 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 3
+Average Time to First Paint of a page with this embed-type: 1698.0 ms 
+Average SpeedIndex of a page with this embed-type: 2837.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 100% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 75 % 
+ 
+parliamentLiveTv:
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+scribd:
+
+Number of Pages with this embed-type: 2
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 161.74 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 2
+Average Time to First Paint of a page with this embed-type: 1765.0 ms 
+Average SpeedIndex of a page with this embed-type: 2670.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 100 % 
+ 
+soundCloud:
+
+Number of Pages with this embed-type: 11
+Number of Pages with  this embed-type that alerted for pageWeight: 1
+Average Size of this embed-type: 161.38 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 9
+Average Time to First Paint of a page with this embed-type: 1762.0 ms 
+Average SpeedIndex of a page with this embed-type: 2664.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 9% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 81 % 
+ 
+spotify:
+
+Number of Pages with this embed-type: 8
+Number of Pages with  this embed-type that alerted for pageWeight: 1
+Average Size of this embed-type: 245.66 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 7
+Average Time to First Paint of a page with this embed-type: 1695.0 ms 
+Average SpeedIndex of a page with this embed-type: 4766.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 12% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 87 % 
+ 
+twitter:
+
+Number of Pages with this embed-type: 95
+Number of Pages with  this embed-type that alerted for pageWeight: 5
+Average Size of this embed-type: 115.5 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 58
+Average Time to First Paint of a page with this embed-type: 1593.0 ms 
+Average SpeedIndex of a page with this embed-type: 2613.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 5% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 61 % 
+ 
+uStream:
+
+Number of Pages with this embed-type: 1
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 18.2 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 1
+Average Time to First Paint of a page with this embed-type: 684.0 ms 
+Average SpeedIndex of a page with this embed-type: 1525.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 100 % 
+ 
+vevo:
+
+Number of Pages with this embed-type: 2
+Number of Pages with  this embed-type that alerted for pageWeight: 1
+Average Size of this embed-type: 691.33 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 1
+Average Time to First Paint of a page with this embed-type: 1431.0 ms 
+Average SpeedIndex of a page with this embed-type: 2576.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 50% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 50 % 
+ 
+3gp video format:
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+vimeo:
+
+Number of Pages with this embed-type: 6
+Number of Pages with  this embed-type that alerted for pageWeight: 2
+Average Size of this embed-type: 1340.81 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 4
+Average Time to First Paint of a page with this embed-type: 1503.0 ms 
+Average SpeedIndex of a page with this embed-type: 2533.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 33% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 66 % 
+ 
+vine:
+
+Number of Pages with this embed-type: 6
+Number of Pages with  this embed-type that alerted for pageWeight: 2
+Average Size of this embed-type: 425.59 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 6
+Average Time to First Paint of a page with this embed-type: 1846.0 ms 
+Average SpeedIndex of a page with this embed-type: 2850.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 33% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 100 % 
+ 
+webp video format:
+
+Number of Pages with this embed-type: 0
+Number of Pages with  this embed-type that alerted for pageWeight: 0
+Average Size of this embed-type: 0.0 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 0
+Average Time to First Paint of a page with this embed-type: 0.0 ms 
+Average SpeedIndex of a page with this embed-type: 0.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 0% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 0 % 
+ 
+youTube:
+
+Number of Pages with this embed-type: 136
+Number of Pages with  this embed-type that alerted for pageWeight: 5
+Average Size of this embed-type: 167.93 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 98
+Average Time to First Paint of a page with this embed-type: 1601.0 ms 
+Average SpeedIndex of a page with this embed-type: 2587.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 3% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 72 % 
+ 
+Unidentified element:
+
+Number of Pages with this embed-type: 470
+Number of Pages with  this embed-type that alerted for pageWeight: 12
+Average Size of this embed-type: 79.74 KB 
+Number of Pages with this embed-type that alerted for pageSpeed: 394
+Average Time to First Paint of a page with this embed-type: 1916.0 ms 
+Average SpeedIndex of a page with this embed-type: 3300.0 ms 
+Chance of a page with this embed-type triggering a pageWeight alert: 2% 
+Chance of a page with this embed-type triggering a pageSpeed alert: 83 % 
+ 
