@@ -2,7 +2,7 @@ import app.apiutils.PageElementFromParameters
 import com.gu.contentapi.client.model.v1.CapiDateTime
 import org.joda.time.DateTime
 
-val pageElementImage = new PageElementFromParameters("https://i.guim.co.uk/img/media/1d7d0ba1f465cd21e2613867de4c797addc78cda/0_227_3500_2100/master/3500.jpg?w=1125&q=55&auto=format&usm=12&fit=max&s=bfaffda9157043b860f84312cc7ca311","type",1,1,1,1,1,10,10240,1,"ipAddress")
+val pageElementImage = new PageElementFromParameters("https://d15mj6e6qmt1na.cloudfront.net/attachments/13524706/counter-terrorism-radio-advert-encourages-mothers-to-talk-to-their-daughters-travelling-to-syri.mp3?audio_clip_id=2990345&uniquifier=937876&Expires=1472236780&Signature=huBzkNvJfghxoHu1t4LxMfFRjvVvTphKqkRjxP4Y3Z2SmMACrWkROybALdZ7yjj%7EwmlcGkNRw4bVNTIcgOXqkXqr4CCyvBF1JkgswtE7wva2eWIffD2CSfkODxaAH69cLnxVcf0XscX%7EnG%7EnT0IR46Uk%7ECn5AqUu5kY-ZKI8OOGX9EHXkfVRB%7EGCjGgeigs4jI-9gIDUqrJyX19Pgb2VOnugXf-QF90YyNb0VUrZOuAaV3aF42xRW0u2t-XkCg9ccksLUI%7Et84gkSInNEXBcusX9Kq667knjq6MdElCnJuEyfca3gAHcRamh7JWcqiZDRwYwBxZeG5QsOiaMCXmi3w__&Key-Pair-Id=APKAJS5FX6XHKL62XLYQ","type",1,1,1,1,1,10,10240,1,"ipAddress")
 val pageElementYoutube = new PageElementFromParameters("https://s.ytimg.com/yts/jsbin/player-en_US-vflWoKF7f/base.js","type",1,1,1,1,1,10,10240,1,"ipAddress")
 val pageElementTwitter = new PageElementFromParameters("https://pbs.twimg.com/media/Cnkqn-EXYAAjtAc.jpg","type",1,1,1,1,1,10,10240,1,"ipAddress")
 val pageElementFacebook = new PageElementFromParameters("https://connect.facebook.net/en_US/sdk/xfbml.ad.js","type",1,1,1,1,1,10,10240,1,"ipAddress")

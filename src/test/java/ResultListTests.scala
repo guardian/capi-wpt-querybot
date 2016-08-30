@@ -89,6 +89,52 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   val emailPassword: String = configArray(5)
   val visualsApiUrl: String = configArray(6)
 
+
+  val urlsToTest = List(
+    "https://www.theguardian.com/education/live/2016/aug/25/gcse-results-day-2016-uk-students-get-their-grades-live",
+    "https://www.theguardian.com/community/gallery/2015/oct/07/baking-disasters-im-sure-it-tastes-nice-readers-share-their-worst",
+    "https://www.theguardian.com/sport/2014/jul/03/tour-de-france-2014-yellow-jersey-contenders-chris-froome-stats-history",
+    "https://www.theguardian.com/world/2015/mar/16/london-teenagers-stopped-syria-parents-islamic-state",
+    "https://www.theguardian.com/music/musicblog/2010/sep/02/wiley-ustream",
+    "https://www.theguardian.com/football/2016/jun/20/ngolo-kante-france-euro-2016-caen-jose-saez",
+    "https://www.theguardian.com/lifeandstyle/2016/jun/04/dont-talk-politics-sex-ex-10-ways-ruin-a-date"
+  )
+
+  val resultUrls = Array(
+    "http://wpt.gu-web.net/xmlResult/160826_16_GZ/",
+    "http://wpt.gu-web.net/xmlResult/160826_MN_H0/",
+    "http://wpt.gu-web.net/xmlResult/160826_11_H1/",
+    "http://wpt.gu-web.net/xmlResult/160826_BF_H2/",
+    "http://wpt.gu-web.net/xmlResult/160826_W5_H3/",
+    "http://wpt.gu-web.net/xmlResult/160826_9H_H4/",
+    "http://wpt.gu-web.net/xmlResult/160826_E2_H5/",
+    "http://wpt.gu-web.net/xmlResult/160826_VQ_H6/",
+    "http://wpt.gu-web.net/xmlResult/160826_ST_H7/",
+    "http://wpt.gu-web.net/xmlResult/160826_QR_H8/",
+    "http://wpt.gu-web.net/xmlResult/160826_0V_H9/",
+    "http://wpt.gu-web.net/xmlResult/160826_FH_HA/",
+    "http://wpt.gu-web.net/xmlResult/160826_KM_HB/",
+    "http://wpt.gu-web.net/xmlResult/160826_TX_HC/",
+    "http://wpt.gu-web.net/xmlResult/160826_8S_HD/",
+    "http://wpt.gu-web.net/xmlResult/160826_MA_HE/",
+    "http://wpt.gu-web.net/xmlResult/160826_K4_W7/",
+    "http://wpt.gu-web.net/xmlResult/160826_3G_HG/",
+    "http://wpt.gu-web.net/xmlResult/160826_1Y_HH/",
+    "http://wpt.gu-web.net/xmlResult/160826_TR_HJ/",
+    "http://wpt.gu-web.net/xmlResult/160826_7X_HK/",
+    "http://wpt.gu-web.net/xmlResult/160826_A7_HM/",
+    "http://wpt.gu-web.net/xmlResult/160826_RX_HN/",
+    "http://wpt.gu-web.net/xmlResult/160826_ZN_HP/",
+    "http://wpt.gu-web.net/xmlResult/160826_18_HQ/",
+    "http://wpt.gu-web.net/xmlResult/160826_YS_HR/",
+    "http://wpt.gu-web.net/xmlResult/160826_S1_NX/",
+    "http://wpt.gu-web.net/xmlResult/160826_16_GZ/"
+  )
+
+  val resultUrls2 = Array(
+  "http://wpt.gu-web.net/xmlResult/160826_H6_WP/"
+  )
+
   //obtain list of items previously alerted on
 //  val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
   /*    val localInput = new LocalFileOperations
@@ -667,19 +713,46 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
 
   }*/
 
-  "refining results for a result" should "yield the result in question" in {
+ /* "refining results for a result" should "yield the result in question" in {
     val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
     val result = wpt.getResults("https://www.theguardian.com/dorset-cereals-bnb-awards/2016/aug/05/hay-barton-bb-a-taste-of-cornish-hospitality", "http://wpt.gu-web.net/xmlResult/160805_S5_BK/")
     println("result received")
     println(result.toCSVString())
     result.timeToFirstByte should be > 0
+  }*/
+
+  /*"not a test" should "produce a list of results for the list of urls to test provided" in {
+    // val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
+    val pageListResults = getResultPages(urlsToTest, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
+    val cAPIQuery = new ArticleUrls(contentApiKey)
+    cAPIQuery.shutDown
+    s3Interface.writeFileToS3("samplePagesToAddNew.csv", pageListResults.map(_.toCSVString()).mkString)
+    assert(true)
+  }*/
+
+
+  "not a test" should "produce a list of results for the list of wpt results pages provided" in {
+    val cAPIQuery = new ArticleUrls(contentApiKey)
+    val resultUrlList = resultUrls2.toList
+    val pageListResults: List[PerformanceResultsObject] = resultUrlList.map(url => getResult(url , wptBaseUrl, wptApiKey, urlFragments, cAPIQuery))
+    cAPIQuery.shutDown
+    s3Interface.writeFileToS3("samplePagesToAddNew2.csv", pageListResults.map(_.toCSVString()).mkString)
+    assert(true)
   }
 
-  def getResult(pageUrl: String, friendlyUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String] ): PerformanceResultsObject = {
-    val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
+  def getResult(resultUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String], articleUrls: ArticleUrls): PerformanceResultsObject = {
+    //val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
     val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
-    val result: PerformanceResultsObject = wpt.getResults(pageUrl, xmlResultUrl)
-    result
+    val pageUrl = "unknown"
+    val newResult = wpt.getResults(pageUrl, resultUrl)
+    val cAPIPage = articleUrls.getSinglePage(newResult.testUrl)
+    newResult.headline = cAPIPage._1.get.headline
+    newResult.pageType = Option("Article")
+    newResult.firstPublished = cAPIPage._1.get.firstPublicationDate
+    newResult.pageLastUpdated = cAPIPage._1.get.lastModified
+    newResult.liveBloggingNow = cAPIPage._1.get.liveBloggingNow
+    setAlertStatus(newResult)
+    newResult
   }
 
 
@@ -759,29 +832,33 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     contentStub
   }
 
-  def getResultPages(results: List[PerformanceResultsObject], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[PerformanceResultsObject] = {
+  def getResultPages(results: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[PerformanceResultsObject] = {
     val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
+    val cAPIQuery = new ArticleUrls(contentApiKey)
     val desktopResultList: List[PerformanceResultsObject] = results.map(page => {
-      val testresultpage =  wpt.sendPage(page.testUrl)
-      val newResult = wpt.getResults(page.testUrl, testresultpage)
-      newResult.headline = page.headline
-      newResult.pageType = page.pageType
-      newResult.firstPublished = page.firstPublished
-      newResult.pageLastUpdated = page.pageLastUpdated
-      newResult.liveBloggingNow = page.liveBloggingNow
+      val cAPIPage = cAPIQuery.getSinglePage(page)
+      val testresultpage =  wpt.sendPage(page)
+      val newResult = wpt.getResults(page, testresultpage)
+      newResult.headline = cAPIPage._1.get.headline
+      newResult.pageType = Option("Article")
+      newResult.firstPublished = cAPIPage._1.get.firstPublicationDate
+      newResult.pageLastUpdated = cAPIPage._1.get.lastModified
+      newResult.liveBloggingNow = cAPIPage._1.get.liveBloggingNow
       setAlertStatus(newResult)
     })
     val mobileResultList: List[PerformanceResultsObject] = results.map(page => {
-      val testresultpage =  wpt.sendMobile3GPage(page.testUrl, wptLocation)
-      val newResult = wpt.getResults(page.testUrl, testresultpage)
-      newResult.headline = page.headline
-      newResult.pageType = page.pageType
-      newResult.firstPublished = page.firstPublished
-      newResult.pageLastUpdated = page.pageLastUpdated
-      newResult.liveBloggingNow = page.liveBloggingNow
+      val cAPIPage = cAPIQuery.getSinglePage(page)
+      val testresultpage =  wpt.sendMobile3GPage(page, wptLocation)
+      val newResult = wpt.getResults(page, testresultpage)
+      newResult.headline = cAPIPage._1.get.headline
+      newResult.pageType = Option("Article")
+      newResult.firstPublished = cAPIPage._1.get.firstPublicationDate
+      newResult.pageLastUpdated = cAPIPage._1.get.lastModified
+      newResult.liveBloggingNow = cAPIPage._1.get.liveBloggingNow
       setAlertStatus(newResult)
     })
     val combinedResults = desktopResultList ::: mobileResultList
+    cAPIQuery.shutDown
     combinedResults.sortWith(_.testUrl > _.testUrl)
   }
 

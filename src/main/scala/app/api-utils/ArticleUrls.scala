@@ -1,8 +1,8 @@
 package app.apiutils
 
 import com.gu.contentapi.client.GuardianContentClient
-import com.gu.contentapi.client.model.SearchQuery
-import com.gu.contentapi.client.model.v1.{Tag, ContentFields}
+import com.gu.contentapi.client.model.{ItemQuery, SearchQuery}
+import com.gu.contentapi.client.model.v1._
 import org.joda.time.DateTime
 
 import scala.concurrent.Await
@@ -272,6 +272,114 @@ class ArticleUrls(key: String) {
     liveBlogUrlString
   }
 */
+
+  def getSinglePage(urlString: String): (Option[ContentFields], Seq[Tag], String) = {
+    val domainName= "www.theguardian.com"
+    val urlId = urlString.substring(urlString.indexOf(domainName)+domainName.length+1,urlString.length)
+    try {
+      val searchQuery = new ItemQuery(urlId)
+        .showFields("all")
+        .showElements("all")
+      println("Sending query to CAPI: \n" + searchQuery.toString)
+
+      val apiResponse = contentApiClient.getResponse(searchQuery)
+      val returnedResponse = Await.result(apiResponse, (20, SECONDS))
+      val resultAndUrl = (returnedResponse.content.get.fields, returnedResponse.content.get.tags, returnedResponse.content.get.webUrl)
+      /*val resultAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results if result.webUrl.contains(urlString)) yield {
+        (result.fields, result.webUrl)
+      }*/
+      if(resultAndUrl._1.isEmpty){
+        println("result and url is coming back as Empty")
+        val emptyTags: Seq[Tag] = Seq()
+        val emptyContentFields: (Option[ContentFields], Seq[Tag], String) = (Option(makeContentStub(Option(urlString), None, Option(false))), emptyTags, urlString)
+        emptyContentFields
+      } else {
+        println("CAPI headline result: \n" + resultAndUrl._1.get.headline)
+        resultAndUrl
+      }
+    } catch {
+      case _: Throwable => {
+        println("bad request - page is empty - returning empty content fields")
+        val emptyTags: Seq[Tag] = Seq()
+        val emptyContentFields: (Option[ContentFields], Seq[Tag], String) = (Option(makeContentStub(Option(urlString), None, Option(false))), emptyTags, urlString)
+        emptyContentFields
+      }
+    }
+  }
+
+  def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
+    val contentStub = new ContentFields {override def newspaperEditionDate: Option[CapiDateTime] = None
+
+      override def internalStoryPackageCode: Option[Int] = None
+
+      override def displayHint: Option[String] = None
+
+      override def legallySensitive: Option[Boolean] = None
+
+      override def creationDate: Option[CapiDateTime] = None
+
+      override def shouldHideAdverts: Option[Boolean] = None
+
+      override def wordcount: Option[Int] = None
+
+      override def thumbnail: Option[String] = None
+
+      override def liveBloggingNow: Option[Boolean] = passedLiveBloggingNow
+
+      override def showInRelatedContent: Option[Boolean] = None
+
+      override def internalComposerCode: Option[String] = None
+
+      override def lastModified: Option[CapiDateTime] = passedLastModified
+
+      override def byline: Option[String] = None
+
+      override def isInappropriateForSponsorship: Option[Boolean] = None
+
+      override def commentable: Option[Boolean] = None
+
+      override def trailText: Option[String] = None
+
+      override def internalPageCode: Option[Int] = None
+
+      override def main: Option[String] = None
+
+      override def body: Option[String] = None
+
+      override def productionOffice: Option[Office] = None
+
+      override def newspaperPageNumber: Option[Int] = None
+
+      override def shortUrl: Option[String] = None
+
+      override def publication: Option[String] = None
+
+      override def secureThumbnail: Option[String] = None
+
+      override def contributorBio: Option[String] = None
+
+      override def firstPublicationDate: Option[CapiDateTime] = None
+
+      override def isPremoderated: Option[Boolean] = None
+
+      override def membershipAccess: Option[MembershipTier] = None
+
+      override def scheduledPublicationDate: Option[CapiDateTime] = None
+
+      override def starRating: Option[Int] = None
+
+      override def hasStoryPackage: Option[Boolean] = None
+
+      override def headline: Option[String] = passedHeadline
+
+      override def commentCloseDate: Option[CapiDateTime] = None
+
+      override def internalOctopusCode: Option[String] = None
+
+      override def standfirst: Option[String] = None
+    }
+    contentStub
+  }
 
 }
 
