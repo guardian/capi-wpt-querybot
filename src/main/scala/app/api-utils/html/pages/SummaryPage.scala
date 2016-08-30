@@ -106,6 +106,26 @@
         "</div>" + "\n"
     }
 
+    def pageDataToHTMLString(): String = {
+      "<div>\n" +
+        "<h3>Page Summary:" + "</h3>" + "\n" +
+        "<p style = \"margin-left: 40px\">Number of pageWeight alerts on article pages:          " + dataSummary.activePageWeightAlerts.filter(_.getPageType.contains("article")) + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Number of pageWeight alerts on interactive pages:      " + dataSummary.activePageWeightAlerts.filter(_.getPageType.contains("interactive")) + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Number of pageWeight alerts on liveblog pages:         " + dataSummary.activePageWeightAlerts.filter(_.getPageType.contains("liveBlog")) + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Number of pageWeight alerts on gLabs pages:            " + dataSummary.activePageWeightAlerts.filter(_.gLabs) + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Total Number of alerts:                     " + dataSummary.activePageWeightAlerts + "</p>" +  "\n" +
+        "Total Number of alerts resolved:                                             " + dataSummary.jobFinishTime.toDateTime + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Average pageWeight of article pages:        " + dataSummary.activePageWeightAlerts.filter(_.getPageType.contains("article")) + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Average pageWeight of interactive pages:    " + dataSummary.numberOfPagesFromCAPI + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Average pageWeight of liveBlog pages:       " + dataSummary.numberOfPagesRetestedFromLastRun + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Average pageWeight of gLabs pages:          " + dataSummary.numberOfPagesSentToWPT + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Average pageSpeed of article pages:         " + dataSummary.activePageWeightAlerts.filter(_.getPageType.contains("article")) + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Average pageSpeed of interactive pages:     " + dataSummary.numberOfPagesFromCAPI + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Average pageSpeed of liveBlog pages:        " + dataSummary.numberOfPagesRetestedFromLastRun + "</p>" +  "\n" +
+        "<p style = \"margin-left: 40px\">Average pageSpeed of gLabs pages:           " + dataSummary.numberOfPagesSentToWPT + "</p>" +  "\n" +
+        "</div>" + "\n"
+    }
+
     def summaryDataToHTMLString(): String = {
       val elementString: String = HTML_REPORT_TABLE_HEADERS +
         runDataToHTMLString() +
