@@ -16,6 +16,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
   val previousResults: List[PerformanceResultsObject] = removeDuplicates(resultsList)
+  //val previousResults: List[PerformanceResultsObject] = resultsList
 
   val resultsFromLast24Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime) yield result
   val oldResults = for (result <- previousResults if result.mostRecentUpdate < cutoffTime) yield result
@@ -68,8 +69,24 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   def removeDuplicates(inputList: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
     //val inputListArray = inputList.toArray
-    val cleanList: List[PerformanceResultsObject] = for (result <- inputList if !isResultADupe(result, inputList )) yield result
+    val emptyList: List[PerformanceResultsObject] = List()
+    val cleanList: List[PerformanceResultsObject] = dedupeList(inputList, emptyList)
     cleanList
+
+  }
+
+  def dedupeList(inputList: List[PerformanceResultsObject], cleanList: List[PerformanceResultsObject]): List[PerformanceResultsObject] ={
+    if(inputList.isEmpty){
+      cleanList
+    } else {
+      val urlAndTestType = (inputList.head.testUrl, inputList.head.typeOfTest)
+      val cleanListUrlAndTestType = cleanList.map(page => (page.testUrl, page.typeOfTest))
+      if(cleanListUrlAndTestType.exists(_ == urlAndTestType)){
+        dedupeList(inputList.tail, cleanList)
+      } else {
+        dedupeList(inputList.tail, cleanList ::: List(inputList.head))
+      }
+    }
   }
 
   def isResultADupe(result: PerformanceResultsObject, resultList: List[PerformanceResultsObject]): Boolean = {

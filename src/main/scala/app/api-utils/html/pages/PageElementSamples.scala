@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 24/08/16.
  */
-class PageElementSamples(dataSummary: DataSummary, alertSummary: DataSummary) {
+class PageElementSamples(dataSummary: DataSummary) {
 
   //HTML Page elements
   //Page Header
@@ -152,8 +152,8 @@ class PageElementSamples(dataSummary: DataSummary, alertSummary: DataSummary) {
     val row31 =  "<tr>" + "<td>" +"video format 3gp: " + "</td>" + "<td>"  + returnPageSample(31) + "</td>" + "</tr>" + "\n"
     val row32 =  "<tr>" + "<td>" +"vimeo: " + "</td>" + "<td>"  + returnPageSample(32) + "</td>" + "</tr>" + "\n"
     val row33 =  "<tr>" + "<td>" +"vine: " + "</td>" + "<td>"  + returnPageSample(33) + "</td>" + "</tr>" + "\n"
-    val row34 =  "<tr>" + "<td>" +"youTube: " + "</td>" + "<td>"  + returnPageSample(34) + "</td>" + "</tr>" + "\n"
-    val row35 =  "<tr>" + "<td>" +"webp video: " + "</td>" + "<td>"  + returnPageSample(35) + "</td>" + "</tr>" + "\n"
+    val row34 =  "<tr>" + "<td>" +"webp video: " + "</td>" + "<td>"  + returnPageSample(34) + "</td>" + "</tr>" + "\n"
+    val row35 =  "<tr>" + "<td>" +"youTube video: " + "</td>" + "<td>"  + returnPageSample(35) + "</td>" + "</tr>" + "\n"
     val row36 =  "<tr>" + "<td>" +"unknownEmbed: " + "</td>" + "<td>"  + returnPageSample(36) + "</td>" + "</tr>" + "\n"
 
     row0 + row1 + row2 + row3 + row4 + row5 + row6 + row7 + row8 + row9 + row10 + row11 + row12 + row13 + row14 + row15 + row16 +
@@ -163,11 +163,7 @@ class PageElementSamples(dataSummary: DataSummary, alertSummary: DataSummary) {
 
   def returnPageSample(index: Int): String = {
     val result = if(sampleArray(index).isEmpty){
-      if(sampleArrayFromAlerts(index).isEmpty){
         "no sample found"
-      } else {
-        "<a href=\"" + sampleArrayFromAlerts(index).get.testUrl + "\">" + sampleArrayFromAlerts(index).get.testUrl + "</a>"
-      }
     }  else {
       "<a href=\"" + sampleArray(index).get.testUrl + "\">" + sampleArray(index).get.testUrl + "</a>"
     }

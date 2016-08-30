@@ -16,12 +16,13 @@ abstract  class PageElement {
   val bytesDownloaded: Int
   val errorStatusCode: Int
   val iP: String
+  lazy val determinedResourceType = identifyPageElementType()
   lazy val sizeInKB: Double = roundAt(3)(bytesDownloaded.toDouble/1024.0)
   lazy val sizeInMB: Double = roundAt(3)(bytesDownloaded.toDouble/(1024.0 * 1024.0))
 
 
   def identifyPageElementType(): String = {
-    val audioBoom = List("audioboom","audio_clip_id")
+    val audioBoom = List("audio_clip_id", "audioboom")
     val brightcove = List("bcsecure", "player.h-cdn.com")
     val cnn = List("cnn.com","z.cdn.turner.com")
     val dailymotion = List("dailymotion","dmcdn")
@@ -59,7 +60,6 @@ abstract  class PageElement {
     val youTube = List("ytimg")
 
     var returnString = "unknownElement"
-
     //check for generic formats
     if(textContainsTextFromList(resource, otherAudio)){returnString = "Audio Embed"}
     if(textContainsTextFromList(resource, otherGif)){returnString = "Gif Embed"}
@@ -70,6 +70,7 @@ abstract  class PageElement {
     if(textContainsTextFromList(resource, webp)){returnString = "webp"}
 
     //check for product specific formats (should override generic formats)
+
     if(textContainsTextFromList(resource, audioBoom)){returnString = "audioBoom"}
     if(textContainsTextFromList(resource, brightcove)){returnString = "brightcove"}
     if(textContainsTextFromList(resource, cnn)){returnString = "cnn"}
@@ -103,13 +104,22 @@ abstract  class PageElement {
   }
 
   def textContainsTextFromList(text: String, stringList: List[String]): Boolean = {
-    val checkList = stringList.map(stringText => text.contains(stringText))
+    val checkList = {
+      if (stringList.nonEmpty && text != "") {
+        stringList.map(stringText => text.contains(stringText))
+      } else {
+        println("PageElement -> textContainsTextFromList passed empty text or StringList")
+        println("text: " + text)
+        println("stringList: " + stringList.map(string => string + "\n").mkString)
+        List(false)
+      }
+    }
     checkList.contains(true)
   }
 
 
   def toHTMLTableRow(): String = {
-    val determinedResourceType = identifyPageElementType()
+
     val contentTypeToDisplay = {if(determinedResourceType.contains("unknownElement")){
         contentType
       } else {
