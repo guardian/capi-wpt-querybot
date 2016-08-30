@@ -45,7 +45,7 @@
     val interactiveSampleFileName = "interactivesamples.conf"
     val visualsPagesFileName = "visuals.conf"
 
-    val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    val resultsFromPreviousTests = "resultsFromPreviousTestsGenerateSamplePages.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAmalgamated.csv"
     // val resultsFromPreviousTests = "resultsFromPreviousTestsShortened.csv"
     //val resultsFromPreviousTests = "shortenedresultstest.csv"
@@ -94,12 +94,13 @@
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
     println("\n\n\n ***** There are " + testResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
-
+    val audioboomcounter = previousResults.filter(_.editorialElementList.map(element => element.resource.contains("audio_clip_id")).contains(true))
+    println("**** audioBoom counter: " + audioboomcounter.length)
     val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testResultsHandler)
     //write summaries to files
     val runSummaryFile = "runSummaryStringtest.txt"
     val runSummaryHTMLFile = "runSummaryHTMLStringtest.html"
-
+    val localFiles = new LocalFileOperations
 
     "Element summary" should "be returned as string" in {
       val elementSummary = dataSummary.summaryList.head
@@ -111,6 +112,11 @@
       println("writing run summary data to new file")
       val summaryPage = new SummaryPage(dataSummary)
       val summaryPageHTMLString = summaryPage.toString()
+      //s3Interface.writeFileToS3(runSummaryFile, dataSummary.summaryDataToString())
+      //s3Interface.writeFileToS3(runSummaryHTMLFile, summaryPageHTMLString)
+
+      //localFiles.writeLocalResultFile(runSummaryFile, dataSummary.summaryDataToString())
+      //localFiles.writeLocalResultFile(runSummaryHTMLFile, summaryPageHTMLString)
       s3Interface.writeFileToS3(runSummaryFile, dataSummary.summaryDataToString())
       s3Interface.writeFileToS3(runSummaryHTMLFile, summaryPageHTMLString)
       dataSummary.printSummaryDataToScreen()
@@ -118,13 +124,10 @@
     }
 
     "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
-      val resultsFromAlertList = "alerts/pageWeightAlertsFromPreviousTests.csv"
-      val alertList = s3Interface.getResultsFileFromS3(resultsFromAlertList)
-      val alertHandler = new ResultsFromPreviousTests(alertList)
-      println("about to make alertHandler")
-      val alertSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, alertHandler)
-      println("alertHandler build ok")
-      val samplePage = new PageElementSamples(dataSummary, alertSummary)
+      val listAudioBoomElement = previousResults.filter(_.testUrl.contains("/world/2015/mar/16/london-teenagers-stopped-syria-parents-islamic-state"))
+      val pageAndElements = listAudioBoomElement.map(page => (page.testUrl, page.editorialElementList.map(_.resource).mkString, page.editorialElementList.map(_.determinedResourceType)))
+      val samplePage = new PageElementSamples(dataSummary)
+//      localFiles.writeLocalResultFile("pageElementSamplePages.html", samplePage.toString())
       s3Interface.writeFileToS3("pageElementSamplePages.html", samplePage.toString())
       assert(true)
     }
