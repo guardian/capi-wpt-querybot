@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 28/06/16.
  */
-class DataSummary(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesFromCapi: Int, numberOfPagesTested: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests) {
+class DataSummary(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesFromCapi: Int, numberOfPagesTested: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests, alertsResultsObject: ResultsFromPreviousTests) {
   /*
 Data summary
 Its time to take note of pages tested each run,
@@ -66,19 +66,20 @@ val timeNow = DateTime.now
 
 
   val previousResultsHandler = previousResultsObject
+  val alertsResultsHandler = alertsResultsObject
   val numberOfPagesRetestedFromLastRun: Int = previousResultsHandler.previousResultsToRetest.length
 
   val resultsFromRun: List[PerformanceResultsObject] = latestResults
   val previousResults: List[PerformanceResultsObject] = previousResultsHandler.previousResults
   val allResults: List[PerformanceResultsObject] = resultsFromRun ::: previousResults
-  val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = previousResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageWeight)
+  val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = alertsResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageWeight)
   val hasPreviouslyAlertedOnSpeed: List[PerformanceResultsObject] = previousResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageSpeed)
 
   val todaysResults = for (result <- allResults if DateTime.parse(result.timeOfTest).getDayOfYear == today) yield result
   val yesterdaysResults = for (result <- allResults if DateTime.parse(result.timeOfTest).getDayOfYear != yesterday) yield result
 
-  val activePageWeightAlerts = resultsFromRun.filter(_.alertStatusPageWeight)
-  val activePageSpeedAlerts = resultsFromRun.filter(_.alertStatusPageSpeed)
+  val activePageWeightAlerts = resultsFromRun.filter(_.alertStatusPageWeight):::previousResultsHandler.oldResults.filter(_.alertStatusPageWeight)
+  val activePageSpeedAlerts = resultsFromRun.filter(_.alertStatusPageSpeed):::previousResultsHandler.oldResults.filter(_.alertStatusPageSpeed)
   val activeSlowButUnderWeight = activePageSpeedAlerts.filter(!_.alertStatusPageWeight)
 
   val newPageWeightAlerts = for (result <- activePageWeightAlerts if !hasPreviouslyAlertedOnWeight.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
@@ -87,6 +88,18 @@ val timeNow = DateTime.now
   val pageWeightAlertsThatHaveBeenResolved = for (result <- hasPreviouslyAlertedOnWeight if !activePageWeightAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
   val pageSpeedAlertsThatHaveBeenResolved = for (result <- hasPreviouslyAlertedOnSpeed if !activePageSpeedAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
   val pageSpeedAlertsResolvedForUnderweightPages = pageSpeedAlertsThatHaveBeenResolved.filter(!_.alertStatusPageWeight)
+
+  val numberOfPageWeightAlertsOnArticlePages = activePageWeightAlerts.filter(_.getPageType.contains("Article")).count(!_.gLabs)
+  val numberOfPageWeightAlertsOnInteractivePages = activePageWeightAlerts.filter(_.getPageType.contains("Interactive")).count(!_.gLabs)
+  val numberOfPageWeightAlertsOnLiveBlogPages = activePageWeightAlerts.filter(_.getPageType.contains("LiveBlog")).count(!_.gLabs)
+  val numberOfPageWeightAlertsOnGLabsPages = activePageWeightAlerts.count(_.gLabs)
+  val numberOfPageWeightAlertsInTotal = activePageWeightAlerts.length
+
+  val numberOfPageSpeedAlertsOnArticlePages = activePageSpeedAlerts.filter(_.getPageType.contains("Article")).count(!_.gLabs)
+  val numberOfPageSpeedAlertsOnInteractivePages = activePageSpeedAlerts.filter(_.getPageType.contains("Interactive")).count(!_.gLabs)
+  val numberOfPageSpeedAlertsOnLiveBlogPages = activePageSpeedAlerts.filter(_.getPageType.contains("LiveBlog")).count(!_.gLabs)
+  val numberOfPageSpeedAlertsOnGLabsPages = activePageSpeedAlerts.count(_.gLabs)
+  val numberOfPageSpeedAlertsInTotal = activePageSpeedAlerts.length
 
   // todo - Need some way of persisting these values
   val numberOfPageWeightAlertsResolvedThisRun = pageWeightAlertsThatHaveBeenResolved.length
@@ -102,6 +115,26 @@ val timeNow = DateTime.now
   //val numberOfPageSpeedAlertsResolvedSoFar = numberOfPageSpeedAlertsResolvedThisRun + Some_value_we_store
   //val numberOfPageSpeedAlertsResolvedForUnderWeightPagesSoFar = numberOfPageSpeedAlertsResolvedForUnderWeightPagesThisRun + Some_value_we_store
 
+  val articles = allResults.filter(_.pageType.contains("Article")).filter(!_.gLabs)
+  val interactives = allResults.filter(_.pageType.contains("Interactive")).filter(!_.gLabs)
+  val liveBlogs = allResults.filter(_.pageType.contains("LiveBlog")).filter(!_.gLabs)
+  val gLabs = allResults.filter(_.gLabs)
+
+  val averageArticlePageWeight = roundAt(3)(articles.map(_.kBInFullyLoaded).sum/articles.length)
+  val averageArticleTTFP = (articles.map(_.timeFirstPaintInMs).sum.toDouble/articles.length).toInt
+  val averageArticleSpeedIndex = (articles.map(_.speedIndex).sum.toDouble/articles.length).toInt
+
+  val averageInteractivePageWeight = roundAt(3)(interactives.map(_.kBInFullyLoaded).sum/interactives.length)
+  val averageInteractiveTTFP = (interactives.map(_.timeFirstPaintInMs).sum.toDouble/interactives.length).toInt
+  val averageInteractiveSpeedIndex = (interactives.map(_.speedIndex).sum.toDouble/interactives.length).toInt
+
+  val averageLiveBlogPageWeight = roundAt(3)(liveBlogs.map(_.kBInFullyLoaded).sum/liveBlogs.length)
+  val averageLiveBlogTTFP = (liveBlogs.map(_.timeFirstPaintInMs).sum.toDouble/liveBlogs.length).toInt
+  val averageLiveBlogSpeedIndex = (liveBlogs.map(_.speedIndex).sum.toDouble/liveBlogs.length).toInt
+
+  val averageGLabsPageWeight = roundAt(3)(gLabs.map(_.kBInFullyLoaded).sum/gLabs.length)
+  val averageGLabsTTFP = (gLabs.map(_.timeFirstPaintInMs).sum.toDouble/gLabs.length).toInt
+  val averageGLabsSpeedIndex = (gLabs.map(_.speedIndex).sum.toDouble/gLabs.length).toInt
 
   val pagesWithAudioBoomEmbed = allResults.filter(pageContainsElementType(_, "audioBoom"))
   val pagesWithBrightcoveEmbed = allResults.filter(pageContainsElementType(_, "brightcove"))
