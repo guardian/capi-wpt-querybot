@@ -96,17 +96,17 @@
     def runDataToHTMLString(): String = {
       "<div>\n" +
         "<h3>Job Summary:" + "</h3>" + "\n" +
-        "<p style = \"margin-left: 40px\">jobStarted at:                                 " + dataSummary.jobStartedTime.toDateTime + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">jobFinished at:                                " + dataSummary.jobFinishTime.toDateTime + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">Duration of Run:                               " + dataSummary.durationOfRunMin + " minutes." + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">Number of pages from CAPI queries:             " + dataSummary.numberOfPagesFromCAPI + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">Number of pages retested from previous run:    " + dataSummary.numberOfPagesRetestedFromLastRun + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">Number of pages tested:                        " + dataSummary.numberOfPagesSentToWPT + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">Number of new pageWeight alerts:               " + dataSummary.newPageWeightAlerts.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">Number of new pageSpeed alerts:                " + dataSummary.newPageSpeedAlerts.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">Number of pageWeight alerts resolved this run: " + dataSummary.numberOfPageWeightAlertsResolvedThisRun + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">Number of pageSpeed alerts resolved this run:  " + dataSummary.numberOfPageSpeedAlertsResolvedThisRun + "</p>" +  "\n" +
-        "<p style = \"margin-left: 40px\">Number of failed tests:                        " + dataSummary.numberOfFailedTests + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">jobStarted at:                                 " + dataSummary.jobStartedTime.toDateTime + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">jobFinished at:                                " + dataSummary.jobFinishTime.toDateTime + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Duration of Run:                               " + dataSummary.durationOfRunMin + " minutes." + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pages from CAPI queries:             " + dataSummary.numberOfPagesFromCAPI + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pages retested from previous run:    " + dataSummary.numberOfPagesRetestedFromLastRun + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pages tested:                        " + dataSummary.numberOfPagesSentToWPT + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of new pageWeight alerts:               " + dataSummary.newPageWeightAlerts.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of new pageSpeed alerts:                " + dataSummary.newPageSpeedAlerts.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageWeight alerts resolved this run: " + dataSummary.numberOfPageWeightAlertsResolvedThisRun + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts resolved this run:  " + dataSummary.numberOfPageSpeedAlertsResolvedThisRun + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of failed tests:                        " + dataSummary.numberOfFailedTests + "</p>" +  "\n" +
         "</div>" + "\n"
     }
 
@@ -115,33 +115,54 @@
         "<h3>Page Summary:" + "</h3>" + "\n"
       val alertsBreakdown = "<div>" + "\n" +
         "<p style = \"margin-left: 40px\">Breakdown of Alerts:</p>" + "\n" +
-        "<p style = \"margin-left: 180px\">Number of pageWeight alerts on article pages:          " + dataSummary.numberOfPageWeightAlertsOnArticlePages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Number of pageWeight alerts on interactive pages:      " + dataSummary.numberOfPageWeightAlertsOnInteractivePages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Number of pageWeight alerts on liveblog pages:         " + dataSummary.numberOfPageWeightAlertsOnLiveBlogPages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Number of pageWeight alerts on gLabs pages:            " + dataSummary.numberOfPageWeightAlertsOnGLabsPages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Total Number of pageWeight alerts:                     " + dataSummary.numberOfPageWeightAlertsInTotal + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Number of pageSpeed alerts on article pages:           " + dataSummary.numberOfPageSpeedAlertsOnArticlePages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Number of pageSpeed alerts on interactive pages:       " + dataSummary.numberOfPageSpeedAlertsOnInteractivePages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Number of pageSpeed alerts on liveblog pages:          " + dataSummary.numberOfPageSpeedAlertsOnLiveBlogPages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Number of pageSpeed alerts on gLabs pages:             " + dataSummary.numberOfPageSpeedAlertsOnGLabsPages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Total Number of pageSpeed alerts:                      " + dataSummary.numberOfPageSpeedAlertsInTotal + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Total Number of pageWeight alerts resolved:            " + dataSummary.pageWeightAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Total Number of pageSpeed alerts resolved:             " + dataSummary.pageSpeedAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Total Number of tests:                                 " + dataSummary.allResults.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts:                     " + dataSummary.numberOfPageWeightAlertsInTotal + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Total Number of pageSpeed alerts:                      " + dataSummary.numberOfPageSpeedAlertsInTotal + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts resolved:            " + dataSummary.pageWeightAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Total Number of pageSpeed alerts resolved:             " + dataSummary.pageSpeedAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Articles:</p>" + "\n" +
+        "<p style = \"margin-left: 100px\">Number of article pages:                               " + dataSummary.articles.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageWeight alerts on article pages:          " + dataSummary.numberOfPageWeightAlertsOnArticlePages + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts on article pages:           " + dataSummary.numberOfPageSpeedAlertsOnArticlePages + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Percentage of pageWeight alerts on article pages:      " + roundAt(2)(100 * dataSummary.numberOfPageWeightAlertsOnArticlePages.toDouble / dataSummary.articles.length) + "%</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Percentage of pageSpeed alerts on article pages:       " + roundAt(2)(100 * dataSummary.numberOfPageSpeedAlertsOnArticlePages.toDouble / dataSummary.articles.length) + "%</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Interactives:</p>" + "\n" +
+        "<p style = \"margin-left: 100px\">Number of interactive pages:                           " + dataSummary.interactives.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageWeight alerts on interactive pages:      " + dataSummary.numberOfPageWeightAlertsOnInteractivePages + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts on interactive pages:       " + dataSummary.numberOfPageSpeedAlertsOnInteractivePages + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Percentage of pageWeight alerts on interactive pages:  " + roundAt(2)(100 * dataSummary.numberOfPageWeightAlertsOnInteractivePages.toDouble / dataSummary.interactives.length) + "%</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Percentage of pageSpeed alerts on interactive pages:  " + roundAt(2)(100 * dataSummary.numberOfPageSpeedAlertsOnInteractivePages.toDouble / dataSummary.interactives.length) + "%</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">LiveBlogs:</p>" + "\n" +
+        "<p style = \"margin-left: 100px\">Number of liveblog pages:                              " + dataSummary.liveBlogs.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageWeight alerts on liveblog pages:         " + dataSummary.numberOfPageWeightAlertsOnLiveBlogPages + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts on liveblog pages:          " + dataSummary.numberOfPageSpeedAlertsOnLiveBlogPages + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Percentage of pageWeight alerts on liveblog pages:     " + roundAt(2)(100 * dataSummary.numberOfPageWeightAlertsOnLiveBlogPages.toDouble / dataSummary.liveBlogs.length) + "%</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Percentage of pageSpeed alerts on liveblog pages:     " + roundAt(2)(100 * dataSummary.numberOfPageSpeedAlertsOnLiveBlogPages.toDouble / dataSummary.liveBlogs.length) + "%</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">GLabs Pages:</p>" + "\n" +
+        "<p style = \"margin-left: 100px\">Number of gLabs pages:                                 " + dataSummary.gLabs.length + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageWeight alerts on gLabs pages:            " + dataSummary.numberOfPageWeightAlertsOnGLabsPages + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts on gLabs pages:             " + dataSummary.numberOfPageSpeedAlertsOnGLabsPages + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Percentage of pageWeight alerts on gLabs pages:        " + roundAt(2)(100 * dataSummary.numberOfPageWeightAlertsOnGLabsPages.toDouble / dataSummary.gLabs.length) + "%</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Percentage of pageSpeed alerts on gLabs pages:        " + roundAt(2)(100 * dataSummary.numberOfPageSpeedAlertsOnGLabsPages.toDouble / dataSummary.gLabs.length) + "%</p>" +  "\n" +
        "</div>" + "\n"
       val pageAverages = "<div>" + "\n" +
         "<p style = \"margin-left: 40px\">Page Averages:</p>" + "\n" +
-        "<p style = \"margin-left: 180px\">Average pageWeight of article pages:                   " + dataSummary.averageArticlePageWeight + " KB" + "</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average pageWeight of interactive pages:               " + dataSummary.averageInteractivePageWeight + " KB</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average pageWeight of liveBlog pages:                  " + dataSummary.averageLiveBlogPageWeight + " KB</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average pageWeight of gLabs pages:                     " + dataSummary.averageGLabsPageWeight + " KB</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average time-to-first-paint of article pages:          " + dataSummary.averageArticleTTFP + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average time-to-first-paint of interactive pages:      " + dataSummary.averageInteractiveTTFP + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average time-to-first-paint of liveBlog pages:         " + dataSummary.averageLiveBlogTTFP + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average time-to-first-paint of gLabs pages:            " + dataSummary.averageGLabsTTFP + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average speed-index of article pages:                  " + dataSummary.averageArticleSpeedIndex + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average speed-index of interactive pages:              " + dataSummary.averageInteractiveSpeedIndex + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average speed-index of liveBlog pages:                 " + dataSummary.averageLiveBlogSpeedIndex + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 180px\">Average speed-index of gLabs pages:                    " + dataSummary.averageGLabsSpeedIndex + " ms</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Articles:</p>" + "\n" +
+        "<p style = \"margin-left: 100px\">Average pageWeight of article pages:                   " + dataSummary.averageArticlePageWeight + " KB" + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Average time-to-first-paint of article pages:          " + dataSummary.averageArticleTTFP + " ms</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Average speed-index of article pages:                  " + dataSummary.averageArticleSpeedIndex + " ms</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Interactives:</p>" + "\n" +
+        "<p style = \"margin-left: 100px\">Average pageWeight of interactive pages:               " + dataSummary.averageInteractivePageWeight + " KB</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Average time-to-first-paint of interactive pages:      " + dataSummary.averageInteractiveTTFP + " ms</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Average speed-index of interactive pages:              " + dataSummary.averageInteractiveSpeedIndex + " ms</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">LiveBlogs:</p>" + "\n" +
+        "<p style = \"margin-left: 100px\">Average pageWeight of liveBlog pages:                  " + dataSummary.averageLiveBlogPageWeight + " KB</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Average time-to-first-paint of liveBlog pages:         " + dataSummary.averageLiveBlogTTFP + " ms</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Average speed-index of liveBlog pages:                 " + dataSummary.averageLiveBlogSpeedIndex + " ms</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">GLabs:</p>" + "\n" +
+        "<p style = \"margin-left: 100px\">Average pageWeight of gLabs pages:                     " + dataSummary.averageGLabsPageWeight + " KB</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Average time-to-first-paint of gLabs pages:            " + dataSummary.averageGLabsTTFP + " ms</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Average speed-index of gLabs pages:                    " + dataSummary.averageGLabsSpeedIndex + " ms</p>" +  "\n" +
         "</div>" + "\n"
       val pageSummaryFooter = "</div>" + "\n"
 

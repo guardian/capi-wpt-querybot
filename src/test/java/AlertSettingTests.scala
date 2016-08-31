@@ -1,5 +1,5 @@
-import app.api.PageWeightEmailTemplate
-import app.apiutils.{ArticleDefaultAverages, PageAverageObject, PerformanceResultsObject}
+import app.api.{S3Operations, PageWeightEmailTemplate}
+import app.apiutils._
 import org.scalatest._
 
 /**
@@ -9,6 +9,26 @@ abstract class AlertUnitSpec extends FlatSpec with Matchers with
 OptionValues with Inside with Inspectors
 
 class AlertSettingTests extends AlertUnitSpec with Matchers {
+
+  val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
+  val s3BucketName = "capi-wpt-querybot"
+  val configFileName = "config.conf"
+  val emailFileName = "addresses.conf"
+  val interactiveSampleFileName = "interactivesamples.conf"
+  val visualsPagesFileName = "visuals.conf"
+
+  val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+  //val resultsFromPreviousTests = "resultsFromPreviousTestsGenerateSamplePages.csv"
+  //val resultsFromPreviousTests = "resultFromPreviousTestsAmalgamated.csv"
+  // val resultsFromPreviousTests = "resultsFromPreviousTestsShortened.csv"
+  //val resultsFromPreviousTests = "shortenedresultstest.csv"
+  val pageWeightAlertsFromPreviousTests = "alerts/pageWeightAlertsFromPreviousTests.csv"
+  val outputFile = "summarytest.csv"
+
+  //Create new S3 Client
+  val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
+  var configArray: Array[String] = Array("", "", "", "", "", "")
+  var urlFragments: List[String] = List()
 
   val articlePerformanceAverages = new ArticleDefaultAverages("color string")  
   
@@ -44,6 +64,29 @@ class AlertSettingTests extends AlertUnitSpec with Matchers {
     assert(testResult.alertStatusPageSpeed && testResult.pageWeightAlertDescription.contains(bothtFPandSpeedIndexAreHigh))
   }
 
+  "Not a test - Revise the alert settings according to current page averages" should "work" in {
+    val outputFile = "resultFromPreviousTestsAlertsUpdated.csv"
+    val previousResults = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val previousArticleResults = previousResults.filter(_.getPageType.contains("Article"))
+    val previousInteractiveResults = previousResults.filter(_.getPageType.contains("Interactive"))
+    val previousLiveBlogResults = previousResults.filter(_.getPageType.contains("LiveBlog"))
+
+    def setAlerts(result: PerformanceResultsObject): PerformanceResultsObject = {
+      val articleAverages = new ArticleDefaultAverages("test")
+      val interactiveAverages = new InteractiveDefaultAverages("test")
+      val liveBlogAverages = new LiveBlogDefaultAverages("test")
+      result.getPageType match {
+        case "Article" => app.App.setAlertStatus(result, articleAverages)
+        case "Interactive" => app.App.setAlertStatus(result, interactiveAverages)
+        case "LiveBlog" => app.App.setAlertStatus(result, liveBlogAverages)
+        case _ => {result}
+
+      }
+    }
+    val updatedResults: List[PerformanceResultsObject] = previousResults.map(result => setAlerts(result))
+    s3Interface.writeFileToS3(outputFile, updatedResults.map(_.toCSVString()).mkString)
+    assert(updatedResults.nonEmpty)
+  }
 
 
 }
