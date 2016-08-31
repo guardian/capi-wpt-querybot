@@ -45,7 +45,8 @@
     val interactiveSampleFileName = "interactivesamples.conf"
     val visualsPagesFileName = "visuals.conf"
 
-    val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    //val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    val resultsFromPreviousTests = "resultFromPreviousTestsAlertsUpdated.csv"
     //val resultsFromPreviousTests = "resultsFromPreviousTestsGenerateSamplePages.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAmalgamated.csv"
     // val resultsFromPreviousTests = "resultsFromPreviousTestsShortened.csv"
@@ -102,9 +103,9 @@
     println("**** audioBoom counter: " + audioboomcounter.length)
     val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testResultsHandler, alertsResultsHandler)
     //write summaries to files
-    val runSummaryFile = "runSummaryStringtest.txt"
-    //val runSummaryHTMLFile = "runSummaryHTMLStringtest.html"
-    val runSummaryHTMLFile = "summarypage.html"
+    val runSummaryFile = "runSummaryStringtestTestAlerts.txt"
+    val runSummaryHTMLFile = "runSummaryHTMLTestAlerts.html"
+    //val runSummaryHTMLFile = "summarypage.html"
     val localFiles = new LocalFileOperations
 
     "Element summary" should "be returned as string" in {
