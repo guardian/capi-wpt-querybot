@@ -45,10 +45,12 @@
     val interactiveSampleFileName = "interactivesamples.conf"
     val visualsPagesFileName = "visuals.conf"
 
-    val resultsFromPreviousTests = "resultsFromPreviousTestsGenerateSamplePages.csv"
+    val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    //val resultsFromPreviousTests = "resultsFromPreviousTestsGenerateSamplePages.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAmalgamated.csv"
     // val resultsFromPreviousTests = "resultsFromPreviousTestsShortened.csv"
     //val resultsFromPreviousTests = "shortenedresultstest.csv"
+    val pageWeightAlertsFromPreviousTests = "alerts/pageWeightAlertsFromPreviousTests.csv"
     val outputFile = "summarytest.csv"
 
     //Create new S3 Client
@@ -92,14 +94,17 @@
     val visualsApiUrl: String = configArray(6)
 
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
+    val alertsResultsHandler = new ResultsFromPreviousTests(previousPageWeightAlerts)
     println("\n\n\n ***** There are " + testResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
     val audioboomcounter = previousResults.filter(_.editorialElementList.map(element => element.resource.contains("audio_clip_id")).contains(true))
     println("**** audioBoom counter: " + audioboomcounter.length)
-    val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testResultsHandler)
+    val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testResultsHandler, alertsResultsHandler)
     //write summaries to files
     val runSummaryFile = "runSummaryStringtest.txt"
-    val runSummaryHTMLFile = "runSummaryHTMLStringtest.html"
+    //val runSummaryHTMLFile = "runSummaryHTMLStringtest.html"
+    val runSummaryHTMLFile = "summarypage.html"
     val localFiles = new LocalFileOperations
 
     "Element summary" should "be returned as string" in {
@@ -123,14 +128,14 @@
       assert(true)
     }
 
-    "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
+  /*  "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
       val listAudioBoomElement = previousResults.filter(_.testUrl.contains("/world/2015/mar/16/london-teenagers-stopped-syria-parents-islamic-state"))
       val pageAndElements = listAudioBoomElement.map(page => (page.testUrl, page.editorialElementList.map(_.resource).mkString, page.editorialElementList.map(_.determinedResourceType)))
       val samplePage = new PageElementSamples(dataSummary)
 //      localFiles.writeLocalResultFile("pageElementSamplePages.html", samplePage.toString())
       s3Interface.writeFileToS3("pageElementSamplePages.html", samplePage.toString())
       assert(true)
-    }
+    }*/
 
 /*    "Not a test but I " should "be able to get a list of pages with an example of each embed" in {
 
