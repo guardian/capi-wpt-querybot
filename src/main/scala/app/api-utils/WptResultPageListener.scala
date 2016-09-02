@@ -16,7 +16,7 @@ class WptResultPageListener(page: String, tone: String, fields: Option[ContentFi
   val firstPublished: Option[CapiDateTime] = pageFields.flatMap(_.firstPublicationDate)
   val pageLastModified: Option[CapiDateTime] = pageFields.flatMap(_.lastModified)
   val liveBloggingNow: Option[Boolean] = pageFields.flatMap(_.liveBloggingNow)
-  val gLabs = tagList.exists(_.id.contains("uk-labs"))
+  val gLabs = tagList.exists(_.id.contains("tone/advertisement-features"))
   val wptResultUrl: String = resultUrl
   var testComplete: Boolean = false
   var confirmationNeeded: Boolean = false
