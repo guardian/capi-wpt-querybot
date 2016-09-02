@@ -559,6 +559,20 @@ object App {
       println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
     }
 
+    //todo - this needs to have both pageweight and page-speed alerts
+    /*val paidContentAlertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(_.gLabs)
+    if (paidContentAlertsToSend.nonEmpty) {
+      println("There are new paid Content alerts to send! There are " + alertsToSend.length + " new alerts")
+      val paidContentEmailAlerts = new PageWeightEmailTemplate(paidContentAlertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
+      val paidContentEmailSuccess = emailer.sendPageWeightAlert(generalAlertsAddressList, paidContentEmailAlerts.toString())
+      if (paidContentEmailSuccess)
+        println(DateTime.now + " Paid-content Alert Emails sent successfully. ")
+      else
+        println(DateTime.now + "ERROR: Sending of Paid-content Alert Emails failed")
+    } else {
+      println("No pages to alert on Paid-content. Email not sent.")
+    }*/
+
     val newPageWeightAlerts = newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList
     // write pageWeight alerts results file
     s3Interface.writeFileToS3(pageWeightAlertsFromPreviousTests, (newPageWeightAlerts ::: previousPageWeightAlerts).map(_.toCSVString()).mkString )
