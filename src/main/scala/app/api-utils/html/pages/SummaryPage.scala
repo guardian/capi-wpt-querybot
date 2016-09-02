@@ -59,8 +59,8 @@
 */
     //Page Tables
     val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"elementSummary\">"+ "\n" +
-      "<thead>" + "\n" + "<caption> Summary of Editorial Embeds from " + dataSummary.previousResults.length + " tested pages</caption>" +
-      "<tr>" + "<th>Type of Embed</th>" + "<th>Number of pages with this embed-type</th>" + "<th>Number of pages that alerted for pageWeight</th>" + "<th>Chance of this embed-type triggering a pageWeight alert</th>" + "<th>Number of Pages that alerted for pageSpeed</th>" + "<th>Chance of this embed-type triggering a pageSpeed alert</th>" + "<th>Average Size of this embed-type (KB)</th>" + "<th>Average Time to First Paint of a page with this embed-type</th>" + "<th>Average SpeedIndex of a page with this embed-type</th>" +  "</tr>"+ "\n" +
+      "<thead>" + "\n" + "<caption> Summary of Editorial Embeds from " + dataSummary.totalNumberOfTests + " tested pages</caption>" +
+      "<tr>" + "<th>Type of Embed</th>" + "<th>Number of pages with this embed-type</th>" + "<th>Chance of a page containing this embed-type</th>" + "<th>Number of pages that alerted for pageWeight</th>" + "<th>Chance of this embed-type triggering a pageWeight alert</th>" + "<th>Number of Pages that alerted for pageSpeed</th>" + "<th>Chance of this embed-type triggering a pageSpeed alert</th>" + "<th>Average Size of this embed-type (KB)</th>" + "<th>Average Time to First Paint of a page with this embed-type</th>" + "<th>Average SpeedIndex of a page with this embed-type</th>" +  "</tr>"+ "\n" +
       "</thead>" +"\n" +
       "<tbody>"
 
@@ -104,8 +104,8 @@
         "<p style = \"margin-left: 100px\">Number of pages tested:                        " + dataSummary.numberOfPagesSentToWPT + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of new pageWeight alerts:               " + dataSummary.newPageWeightAlerts.length + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of new pageSpeed alerts:                " + dataSummary.newPageSpeedAlerts.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageWeight alerts resolved this run: " + dataSummary.numberOfPageWeightAlertsResolvedThisRun + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts resolved this run:  " + dataSummary.numberOfPageSpeedAlertsResolvedThisRun + "</p>" +  "\n" +
+        //"<p style = \"margin-left: 100px\">Number of pageWeight alerts resolved this run: " + dataSummary.numberOfPageWeightAlertsResolvedThisRun + "</p>" +  "\n" +
+        //"<p style = \"margin-left: 100px\">Number of pageSpeed alerts resolved this run:  " + dataSummary.numberOfPageSpeedAlertsResolvedThisRun + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of failed tests:                        " + dataSummary.numberOfFailedTests + "</p>" +  "\n" +
         "</div>" + "\n"
     }
@@ -118,8 +118,8 @@
         "<p style = \"margin-left: 100px\">Total Number of tests:                                 " + dataSummary.allResults.length + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts:                     " + dataSummary.numberOfPageWeightAlertsInTotal + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Total Number of pageSpeed alerts:                      " + dataSummary.numberOfPageSpeedAlertsInTotal + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts resolved:            " + dataSummary.pageWeightAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Total Number of pageSpeed alerts resolved:             " + dataSummary.pageSpeedAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
+        //"<p style = \"margin-left: 100px\">Total Number of pageWeight alerts resolved:            " + dataSummary.pageWeightAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
+        //"<p style = \"margin-left: 100px\">Total Number of pageSpeed alerts resolved:             " + dataSummary.pageSpeedAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Articles:</p>" + "\n" +
         "<p style = \"margin-left: 100px\">Number of article pages:                               " + dataSummary.articles.length + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of pageWeight alerts on article pages:          " + dataSummary.numberOfPageWeightAlertsOnArticlePages + "</p>" +  "\n" +
@@ -182,6 +182,7 @@
         "<tr>" + "\n" +
         "<td>" + elementSummary.title + "</td>" + "\n" +
         "<td>" + elementSummary.numberOfPagesWithEmbed + "</td>" + "\n" +
+        "<td>" + elementSummary.percentageOfPagesWithEmbed + "%"+ "</td>" + "\n" +
         "<td>" + elementSummary.numberOfPageWeightAlerts + "</td>" + "\n" +
         "<td>" + elementSummary.percentageOfPageWeightAlerts + "%"+ "</td>" + "\n" +
         "<td>" + elementSummary.numberOfPageSpeedAlerts + "</td>" + "\n" +

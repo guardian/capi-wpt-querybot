@@ -33,13 +33,14 @@ look through data - what are the main embeds
 
   case class ElementSummaryData(title: String,
                                 numberOfPagesWithEmbed: Int,
+                                percentageOfPagesWithEmbed: Double,
                                 numberOfPageWeightAlerts: Int,
                                 numberOfPageSpeedAlerts: Int,
-                                percentageOfPageWeightAlerts: Int,
-                                percentageOfPageSpeedAlerts: Int,
+                                percentageOfPageWeightAlerts: Double,
+                                percentageOfPageSpeedAlerts: Double,
                                 averageSizeOfEmbeds: Double,
-                                averageTimeFirstPaint: Double,
-                                averageSpeedIndexMs: Double)
+                                averageTimeFirstPaint: Int,
+                                averageSpeedIndexMs: Int)
 
 
 val timeNow = DateTime.now
@@ -72,6 +73,8 @@ val timeNow = DateTime.now
   val resultsFromRun: List[PerformanceResultsObject] = latestResults
   val previousResults: List[PerformanceResultsObject] = previousResultsHandler.previousResults
   val allResults: List[PerformanceResultsObject] = resultsFromRun ::: previousResults
+  val totalNumberOfTests = allResults.length
+
   val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = alertsResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageWeight)
   val hasPreviouslyAlertedOnSpeed: List[PerformanceResultsObject] = previousResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageSpeed)
 
@@ -295,7 +298,7 @@ val timeNow = DateTime.now
         unknownEmbedSummary
   )
 
-  val sortedSummaryList = summaryList.sortWith(_.percentageOfPageWeightAlerts > _.percentageOfPageWeightAlerts)
+  val sortedSummaryList = summaryList.sortWith(_.numberOfPagesWithEmbed > _.numberOfPagesWithEmbed)
 
 
 
@@ -459,16 +462,23 @@ val timeNow = DateTime.now
     val numberOfPagesWithEmbed = pagesWithEmbed.length
     val numberOfPageWeightAlerts = pagesWithEmbed.count(_.alertStatusPageWeight)
     val numberOfPageSpeedAlerts = pagesWithEmbed.count(_.alertStatusPageSpeed)
+    val percentageOfPagesWithEmbed = {
+      if (numberOfPagesWithEmbed > 0) {
+        roundAt(2)((numberOfPagesWithEmbed.toDouble / totalNumberOfTests) * 100)
+      } else {
+        0
+      }
+    }
     val percentageOfPageWeightAlerts = {
       if (numberOfPageWeightAlerts > 0) {
-        ((numberOfPageWeightAlerts.toDouble / numberOfPagesWithEmbed) * 100).toInt
+        roundAt(2)((numberOfPageWeightAlerts.toDouble / numberOfPagesWithEmbed) * 100)
       } else {
         0
       }
     }
     val percentageOfPageSpeedAlerts = {
       if (numberOfPageSpeedAlerts > 0) {
-        ((numberOfPageSpeedAlerts.toDouble / numberOfPagesWithEmbed) * 100).toInt
+        roundAt(2)((numberOfPageSpeedAlerts.toDouble / numberOfPagesWithEmbed) * 100)
       } else {
         0
       }
@@ -479,6 +489,7 @@ val timeNow = DateTime.now
 
     new ElementSummaryData(title,
       numberOfPagesWithEmbed,
+      percentageOfPagesWithEmbed,
       numberOfPageWeightAlerts,
       numberOfPageSpeedAlerts,
       percentageOfPageWeightAlerts,
