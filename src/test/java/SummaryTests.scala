@@ -104,8 +104,8 @@
     val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testResultsHandler, alertsResultsHandler)
     //write summaries to files
     val runSummaryFile = "runSummaryStringtestTestAlerts.txt"
-    val runSummaryHTMLFile = "runSummaryHTMLTestAlerts.html"
-    //val runSummaryHTMLFile = "summarypage.html"
+    //val runSummaryHTMLFile = "runSummaryHTMLTestAlerts.html"
+    val runSummaryHTMLFile = "summarypage.html"
     val localFiles = new LocalFileOperations
 
     "Element summary" should "be returned as string" in {
