@@ -42,6 +42,7 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   val configFileName = "config.conf"
   val emailFileName = "addresses.conf"
   val interactiveSampleFileName = "interactivesamples.conf"
+  val pagesWithInsecureElements = ""
   val visualsPagesFileName = "visuals.conf"
 
  val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
@@ -731,12 +732,20 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
   }*/
 
 
-  "not a test" should "produce a list of results for the list of wpt results pages provided" in {
+/*  "not a test" should "produce a list of results for the list of wpt results pages provided" in {
     val cAPIQuery = new ArticleUrls(contentApiKey)
     val resultUrlList = resultUrls2.toList
     val pageListResults: List[PerformanceResultsObject] = resultUrlList.map(url => getResult(url , wptBaseUrl, wptApiKey, urlFragments, cAPIQuery))
     cAPIQuery.shutDown
     s3Interface.writeFileToS3("samplePagesToAddNew2.csv", pageListResults.map(_.toCSVString()).mkString)
+    assert(true)
+  }*/
+
+  "not a test" should "generate list of pages that request insecure elements" in {
+    val previousResults = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val listOfPagesWithHTTPElements = previousResults.filter(_.fullElementList.exists(test => test.resource.take(5).contains("http:")))
+    s3Interface.writeFileToS3("pagesWithInsecureElements.csv", listOfPagesWithHTTPElements.map(_.toCSVString()).mkString)
+    println("written out file with " + listOfPagesWithHTTPElements.length + " rows")
     assert(true)
   }
 

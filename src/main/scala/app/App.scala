@@ -68,6 +68,7 @@ object App {
     val interactiveAlertsFromPreviousTests = "alerts/interactiveAlertsFromPreviousTests.csv"
 
     val alertsThatHaveBeenFixed = "alertsthathavebeenfixed.csv"
+    val pagesWithInsecureElements = "pagesWithInsecureElements.csv"
     val duplicateResultList = "duplicateresultsfromlastrun.csv"
     val runLog = "runLog.csv"
 
@@ -177,6 +178,7 @@ object App {
     //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
     val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
     val previousInteractiveAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(interactiveAlertsFromPreviousTests)
+    val previousPagesWithInsecureElements: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pagesWithInsecureElements)
 
 
     //validate list handling
@@ -458,6 +460,8 @@ object App {
 
     val listOfDupes = for (result <- sortedByWeightCombinedResults if sortedByWeightCombinedResults.map(page => (page.testUrl, page.typeOfTest)).count(_ == (result.testUrl,result.typeOfTest)) > 1) yield result
 
+    val listOfPagesWithInsecureElements = (combinedResultsList ::: previousPagesWithInsecureElements).filter(_.fullElementList.exists(test => test.resource.take(5).contains("http:")))
+
     if (listOfDupes.nonEmpty) {
       println("\n\n\n\n ******** Duplicates found in results! ****** \n Found " + listOfDupes.length + " duplicates")
       println("Duplicate urls are: \n" + listOfDupes.map(result => "url: " + result.testUrl + " TestType: " + result.typeOfTest + "\n"))
@@ -475,6 +479,7 @@ object App {
       s3Interface.writeFileToS3(interactiveDashboardMobileFilename, interactiveDashboardMobile.toString())
       s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
       s3Interface.writeFileToS3(alertsThatHaveBeenFixed, pageWeightAlertsFixedCSVString)
+      s3Interface.writeFileToS3(pagesWithInsecureElements, listOfPagesWithInsecureElements.map(_.toCSVString()).mkString)
       s3Interface.writeFileToS3(duplicateResultList, listOfDupes.map(_.toCSVString()).mkString)
     }
     else {
