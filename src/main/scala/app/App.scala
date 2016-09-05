@@ -51,6 +51,10 @@ object App {
     val interactiveDashboardDesktopFilename = "interactivedashboarddesktop.html"
     val interactiveDashboardMobileFilename = "interactivedashboardmobile.html"
 
+    val gLabsDashboardFilename = "glabs.html"
+    val gLabsDashboardDesktopFilename = "glabsdashboarddesktop.html"
+    val gLabsDashboardMobileFilename = "glabsdashboardmobile.html"
+
     val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
     val interactiveResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + interactiveOutputFilename
@@ -115,6 +119,8 @@ object App {
 
     //Initialize Interactive email alerts lists - these will be used to generate emails
     var interactiveAlertList: List[PerformanceResultsObject] = List()
+    var gLabsAlertList: List[PerformanceResultsObject] = List()
+
 
     //Create new S3 Client
     println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
@@ -161,6 +167,7 @@ object App {
     val emailAddresses: Array[List[String]] = s3Interface.getEmailAddresses
     val generalAlertsAddressList: List[String] = emailAddresses(0)
     val interactiveAlertsAddressList: List[String] = emailAddresses(1)
+    val gLabsAlertsAddressList: List[String] = emailAddresses(2)
 
     //Create Email Handler class
     val emailer: EmailOperations = new EmailOperations(emailUsername, emailPassword)
@@ -289,6 +296,7 @@ object App {
       // write article results to string
       //Create a list of alerting pages and write to string
       articlePageWeightAlertList = for (result <- sortedByWeightArticleResultsList if result.alertStatusPageWeight) yield result
+      gLabsAlertList = for (result <- sortedByWeightArticleResultsList if (result.alertStatusPageWeight || result.alertStatusPageSpeed) && result.gLabs) yield result
       articleResults = articleResults.concat(articleHTMLResults.mkString)
       articleResults = articleResults + htmlString.closeTable + htmlString.closePage
       //write article results to file
@@ -333,6 +341,7 @@ object App {
       // write liveblog results to string
       //Create a list of alerting pages and write to string
       liveBlogPageWeightAlertList = for (result <- sortedLiveBlogResultsList if result.alertStatusPageWeight) yield result
+      gLabsAlertList = for (result <- sortedLiveBlogResultsList if (result.alertStatusPageWeight || result.alertStatusPageSpeed) && result.gLabs) yield result
 
       liveBlogResults = liveBlogResults.concat(liveBlogHTMLResults.mkString)
       liveBlogResults = liveBlogResults + htmlString.closeTable + htmlString.closePage
@@ -378,6 +387,7 @@ object App {
       //generate interactive alert message body
       interactivePageWeightAlertList = for (result <- sortedInteractiveResultsList if result.alertStatusPageWeight) yield result
       interactiveAlertList = for (result <- sortedInteractiveResultsList if result.alertStatusPageWeight || result.alertStatusPageSpeed) yield result
+      gLabsAlertList = interactiveAlertList.filter(_.gLabs)
       // write interactive results to string
       interactiveResults = interactiveResults.concat(interactiveHTMLResults.mkString)
       interactiveResults = interactiveResults + htmlString.closeTable + htmlString.closePage
@@ -410,19 +420,19 @@ object App {
     //Generate lists for sortByWeight combined pages
 
     val sortedByWeightCombinedDesktopResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsByWeight(combinedDesktopResultsList)
-    val sortedCombinedByWeightMobileResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsByWeight(combinedMobileResultsList)
+    val sortedByWeightCombinedMobileResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsByWeight(combinedMobileResultsList)
 
     println("length of sorted By Weight Mobile List is: " + sortedByWeightCombinedDesktopResults.length)
-    println("length of sorted By Weight Combined List is: " + sortedCombinedByWeightMobileResults.length)
+    println("length of sorted By Weight Combined List is: " + sortedByWeightCombinedMobileResults.length)
     //  strip out errors
     val errorFreeSortedByWeightCombinedResults = for (result <- sortedByWeightCombinedResults if result.speedIndex > 0) yield result
     val errorFreeCombinedListLength = errorFreeSortedByWeightCombinedResults.length
     println("length of errorFreeSortedByWeightCombinedResults: " + errorFreeCombinedListLength)
     println((sortedByWeightCombinedResults.length - errorFreeSortedByWeightCombinedResults.length) + " records have been lost due to error")
 
-    val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
-    val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
-    val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
+    val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedByWeightCombinedMobileResults)
+    val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedByWeightCombinedMobileResults)
+    val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedByWeightCombinedMobileResults)
 
     // record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
@@ -449,10 +459,18 @@ object App {
     val sortedInteractiveDesktopResults: List[PerformanceResultsObject] = sorter.sortHomogenousInteractiveResultsBySpeed(interactiveDesktopResults)
     val sortedInteractiveMobileResults: List[PerformanceResultsObject] = sorter.sortHomogenousInteractiveResultsBySpeed(interactiveMobileResults)
 
+    val sortedGLabsCombinedResults: List[PerformanceResultsObject] = sortedByWeightCombinedResults.filter(_.gLabs)
+    val sortedGLabsDesktopResults: List[PerformanceResultsObject] = sortedByWeightCombinedDesktopResults.filter(_.gLabs)
+    val sortedGLabsMobileResults: List[PerformanceResultsObject] = sortedByWeightCombinedMobileResults.filter(_.gLabs)
+
     val dotcomPageSpeedDashboard = new PageSpeedDashboardTabbed(sortedBySpeedCombinedResults, sortedBySpeedCombinedDesktopResults, sortedBySpeedCombinedMobileResults)
     val interactiveDashboard = new InteractiveDashboardTabbed(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
     val interactiveDashboardDesktop = new InteractiveDashboardDesktop(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
     val interactiveDashboardMobile = new InteractiveDashboardMobile(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
+
+    val gLabsDashboard =  new GLabsDashboardTabbed(sortedGLabsCombinedResults, sortedGLabsDesktopResults, sortedGLabsMobileResults)
+    val gLabsDashboardDesktop = new InteractiveDashboardDesktop(sortedGLabsCombinedResults, sortedGLabsDesktopResults, sortedGLabsMobileResults)
+    val gLabsDashboardMobile = new InteractiveDashboardMobile(sortedGLabsCombinedResults, sortedGLabsDesktopResults, sortedGLabsMobileResults)
 
     val pageWeightAlertsPreviouslyFixed = s3Interface.getResultsFileFromS3(alertsThatHaveBeenFixed)
     val pageWeightAlertsFixedThisRun = for (alert <- previousTestResultsHandler.hasPreviouslyAlertedOnWeight if !(articlePageWeightAlertList ::: liveBlogPageWeightAlertList ::: interactivePageWeightAlertList).map(result => (result.testUrl, result.typeOfTest)).contains((alert.testUrl, alert.typeOfTest))) yield alert
@@ -477,6 +495,9 @@ object App {
       s3Interface.writeFileToS3(interactiveDashboardFilename, interactiveDashboard.toString())
       s3Interface.writeFileToS3(interactiveDashboardDesktopFilename, interactiveDashboardDesktop.toString())
       s3Interface.writeFileToS3(interactiveDashboardMobileFilename, interactiveDashboardMobile.toString())
+      s3Interface.writeFileToS3(gLabsDashboardFilename, gLabsDashboard.toString())
+      s3Interface.writeFileToS3(gLabsDashboardDesktopFilename, gLabsDashboardDesktop.toString())
+      s3Interface.writeFileToS3(gLabsDashboardMobileFilename, gLabsDashboardMobile.toString())
       s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
       s3Interface.writeFileToS3(alertsThatHaveBeenFixed, pageWeightAlertsFixedCSVString)
       s3Interface.writeFileToS3(pagesWithInsecureElements, listOfPagesWithInsecureElements.map(_.toCSVString()).mkString)
@@ -532,11 +553,12 @@ object App {
 
 
     //check if alert items have already been sent in earlier run
-    val newArticlePageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(articlePageWeightAlertList)
-    val newLiveBlogPageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(liveBlogPageWeightAlertList)
-    val newInteractivePageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(interactivePageWeightAlertList)
+    val newArticlePageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOnForWeight(articlePageWeightAlertList)
+    val newLiveBlogPageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOnForWeight(liveBlogPageWeightAlertList)
+    val newInteractivePageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOnForWeight(interactivePageWeightAlertList)
     //    val newFrontsPageWeightAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(frontsPageWeightAlertList)
     val newInteractiveAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(interactiveAlertList)
+    val newGLabsAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(gLabsAlertList)
 
     val alertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
     if (alertsToSend.nonEmpty) {
@@ -563,6 +585,20 @@ object App {
     } else {
       println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
     }
+
+    if (newGLabsAlertsList.nonEmpty) {
+      println("There are new interactive email alerts to send - length of list is: " + newGLabsAlertsList.length)
+      val gLabsEmailAlerts = new GLabsEmailTemplate(newGLabsAlertsList, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardDesktopFilename)
+      val gLabsEmailSuccess = emailer.sendInteractiveAlert(gLabsAlertsAddressList, gLabsEmailAlerts.toString())
+      if (gLabsEmailSuccess) {
+        println("Interactive Alert email sent successfully.")
+      } else {
+        println("ERROR: Sending of Interactive Alert Emails failed")
+      }
+    } else {
+      println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
+    }
+
 
     //todo - this needs to have both pageweight and page-speed alerts
     /*val paidContentAlertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(_.gLabs)
