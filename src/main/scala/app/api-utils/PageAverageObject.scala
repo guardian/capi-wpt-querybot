@@ -73,9 +73,9 @@ class PageAverageObject(dtfp: Int, dtdc: Int, dsdc: Int, dtfl: Int, dsfl: Int, d
 class ArticleDefaultAverages(averageColor: String) extends PageAverageObject {
   override val desktopTimeFirstPaintInMs: Int = (2 * 1000).toInt
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
-  override val desktopKBInDocComplete: Double = 2 * 1024
+  override val desktopKBInDocComplete: Double = 4 * 1024
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
-  override val desktopKBInFullyLoaded: Double = 3072
+  override val desktopKBInFullyLoaded: Double = 4096
   override val desktopEstUSPrePaidCost: Double = 0.60
   override val desktopEstUSPostPaidCost: Double = 0.50
   override val desktopSpeedIndex: Int = 1482
