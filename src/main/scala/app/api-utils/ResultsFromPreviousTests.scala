@@ -49,6 +49,10 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     for (result <- resultsList if !hasPreviouslyAlerted.map(_.testUrl).contains(result.testUrl)) yield result
   }
 
+  def returnPagesNotYetAlertedOnForWeight(resultsList: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    for (result <- resultsList if !hasPreviouslyAlertedOnWeight.map(_.testUrl).contains(result.testUrl)) yield result
+  }
+
   /*def removeDuplicates(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
     val emptyResultList: List[PerformanceResultsObject] = List()
     cleanList(results, emptyResultList)
