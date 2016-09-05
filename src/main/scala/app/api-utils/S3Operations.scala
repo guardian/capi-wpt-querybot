@@ -82,11 +82,13 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     println("returning config object")
     val generalAlerts = conf.getStringList("general.alerts").toList
     val interactiveAlerts = conf.getStringList("interactive.alerts").toList
-    if (generalAlerts.nonEmpty || interactiveAlerts.nonEmpty){
+    val gLabsAlerts = conf.getStringList("glabs.alerts").toList
+    if (generalAlerts.nonEmpty || interactiveAlerts.nonEmpty || gLabsAlerts.nonEmpty){
       println(DateTime.now + " Config retrieval successful. \n You have retrieved the following users\n" +
         generalAlerts + "\n" +
-        interactiveAlerts + "\n")
-      val returnArray = Array(generalAlerts, interactiveAlerts)
+        interactiveAlerts + "\n" +
+        gLabsAlerts)
+      val returnArray = Array(generalAlerts, interactiveAlerts,gLabsAlerts)
       returnArray
     }
     else {
