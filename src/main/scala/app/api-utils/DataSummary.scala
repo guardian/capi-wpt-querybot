@@ -43,6 +43,18 @@ look through data - what are the main embeds
                                 averageSpeedIndexMs: Int)
 
 
+  case class PageSummaryData(pageType: String,
+                              testType: String,
+                              numberOfPagesTested: Int,
+                              numberOfPageWeightAlerts: Int,
+                              percentageOfPageWeightAlerts: Double,
+                              numberOfPageSpeedAlerts: Int,
+                              percentageOfPageSpeedAlerts: Double,
+                              averagePageWeight: Double,
+                              averageTTFP: Int,
+                              averageSpeedIndex: Int
+                              )
+
 val timeNow = DateTime.now
   val today = timeNow.getDayOfYear
   val yesterday = timeNow.minusDays(1).getDayOfYear
@@ -52,6 +64,8 @@ val timeNow = DateTime.now
   val durationOfRunMs = jobFinished.getMillis - jobStarted.getMillis
   val durationOfRunS = durationOfRunMs.toDouble / 1000
   val durationOfRunMin = roundAt(2)(durationOfRunS / 60)
+
+
 
   //last run - number of pages pulled from capi
   val numberOfPagesFromCAPI: Int = numberOfPagesFromCapi
@@ -71,9 +85,14 @@ val timeNow = DateTime.now
   val numberOfPagesRetestedFromLastRun: Int = previousResultsHandler.previousResultsToRetest.length
 
   val resultsFromRun: List[PerformanceResultsObject] = latestResults
-  val previousResults: List[PerformanceResultsObject] = previousResultsHandler.previousResults
+  val previousResults: List[PerformanceResultsObject] = previousResultsHandler.allResults
   val allResults: List[PerformanceResultsObject] = resultsFromRun ::: previousResults
+  val allDesktopResults: List[PerformanceResultsObject] = allResults.filter(_.typeOfTestName.contains("Desktop"))
+  val allMobileResults: List[PerformanceResultsObject] = allResults.filter(_.typeOfTestName.contains("Mobile"))
+
   val totalNumberOfTests = allResults.length
+  val totalNumberOfDesktopTests = allDesktopResults.length
+  val totalNumberOfMobileTests = allMobileResults.length
 
   val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = alertsResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageWeight)
   val hasPreviouslyAlertedOnSpeed: List[PerformanceResultsObject] = previousResultsHandler.hasPreviouslyAlerted.filter(_.alertStatusPageSpeed)
@@ -85,30 +104,27 @@ val timeNow = DateTime.now
   val activePageSpeedAlerts = resultsFromRun.filter(_.alertStatusPageSpeed):::previousResultsHandler.oldResults.filter(_.alertStatusPageSpeed)
   val activeSlowButUnderWeight = activePageSpeedAlerts.filter(!_.alertStatusPageWeight)
 
-  val newPageWeightAlerts = for (result <- activePageWeightAlerts if !hasPreviouslyAlertedOnWeight.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
-  val newPageSpeedAlerts = for (result <- activePageSpeedAlerts if !hasPreviouslyAlertedOnSpeed.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
+  val hasAlertedOnWeightThisRun = resultsFromRun.filter(_.alertStatusPageWeight)
+  val hasAlertedOnSpeedThisRun = resultsFromRun.filter(_.alertStatusPageSpeed)
+  
+  val newPageWeightAlerts = for (result <- hasAlertedOnWeightThisRun if !hasPreviouslyAlertedOnWeight.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
+  val newPageSpeedAlerts = for (result <- hasAlertedOnSpeedThisRun if !hasPreviouslyAlertedOnSpeed.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
 
-  val pageWeightAlertsThatHaveBeenResolved = for (result <- hasPreviouslyAlertedOnWeight if !activePageWeightAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
-  val pageSpeedAlertsThatHaveBeenResolved = for (result <- hasPreviouslyAlertedOnSpeed if !activePageSpeedAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
-  val pageSpeedAlertsResolvedForUnderweightPages = pageSpeedAlertsThatHaveBeenResolved.filter(!_.alertStatusPageWeight)
+  val pageWeightAlertsThatHaveBeenResolvedThisRun = for (result <- hasPreviouslyAlertedOnWeight if !activePageWeightAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
+  val pageSpeedAlertsThatHaveBeenResolvedThisRun = for (result <- hasPreviouslyAlertedOnSpeed if !activePageSpeedAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
+  val pageSpeedAlertsResolvedForUnderweightPages = pageSpeedAlertsThatHaveBeenResolvedThisRun.filter(!_.alertStatusPageWeight)
 
-  val numberOfPageWeightAlertsOnArticlePages = activePageWeightAlerts.filter(_.getPageType.contains("Article")).count(!_.gLabs)
-  val numberOfPageWeightAlertsOnInteractivePages = activePageWeightAlerts.filter(_.getPageType.contains("Interactive")).count(!_.gLabs)
-  val numberOfPageWeightAlertsOnLiveBlogPages = activePageWeightAlerts.filter(_.getPageType.contains("LiveBlog")).count(!_.gLabs)
-  val numberOfPageWeightAlertsOnGLabsPages = activePageWeightAlerts.count(_.gLabs)
-  val numberOfPageWeightAlertsInTotal = activePageWeightAlerts.length
-
-  val numberOfPageSpeedAlertsOnArticlePages = activePageSpeedAlerts.filter(_.getPageType.contains("Article")).count(!_.gLabs)
-  val numberOfPageSpeedAlertsOnInteractivePages = activePageSpeedAlerts.filter(_.getPageType.contains("Interactive")).count(!_.gLabs)
-  val numberOfPageSpeedAlertsOnLiveBlogPages = activePageSpeedAlerts.filter(_.getPageType.contains("LiveBlog")).count(!_.gLabs)
-  val numberOfPageSpeedAlertsOnGLabsPages = activePageSpeedAlerts.count(_.gLabs)
-  val numberOfPageSpeedAlertsInTotal = activePageSpeedAlerts.length
+  val dateOfOldestTest = previousResultsHandler.timeOfOldestTest
+  val dateOfOldestAlert = alertsResultsHandler.timeOfOldestTest
 
   // todo - Need some way of persisting these values
-  val numberOfPageWeightAlertsResolvedThisRun = pageWeightAlertsThatHaveBeenResolved.length
-  val numberOfPageSpeedAlertsResolvedThisRun = pageSpeedAlertsThatHaveBeenResolved.length
-  val numberOfPageSpeedAlertsResolvedForUnderWeightPagesThisRun = pageSpeedAlertsThatHaveBeenResolved.length
+  val numberOfPageWeightAlertsResolvedThisRun = pageWeightAlertsThatHaveBeenResolvedThisRun.length
+  val numberOfPageSpeedAlertsResolvedThisRun = pageSpeedAlertsThatHaveBeenResolvedThisRun.length
+  val numberOfPageSpeedAlertsResolvedForUnderWeightPagesThisRun = pageSpeedAlertsThatHaveBeenResolvedThisRun.length
 
+  val totalPageWeightAlertsThatHaveBeenResolved = for (result <- alertsResultsHandler.allResults if !activePageWeightAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
+  val totalNumberOfPageWeightAlertsTriggered = alertsResultsHandler.allResults.length
+  val totalNumberOfPageWeightAlertsResolved = totalPageWeightAlertsThatHaveBeenResolved.length
   // todo - Use persisted values from previous runs
   //val numberOfPageWeightAlertsResolvedLast24Hrs = numberOfPageWeightAlertsResolvedThisRun + Some_value_we_store
   //val numberOfPageSpeedAlertsResolvedLast24Hrs = numberOfPageSpeedAlertsResolvedThisRun + Some_value_we_store
@@ -118,10 +134,46 @@ val timeNow = DateTime.now
   //val numberOfPageSpeedAlertsResolvedSoFar = numberOfPageSpeedAlertsResolvedThisRun + Some_value_we_store
   //val numberOfPageSpeedAlertsResolvedForUnderWeightPagesSoFar = numberOfPageSpeedAlertsResolvedForUnderWeightPagesThisRun + Some_value_we_store
 
+
   val articles = allResults.filter(_.pageType.contains("Article")).filter(!_.gLabs)
+  val articlesDesktop = articles.filter(_.typeOfTestName.contains("Desktop"))
+  val articlesMobile = articles.filter(_.typeOfTestName.contains("Mobile"))
+
   val interactives = allResults.filter(_.pageType.contains("Interactive")).filter(!_.gLabs)
+  val interactivesDesktop = interactives.filter(_.typeOfTestName.contains("Desktop"))
+  val interactivesMobile = interactives.filter(_.typeOfTestName.contains("Mobile"))
+
   val liveBlogs = allResults.filter(_.pageType.contains("LiveBlog")).filter(!_.gLabs)
+  val liveBlogsDesktop = liveBlogs.filter(_.typeOfTestName.contains("Desktop"))
+  val liveBlogsMobile = liveBlogs.filter(_.typeOfTestName.contains("Mobile"))
+
   val gLabs = allResults.filter(_.gLabs)
+  val gLabsDesktop = gLabs.filter(_.typeOfTestName.contains("Desktop"))
+  val gLabsMobile = gLabs.filter(_.typeOfTestName.contains("Mobile"))
+
+  val isATotal = true
+  val notATotal = false
+
+  val articlesCombinedSummary = summarisePageType(articles, notATotal)
+  val articlesDesktopSummary = summarisePageType(articlesDesktop, notATotal)
+  val articlesMobileSummary = summarisePageType(articlesMobile, notATotal)
+
+  val interactivesCombinedSummary = summarisePageType(interactives, notATotal)
+  val interactivesDesktopSummary = summarisePageType(interactivesDesktop, notATotal)
+  val interactivesMobileSummary = summarisePageType(interactivesMobile, notATotal)
+
+  val liveBlogsCombinedSummary = summarisePageType(liveBlogs, notATotal)
+  val liveBlogsDesktopSummary = summarisePageType(liveBlogsDesktop, notATotal)
+  val liveBlogsMobileSummary = summarisePageType(liveBlogsMobile, notATotal)
+
+  val gLabsCombinedSummary = summarisePageType(gLabs, notATotal)
+  val gLabsDesktopSummary = summarisePageType(gLabsDesktop, notATotal)
+  val gLabsMobileSummary = summarisePageType(gLabsMobile, notATotal)
+
+  val totalCombinedSummary = summarisePageType(allResults, isATotal)
+  val totalDesktopSummary = summarisePageType(allDesktopResults, isATotal)
+  val totalMobileSummary = summarisePageType(allMobileResults, isATotal)
+
 
   val averageArticlePageWeight = roundAt(3)(articles.map(_.kBInFullyLoaded).sum/articles.length)
   val averageArticleTTFP = (articles.map(_.timeFirstPaintInMs).sum.toDouble/articles.length).toInt
@@ -302,7 +354,7 @@ val timeNow = DateTime.now
 
 
 
-  def getSamplePageArray(): Array[Option[PerformanceResultsObject]] = {
+  def getSamplePageArray: Array[Option[PerformanceResultsObject]] = {
     val audioboom = getPage(pagesWithAudioBoomEmbed)
     val brightcove = getPage(pagesWithBrightcoveEmbed)
     val cnn = getPage(pagesWithCNNEmbed)
@@ -419,8 +471,6 @@ val timeNow = DateTime.now
     checkEditorialElementList || checkFullElementList
   }
 
-
-
   def summaryDataToString(): String = {
     val runString: String = "Job Summary: \n" + "\n" +
       "jobStarted at: " + jobStartedTime.toDateTime + "\n" +
@@ -455,6 +505,39 @@ val timeNow = DateTime.now
       "</div>" + "\n"
     val elementString: String = sortedSummaryList.map(elementData => returnElementSummaryAsHTMLString(elementData)).mkString
     runString + elementString
+  }
+
+  def summarisePageType(results: List[PerformanceResultsObject], total: Boolean): PageSummaryData = {
+    val contentType = results.head.getPageType
+    val pageType = {
+      if (results.head.gLabs && !total) {
+        "GLabs"
+      } else {
+        if (total) {
+          "Total"
+        } else {
+          contentType
+        }
+      }
+    }
+    val testType = {
+      if(results.head.typeOfTest == results.tail.head.typeOfTest){
+        results.head.typeOfTestName
+      } else {
+        "Both Desktop and Mobile tests"
+      }
+    }
+
+    val numberOfTests = results.length
+    val numberOfPageWeightAlerts = results.count(_.alertStatusPageWeight)
+    val percentageOfPageWeightAlerts = roundAt(2)((numberOfPageWeightAlerts * 100).toDouble/numberOfTests)
+    val numberOfPageSpeedAlerts = results.count(_.alertStatusPageSpeed)
+    val percentageOfPageSpeedAlerts = roundAt(2)((numberOfPageSpeedAlerts * 100).toDouble/numberOfTests)
+    val averagePageWeight = roundAt(3)(results.map(_.kBInFullyLoaded).sum/results.length)
+    val averageTTFP = (results.map(_.timeFirstPaintInMs).sum.toDouble/results.length).toInt
+    val averageSpeedIndex = (results.map(_.speedIndex).sum.toDouble/results.length).toInt
+
+    PageSummaryData(pageType, testType, numberOfTests, numberOfPageWeightAlerts, percentageOfPageWeightAlerts, numberOfPageSpeedAlerts, percentageOfPageSpeedAlerts, averageArticlePageWeight, averageArticleTTFP, averageArticleSpeedIndex)
   }
 
   def summariseElement(elementName: String, pagesWithEmbed: List[PerformanceResultsObject], listOfEmbeds: List[PageElementFromHTMLTableRow]): ElementSummaryData = {
