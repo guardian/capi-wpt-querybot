@@ -12,8 +12,8 @@ class PageElementSamples(dataSummary: DataSummary) {
   //HTML Page elements
   //Page Header
 
-  val sampleArray = dataSummary.getSamplePageArray()
-  val sampleArrayFromAlerts = dataSummary.getSamplePageArray()
+  val sampleArray = dataSummary.getSamplePageArray
+  val sampleArrayFromAlerts = dataSummary.getSamplePageArray
 
   val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
     "<head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>" + "\n" +

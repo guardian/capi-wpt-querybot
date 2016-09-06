@@ -175,22 +175,6 @@ val timeNow = DateTime.now
   val totalMobileSummary = summarisePageType(allMobileResults, isATotal)
 
 
-  val averageArticlePageWeight = roundAt(3)(articles.map(_.kBInFullyLoaded).sum/articles.length)
-  val averageArticleTTFP = (articles.map(_.timeFirstPaintInMs).sum.toDouble/articles.length).toInt
-  val averageArticleSpeedIndex = (articles.map(_.speedIndex).sum.toDouble/articles.length).toInt
-
-  val averageInteractivePageWeight = roundAt(3)(interactives.map(_.kBInFullyLoaded).sum/interactives.length)
-  val averageInteractiveTTFP = (interactives.map(_.timeFirstPaintInMs).sum.toDouble/interactives.length).toInt
-  val averageInteractiveSpeedIndex = (interactives.map(_.speedIndex).sum.toDouble/interactives.length).toInt
-
-  val averageLiveBlogPageWeight = roundAt(3)(liveBlogs.map(_.kBInFullyLoaded).sum/liveBlogs.length)
-  val averageLiveBlogTTFP = (liveBlogs.map(_.timeFirstPaintInMs).sum.toDouble/liveBlogs.length).toInt
-  val averageLiveBlogSpeedIndex = (liveBlogs.map(_.speedIndex).sum.toDouble/liveBlogs.length).toInt
-
-  val averageGLabsPageWeight = roundAt(3)(gLabs.map(_.kBInFullyLoaded).sum/gLabs.length)
-  val averageGLabsTTFP = (gLabs.map(_.timeFirstPaintInMs).sum.toDouble/gLabs.length).toInt
-  val averageGLabsSpeedIndex = (gLabs.map(_.speedIndex).sum.toDouble/gLabs.length).toInt
-
   val pagesWithAudioBoomEmbed = allResults.filter(pageContainsElementType(_, "audioBoom"))
   val pagesWithBrightcoveEmbed = allResults.filter(pageContainsElementType(_, "brightcove"))
   val pagesWithCNNEmbed = allResults.filter(pageContainsElementType(_, "cnn"))
@@ -350,7 +334,8 @@ val timeNow = DateTime.now
         unknownEmbedSummary
   )
 
-  val sortedSummaryList = summaryList.sortWith(_.numberOfPagesWithEmbed > _.numberOfPagesWithEmbed)
+  val sortedCombinedSummaryList = summaryList.sortWith(_.numberOfPagesWithEmbed > _.numberOfPagesWithEmbed)
+
 
 
 
@@ -503,7 +488,7 @@ val timeNow = DateTime.now
       "<p style = \"margin-left: 40px\">Number of pages tested: " + numberOfPagesSentToWPT + "</p>" +  "\n" +
       "<p style = \"margin-left: 40px\">Number of failed tests: " + numberOfFailedTests + "</p>" +  "\n" +
       "</div>" + "\n"
-    val elementString: String = sortedSummaryList.map(elementData => returnElementSummaryAsHTMLString(elementData)).mkString
+    val elementString: String = sortedCombinedSummaryList.map(elementData => returnElementSummaryAsHTMLString(elementData)).mkString
     runString + elementString
   }
 
@@ -537,7 +522,7 @@ val timeNow = DateTime.now
     val averageTTFP = (results.map(_.timeFirstPaintInMs).sum.toDouble/results.length).toInt
     val averageSpeedIndex = (results.map(_.speedIndex).sum.toDouble/results.length).toInt
 
-    PageSummaryData(pageType, testType, numberOfTests, numberOfPageWeightAlerts, percentageOfPageWeightAlerts, numberOfPageSpeedAlerts, percentageOfPageSpeedAlerts, averageArticlePageWeight, averageArticleTTFP, averageArticleSpeedIndex)
+    PageSummaryData(pageType, testType, numberOfTests, numberOfPageWeightAlerts, percentageOfPageWeightAlerts, numberOfPageSpeedAlerts, percentageOfPageSpeedAlerts, averagePageWeight, averageTTFP, averageSpeedIndex)
   }
 
   def summariseElement(elementName: String, pagesWithEmbed: List[PerformanceResultsObject], listOfEmbeds: List[PageElementFromHTMLTableRow]): ElementSummaryData = {
