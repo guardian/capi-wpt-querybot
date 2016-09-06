@@ -180,7 +180,7 @@ object App {
     /*    val localInput = new LocalFileOperations
     val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
     val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
-    println("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
+    println("\n\n\n ***** There are " + previousTestResultsHandler.allResults.length + " previous results in file  ********* \n\n\n")
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
     //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
     val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
