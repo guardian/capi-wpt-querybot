@@ -26,6 +26,7 @@ object App {
     println("Local Testing Flag is set to: " + iamTestingLocally.toString)
 
     val jobStart = DateTime.now
+    val startOfWeek = jobStart.minusDays(jobStart.getDayOfWeek).minusMillis(jobStart.getMillisOfDay)
     //  Define names of s3bucket, configuration and output Files
     val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
     val s3BucketName = "capi-wpt-querybot"
@@ -44,6 +45,7 @@ object App {
     val currentDataSummaryPage = "summarypage.html"
     val currentPageWeightAlertSummaryPage = "pageweightalertsummarypage.html"
     val currentInteractiveSummaryPage = "interactivesummarypage.html"
+    val currentWeeklySummaryPage = "weeklysummarypage.html"
 
     val dotcomPageSpeedFilename = "dotcompagespeeddashboard.html"
 
@@ -642,14 +644,21 @@ object App {
         val pageWeightAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newPageWeightAlerts, new ResultsFromPreviousTests(previousPageWeightAlerts), new ResultsFromPreviousTests(previousPageWeightAlerts))
         val interactiveAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newInteractiveAlertsList, new ResultsFromPreviousTests(previousInteractiveAlerts), new ResultsFromPreviousTests(previousInteractiveAlerts))
 
+        val resultsFromThisWeek = previousTestResultsHandler.allResults.filter(_.getPageLastUpdated > startOfWeek.getMillis)
+        val alertsFromThisWeek = previousPageWeightAlerts.filter(_.getPageLastUpdated > startOfWeek.getMillis)
+
+        val weeklySummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, combinedResultsList, new ResultsFromPreviousTests(resultsFromThisWeek), new ResultsFromPreviousTests(alertsFromThisWeek))
+
     //generate summary pages
         val summaryHTMLPage = new SummaryPage(resultSummary)
         val pageWeightAlertSummaryHTMLPage = new SummaryPage(pageWeightAlertsSummary)
         val interactiveAlertSummaryHTMLPage = new SummaryPage(interactiveAlertsSummary)
+        val weeklySummaryHTMLPage = new SummaryPage(weeklySummary)
     //write summary pages to file
         s3Interface.writeFileToS3(currentDataSummaryPage, summaryHTMLPage.toString())
         s3Interface.writeFileToS3(currentPageWeightAlertSummaryPage, pageWeightAlertSummaryHTMLPage.toString())
         s3Interface.writeFileToS3(currentInteractiveSummaryPage, interactiveAlertSummaryHTMLPage.toString())
+        s3Interface.writeFileToS3(currentWeeklySummaryPage, weeklySummaryHTMLPage.toString())
 
     //write summaries to files
         println("writing run summary data to new file")
