@@ -45,14 +45,19 @@
     val interactiveSampleFileName = "interactivesamples.conf"
     val visualsPagesFileName = "visuals.conf"
 
-    //val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
-    val resultsFromPreviousTests = "resultFromPreviousTestsAlertsUpdated.csv"
+    val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    //val resultsFromPreviousTests = "resultFromPreviousTestsAlertsUpdated.csv"
     //val resultsFromPreviousTests = "resultsFromPreviousTestsGenerateSamplePages.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAmalgamated.csv"
     // val resultsFromPreviousTests = "resultsFromPreviousTestsShortened.csv"
     //val resultsFromPreviousTests = "shortenedresultstest.csv"
     val pageWeightAlertsFromPreviousTests = "alerts/pageWeightAlertsFromPreviousTests.csv"
     val outputFile = "summarytest.csv"
+
+    val runSummaryFile = "runSummaryStringtestTestAlerts.txt"
+    //val runSummaryHTMLFile = "runSummaryHTMLTestAlerts.html"
+    val runSummaryHTMLFile = "summarypagetest.html"
+
 
     //Create new S3 Client
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
@@ -98,14 +103,13 @@
     val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
     val alertsResultsHandler = new ResultsFromPreviousTests(previousPageWeightAlerts)
-    println("\n\n\n ***** There are " + testResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
+    println("\n\n\n ***** There are " + testResultsHandler.allResults.length + " previous results in file  ********* \n\n\n")
     val audioboomcounter = previousResults.filter(_.editorialElementList.map(element => element.resource.contains("audio_clip_id")).contains(true))
     println("**** audioBoom counter: " + audioboomcounter.length)
+
+
     val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testResultsHandler, alertsResultsHandler)
     //write summaries to files
-    val runSummaryFile = "runSummaryStringtestTestAlerts.txt"
-    //val runSummaryHTMLFile = "runSummaryHTMLTestAlerts.html"
-    val runSummaryHTMLFile = "summarypage.html"
     val localFiles = new LocalFileOperations
 
     "Element summary" should "be returned as string" in {

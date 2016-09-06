@@ -64,6 +64,19 @@
       "</thead>" +"\n" +
       "<tbody>"
 
+    val HTML_PAGE_SUMMARY_MOBILE_TABLE_HEADERS: String =       "<table id=\"pageSummary\">"+ "\n" +
+      "<thead>" + "\n" + "<caption> Summary of Pages tested on Mobile " + dataSummary.totalNumberOfMobileTests + " tested pages</caption>" +
+      "<tr>" + "<th>Type of Page</th>" + "<th>Number of tests for this page type</th>" + "<th>Number of pageweight alerts</th>" + "<th>Percentage of pageweight alerts</th>" + "<th>Number of pagespeed alerts</th>" + "<th>Percentage of pagespeed alerts</th>" + "<th>Average Size (KB)</th>" + "<th>Average Time to First Paint (ms)</th>" + "<th>Average SpeedIndex (ms)</th>" +  "</tr>"+ "\n" +
+      "</thead>" +"\n" +
+      "<tbody>" + "\n"
+
+    val HTML_PAGE_SUMMARY_DESKTOP_TABLE_HEADERS: String =       "<table id=\"pageSummary\">"+ "\n" +
+      "<thead>" + "\n" + "<caption> Summary of Pages tested on Desktop " + dataSummary.totalNumberOfDesktopTests + " tested pages</caption>" +
+      "<tr>" + "<th>Type of Page</th>" + "<th>Number of tests for this page type</th>" + "<th>Number of pageweight alerts</th>" + "<th>Percentage of pageweight alerts</th>" + "<th>Number of pagespeed alerts</th>" + "<th>Percentage of pagespeed alerts</th>" + "<th>Average Size (KB)</th>" + "<th>Average Time to First Paint (ms)</th>" + "<th>Average SpeedIndex (ms)</th>" +  "</tr>"+ "\n" +
+      "</thead>" +"\n" +
+      "<tbody>" + "\n"
+
+
     val HTML_ELEMENT_SUMMARY_TABLE_HEADERSPT1: String = "<tr>" + "\n" +
       "<td colspan=\"12\">" + "<table id=\"data\" class=\"data\">" + "\n" +
     "<caption>"
@@ -91,7 +104,10 @@
 
     //HTML_PAGE
     val HTML_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER +
-      summaryDataToHTMLString() + HTML_FOOTER
+      runDataToHTMLString() + "<p>&nbsp;</p>" +
+      mobilePageSummaryToHTMLString() + "<p>&nbsp;</p>" +
+      desktopPageSummaryToHTMLString() + "<p>&nbsp;</p>" +
+      elementSummaryToHTMLString() + HTML_FOOTER
 
     def runDataToHTMLString(): String = {
       "<div>\n" +
@@ -104,77 +120,60 @@
         "<p style = \"margin-left: 100px\">Number of pages tested:                        " + dataSummary.numberOfPagesSentToWPT + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of new pageWeight alerts:               " + dataSummary.newPageWeightAlerts.length + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of new pageSpeed alerts:                " + dataSummary.newPageSpeedAlerts.length + "</p>" +  "\n" +
-        //"<p style = \"margin-left: 100px\">Number of pageWeight alerts resolved this run: " + dataSummary.numberOfPageWeightAlertsResolvedThisRun + "</p>" +  "\n" +
-        //"<p style = \"margin-left: 100px\">Number of pageSpeed alerts resolved this run:  " + dataSummary.numberOfPageSpeedAlertsResolvedThisRun + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageWeight alerts resolved this run: " + dataSummary.numberOfPageWeightAlertsResolvedThisRun + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts resolved this run:  " + dataSummary.numberOfPageSpeedAlertsResolvedThisRun + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Date of oldest test:                           " + dataSummary.dateOfOldestTest + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Date of oldest alert:                          " + dataSummary.dateOfOldestTest + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts triggered:   " + dataSummary.totalNumberOfPageWeightAlertsTriggered + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts resolved:    " + dataSummary.totalNumberOfPageWeightAlertsResolved + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of failed tests:                        " + dataSummary.numberOfFailedTests + "</p>" +  "\n" +
         "</div>" + "\n"
     }
+    
 
-    def pageDataToHTMLString(): String = {
-      val pageSummaryHeader = "<div>\n" +
-        "<h3>Page Summary:" + "</h3>" + "\n"
-      val alertsBreakdown = "<div>" + "\n" +
-        "<p style = \"margin-left: 40px\">Breakdown of Alerts:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Total Number of tests:                                 " + dataSummary.allResults.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts:                     " + dataSummary.numberOfPageWeightAlertsInTotal + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Total Number of pageSpeed alerts:                      " + dataSummary.numberOfPageSpeedAlertsInTotal + "</p>" +  "\n" +
-        //"<p style = \"margin-left: 100px\">Total Number of pageWeight alerts resolved:            " + dataSummary.pageWeightAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
-        //"<p style = \"margin-left: 100px\">Total Number of pageSpeed alerts resolved:             " + dataSummary.pageSpeedAlertsThatHaveBeenResolved.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Articles:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Number of article pages:                               " + dataSummary.articles.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageWeight alerts on article pages:          " + dataSummary.numberOfPageWeightAlertsOnArticlePages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts on article pages:           " + dataSummary.numberOfPageSpeedAlertsOnArticlePages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Percentage of pageWeight alerts on article pages:      " + roundAt(2)(100 * dataSummary.numberOfPageWeightAlertsOnArticlePages.toDouble / dataSummary.articles.length) + "%</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Percentage of pageSpeed alerts on article pages:       " + roundAt(2)(100 * dataSummary.numberOfPageSpeedAlertsOnArticlePages.toDouble / dataSummary.articles.length) + "%</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Interactives:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Number of interactive pages:                           " + dataSummary.interactives.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageWeight alerts on interactive pages:      " + dataSummary.numberOfPageWeightAlertsOnInteractivePages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts on interactive pages:       " + dataSummary.numberOfPageSpeedAlertsOnInteractivePages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Percentage of pageWeight alerts on interactive pages:  " + roundAt(2)(100 * dataSummary.numberOfPageWeightAlertsOnInteractivePages.toDouble / dataSummary.interactives.length) + "%</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Percentage of pageSpeed alerts on interactive pages:  " + roundAt(2)(100 * dataSummary.numberOfPageSpeedAlertsOnInteractivePages.toDouble / dataSummary.interactives.length) + "%</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">LiveBlogs:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Number of liveblog pages:                              " + dataSummary.liveBlogs.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageWeight alerts on liveblog pages:         " + dataSummary.numberOfPageWeightAlertsOnLiveBlogPages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts on liveblog pages:          " + dataSummary.numberOfPageSpeedAlertsOnLiveBlogPages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Percentage of pageWeight alerts on liveblog pages:     " + roundAt(2)(100 * dataSummary.numberOfPageWeightAlertsOnLiveBlogPages.toDouble / dataSummary.liveBlogs.length) + "%</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Percentage of pageSpeed alerts on liveblog pages:     " + roundAt(2)(100 * dataSummary.numberOfPageSpeedAlertsOnLiveBlogPages.toDouble / dataSummary.liveBlogs.length) + "%</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">GLabs Pages:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Number of gLabs pages:                                 " + dataSummary.gLabs.length + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageWeight alerts on gLabs pages:            " + dataSummary.numberOfPageWeightAlertsOnGLabsPages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Number of pageSpeed alerts on gLabs pages:             " + dataSummary.numberOfPageSpeedAlertsOnGLabsPages + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Percentage of pageWeight alerts on gLabs pages:        " + roundAt(2)(100 * dataSummary.numberOfPageWeightAlertsOnGLabsPages.toDouble / dataSummary.gLabs.length) + "%</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Percentage of pageSpeed alerts on gLabs pages:        " + roundAt(2)(100 * dataSummary.numberOfPageSpeedAlertsOnGLabsPages.toDouble / dataSummary.gLabs.length) + "%</p>" +  "\n" +
-       "</div>" + "\n"
-      val pageAverages = "<div>" + "\n" +
-        "<p style = \"margin-left: 40px\">Page Averages:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Articles:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Average pageWeight of article pages:                   " + dataSummary.averageArticlePageWeight + " KB" + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Average time-to-first-paint of article pages:          " + dataSummary.averageArticleTTFP + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Average speed-index of article pages:                  " + dataSummary.averageArticleSpeedIndex + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Interactives:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Average pageWeight of interactive pages:               " + dataSummary.averageInteractivePageWeight + " KB</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Average time-to-first-paint of interactive pages:      " + dataSummary.averageInteractiveTTFP + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Average speed-index of interactive pages:              " + dataSummary.averageInteractiveSpeedIndex + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">LiveBlogs:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Average pageWeight of liveBlog pages:                  " + dataSummary.averageLiveBlogPageWeight + " KB</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Average time-to-first-paint of liveBlog pages:         " + dataSummary.averageLiveBlogTTFP + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Average speed-index of liveBlog pages:                 " + dataSummary.averageLiveBlogSpeedIndex + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">GLabs:</p>" + "\n" +
-        "<p style = \"margin-left: 100px\">Average pageWeight of gLabs pages:                     " + dataSummary.averageGLabsPageWeight + " KB</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Average time-to-first-paint of gLabs pages:            " + dataSummary.averageGLabsTTFP + " ms</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Average speed-index of gLabs pages:                    " + dataSummary.averageGLabsSpeedIndex + " ms</p>" +  "\n" +
-        "</div>" + "\n"
-      val pageSummaryFooter = "</div>" + "\n"
-
-      pageSummaryHeader + alertsBreakdown + pageAverages + pageSummaryFooter
+    def elementSummaryToHTMLString(): String = {
+      val elementString: String = "<div><p>" + HTML_REPORT_TABLE_HEADERS +
+        dataSummary.sortedSummaryList.map(elementData => returnElementSummaryAsHTMLRow(elementData)).mkString +
+        HTML_TABLE_END + "</p></div>"
+      elementString
     }
 
-    def summaryDataToHTMLString(): String = {
-      val elementString: String = HTML_REPORT_TABLE_HEADERS +
-        runDataToHTMLString() + pageDataToHTMLString() +
-        dataSummary.sortedSummaryList.map(elementData => returnElementSummaryAsHTMLRow(elementData)).mkString +
-        HTML_TABLE_END
-      elementString
+    def mobilePageSummaryToHTMLString(): String = {
+      "<div><p>" +
+      HTML_PAGE_SUMMARY_MOBILE_TABLE_HEADERS +
+      returnPageSummaryAsHTMLRows(dataSummary.articlesMobileSummary) +
+      returnPageSummaryAsHTMLRows(dataSummary.interactivesMobileSummary) +
+      returnPageSummaryAsHTMLRows(dataSummary.liveBlogsMobileSummary) +
+      returnPageSummaryAsHTMLRows(dataSummary.gLabsMobileSummary) +
+      returnPageSummaryAsHTMLRows(dataSummary.totalMobileSummary) +
+      HTML_TABLE_END +
+      "</p></div>"
+    }
+
+    def desktopPageSummaryToHTMLString(): String = {
+      "<div><p>" +
+      HTML_PAGE_SUMMARY_DESKTOP_TABLE_HEADERS +
+        returnPageSummaryAsHTMLRows(dataSummary.articlesDesktopSummary) +
+        returnPageSummaryAsHTMLRows(dataSummary.interactivesDesktopSummary) +
+        returnPageSummaryAsHTMLRows(dataSummary.liveBlogsDesktopSummary) +
+        returnPageSummaryAsHTMLRows(dataSummary.gLabsDesktopSummary) +
+        returnPageSummaryAsHTMLRows(dataSummary.totalDesktopSummary) +
+        HTML_TABLE_END +
+      "</p></div>"
+    }
+
+    def returnPageSummaryAsHTMLRows(pageSummary: dataSummary.PageSummaryData):  String = {
+      "<tr>"+ "\n" +
+        "<td>" + pageSummary.pageType + "</td>" + "\n" +
+        "<td>" + pageSummary.testType + "</td>" + "\n" +
+        "<td>" + pageSummary.numberOfPageWeightAlerts + "</td>" + "\n" +
+        "<td>" + pageSummary.percentageOfPageWeightAlerts + "</td>" + "\n" +
+        "<td>" + pageSummary.numberOfPageSpeedAlerts + "</td>" + "\n" +
+        "<td>" + pageSummary.percentageOfPageSpeedAlerts + "</td>" + "\n" +
+        "<td>" + pageSummary.averagePageWeight + "</td>" + "\n" +
+        "<td>" + pageSummary.averageTTFP + "</td>" + "\n" +
+        "<td>" + pageSummary.averageSpeedIndex + "</td>" + "\n" +
+      "<tr>"
     }
 
 
