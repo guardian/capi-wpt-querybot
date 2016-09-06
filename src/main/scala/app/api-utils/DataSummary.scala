@@ -85,7 +85,7 @@ val timeNow = DateTime.now
   val numberOfPagesRetestedFromLastRun: Int = previousResultsHandler.previousResultsToRetest.length
 
   val resultsFromRun: List[PerformanceResultsObject] = latestResults
-  val previousResults: List[PerformanceResultsObject] = previousResultsHandler.allResults
+  val previousResults: List[PerformanceResultsObject] = previousResultsHandler.previousResults
   val allResults: List[PerformanceResultsObject] = resultsFromRun ::: previousResults
   val allDesktopResults: List[PerformanceResultsObject] = allResults.filter(_.typeOfTestName.contains("Desktop"))
   val allMobileResults: List[PerformanceResultsObject] = allResults.filter(_.typeOfTestName.contains("Mobile"))
@@ -122,8 +122,8 @@ val timeNow = DateTime.now
   val numberOfPageSpeedAlertsResolvedThisRun = pageSpeedAlertsThatHaveBeenResolvedThisRun.length
   val numberOfPageSpeedAlertsResolvedForUnderWeightPagesThisRun = pageSpeedAlertsThatHaveBeenResolvedThisRun.length
 
-  val totalPageWeightAlertsThatHaveBeenResolved = for (result <- alertsResultsHandler.allResults if !activePageWeightAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
-  val totalNumberOfPageWeightAlertsTriggered = alertsResultsHandler.allResults.length
+  val totalPageWeightAlertsThatHaveBeenResolved = for (result <- alertsResultsHandler.previousResults if !activePageWeightAlerts.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
+  val totalNumberOfPageWeightAlertsTriggered = alertsResultsHandler.previousResults.length
   val totalNumberOfPageWeightAlertsResolved = totalPageWeightAlertsThatHaveBeenResolved.length
   // todo - Use persisted values from previous runs
   //val numberOfPageWeightAlertsResolvedLast24Hrs = numberOfPageWeightAlertsResolvedThisRun + Some_value_we_store
