@@ -182,7 +182,7 @@ object App {
     /*    val localInput = new LocalFileOperations
     val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
     val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
-    println("\n\n\n ***** There are " + previousTestResultsHandler.allResults.length + " previous results in file  ********* \n\n\n")
+    println("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
     //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
     val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
@@ -644,7 +644,7 @@ object App {
         val pageWeightAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newPageWeightAlerts, new ResultsFromPreviousTests(previousPageWeightAlerts), new ResultsFromPreviousTests(previousPageWeightAlerts))
         val interactiveAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newInteractiveAlertsList, new ResultsFromPreviousTests(previousInteractiveAlerts), new ResultsFromPreviousTests(previousInteractiveAlerts))
 
-        val resultsFromThisWeek = previousTestResultsHandler.allResults.filter(_.getPageLastUpdated > startOfWeek.getMillis)
+        val resultsFromThisWeek = previousTestResultsHandler.previousResults.filter(_.getPageLastUpdated > startOfWeek.getMillis)
         val alertsFromThisWeek = previousPageWeightAlerts.filter(_.getPageLastUpdated > startOfWeek.getMillis)
 
         val weeklySummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, combinedResultsList, new ResultsFromPreviousTests(resultsFromThisWeek), new ResultsFromPreviousTests(alertsFromThisWeek))
