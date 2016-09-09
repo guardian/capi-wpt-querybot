@@ -103,7 +103,7 @@
     val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
     val alertsResultsHandler = new ResultsFromPreviousTests(previousPageWeightAlerts)
-    println("\n\n\n ***** There are " + testResultsHandler.allResults.length + " previous results in file  ********* \n\n\n")
+    println("\n\n\n ***** There are " + testResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
     val audioboomcounter = previousResults.filter(_.editorialElementList.map(element => element.resource.contains("audio_clip_id")).contains(true))
     println("**** audioBoom counter: " + audioboomcounter.length)
 
