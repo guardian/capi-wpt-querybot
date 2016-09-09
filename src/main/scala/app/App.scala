@@ -591,7 +591,7 @@ object App {
     if (newGLabsAlertsList.nonEmpty) {
       println("There are new interactive email alerts to send - length of list is: " + newGLabsAlertsList.length)
       val gLabsEmailAlerts = new GLabsEmailTemplate(newGLabsAlertsList, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardDesktopFilename)
-      val gLabsEmailSuccess = emailer.sendInteractiveAlert(gLabsAlertsAddressList, gLabsEmailAlerts.toString())
+      val gLabsEmailSuccess = emailer.sendPaidContentAlert(gLabsAlertsAddressList, gLabsEmailAlerts.toString())
       if (gLabsEmailSuccess) {
         println("Interactive Alert email sent successfully.")
       } else {
