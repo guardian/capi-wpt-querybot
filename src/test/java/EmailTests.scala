@@ -1,5 +1,5 @@
-import app.api.{InteractiveEmailTemplate, PageWeightEmailTemplate}
-import app.apiutils.PerformanceResultsObject
+import app.api.{GLabsEmailTemplate, InteractiveEmailTemplate, PageWeightEmailTemplate}
+import app.apiutils.{EmailOperations, PerformanceResultsObject}
 import org.scalatest._
 
 /**
@@ -9,6 +9,11 @@ abstract class EmailUnitSpec extends FlatSpec with Matchers with
 OptionValues with Inside with Inspectors
 
 class EmailTests extends EmailUnitSpec with Matchers {
+
+  val testEmailAddresses = List("Insert.Email.Here@emailaddress.com")
+  val testEmailUserName = "Insert.Email.Here@emailaddress.com"
+  val testEmailPwd = "SomeTextHere"
+
 
   val fakeDashboardUrl = "http://www.theguardian.com/uk"
   val fakeOtherDashboardUrl = "http://www.theguardian.com/us"
@@ -25,6 +30,8 @@ class EmailTests extends EmailUnitSpec with Matchers {
   val singleResultText = "mobileArticlespeedIndexHigh"
   val twoResultsText = "mobileArticletFpHigh"
   val threeResultsText = "testResult3"
+
+  val emailOps = new EmailOperations(testEmailUserName,testEmailPwd)
 
   "An pageWeight Email list with 0 Results" should "contain results and page elements" in {
     val pageWeightEmail = new PageWeightEmailTemplate(List(), fakeDashboardUrl, fakeOtherDashboardUrl)
@@ -72,6 +79,37 @@ class EmailTests extends EmailUnitSpec with Matchers {
     val interactiveEmail = new InteractiveEmailTemplate(testResultList3results, fakeDashboardUrl, fakeOtherDashboardUrl)
     //      println(pageWeightEmail.toString())
     assert(interactiveEmail.toString().contains(singleResultText) && interactiveEmail.toString().contains(twoResultsText) && interactiveEmail.toString().contains(threeResultsText))
+  }
+
+  "A Paid-Content Email list with 0 Results" should "contain results and page elements" in {
+    val paidContentEmail = new GLabsEmailTemplate(List(), fakeDashboardUrl, fakeOtherDashboardUrl)
+    //      println(pageWeightEmail.toString())
+    assert(paidContentEmail.toString().contains(emptyListText))
+  }
+
+  "A Paid-Content Email list with 1 Results" should "contain results and page elements" in {
+    val paidContentEmail = new GLabsEmailTemplate(testResultList1results, fakeDashboardUrl, fakeOtherDashboardUrl)
+    //      println(pageWeightEmail.toString())
+    assert(paidContentEmail.toString().contains(singleResultText))
+  }
+
+  "A Paid-Content Email list with 2 Results" should "contain results and page elements" in {
+    val paidContentEmail = new GLabsEmailTemplate(testResultList2results, fakeDashboardUrl, fakeOtherDashboardUrl)
+    //      println(pageWeightEmail.toString())
+    assert(paidContentEmail.toString().contains(singleResultText) && paidContentEmail.toString().contains(twoResultsText))
+  }
+
+  "A Paid-Content Email list with 3 Results" should "contain results and page elements" in {
+    val paidContentEmail = new GLabsEmailTemplate(testResultList3results, fakeDashboardUrl, fakeOtherDashboardUrl)
+    //      println(pageWeightEmail.toString())
+    assert(paidContentEmail.toString().contains(singleResultText) && paidContentEmail.toString().contains(twoResultsText) && paidContentEmail.toString().contains(threeResultsText))
+  }
+
+  "A Paid-Content Email list with 3 Results" should "send succesfully" in {
+    val paidContentEmail = new GLabsEmailTemplate(testResultList3results, fakeDashboardUrl, fakeOtherDashboardUrl)
+    //      println(pageWeightEmail.toString())
+    val emailSendSuccess = emailOps.sendPaidContentAlert(testEmailAddresses,paidContentEmail.toString())
+    assert(paidContentEmail.toString().contains(singleResultText) && paidContentEmail.toString().contains(twoResultsText) && paidContentEmail.toString().contains(threeResultsText) && emailSendSuccess)
   }
 
 
