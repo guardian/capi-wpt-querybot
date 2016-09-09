@@ -771,9 +771,11 @@ object App {
       println("all variables set for element")
       newElement
     })
+    println("Generating list of results objects from list of listener objects")
     val testResults = resultsList.map(element => element.testResults).toList
+    println("setting alert status of results in list")
     val resultsWithAlerts: List[PerformanceResultsObject] = testResults.map(element => setAlertStatus(element, averages))
-
+    println("about to return list of results")
     resultsWithAlerts
   }
     //Confirm alert status by retesting alerting urls - this has been removed as an attempt to reduce excessive load on the revised
