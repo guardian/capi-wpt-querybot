@@ -32,46 +32,62 @@
       "<h1>Summary of Performance Data </h1>" + "\n" +
       "</div>" + "\n"
 
-/*    val HTML_PAGE_TABS_LIST: String = "<div class=\"tabs\">" + "\n" +
+    val HTML_PAGE_TABS_LIST: String = "<div class=\"tabs\">" + "\n" +
       "<ul class=\"tab-links\">" + "\n" +
-      "<li class=\"active\">" + "<a href=\"#mobile\">Mobile view</a>" + "</li>" + "\n" +
-      "<li>" + "<a href=\"#desktop\">Desktop view</a>" + "</li>" + "\n" +
-      "<li>" + "<a href=\"#combined\">Combined view</a>" + "</li>" + "\n" +
+      "<li class=\"active\">" + "<a href=\"#embedssummary\">Summary of embeds</a>" + "</li>" + "\n" +
+      "<li>" + "<a href=\"#mobile\">Full mobile summary</a>" + "</li>" + "\n" +
+      "<li>" + "<a href=\"#desktop\">Full desktop summary</a>" + "</li>" + "\n" +
+      "<li>" + "<a href=\"#runsummary\">Latest run summary</a>" + "</li>" + "\n" +
       "</ul>" + "\n"
-    //close div added to HTML_FOOTER*/
+    //close div added to HTML_FOOTER
 
     //Page Content
- /*   val HTML_TAB_CONTENT: String = "<div id=\"tab-content\">" + "\n"
+    val HTML_TAB_CONTENT: String = "<div id=\"tab-content\">" + "\n"
 
     val HTML_TAB_HEADER: String = "<div class=\"tab-content\">" + "\n"
 
 
-    val HTML_MOBILE_TAB_CONTENT_HEADER: String = "<div id=\"mobile\" class=\"tab active\">" + "\n" +
-      "<p>" + "<h2>Mobile view" + "</h2>" + "</p>" + "\n"
+    val HTML_MOBILE_TAB_CONTENT_HEADER: String = "<div id=\"mobile\" class=\"tab\">" + "\n" +
+      "<p>" + "<h2>Summary for mobile tests" + "</h2>" + "</p>" + "\n"
 
     val HTML_DESKTOP_TAB_CONTENT_HEADER: String = "<div id=\"desktop\" class=\"tab\">" + "\n" +
-      "<p>" + "<h2>Desktop view" + "</h2>" + "</p>" + "\n"
+      "<p>" + "<h2>Summary for desktop tests" + "</h2>" + "</p>" + "\n"
 
-    val HTML_COMBINED_TAB_CONTENT_HEADER: String = "<div id=\"combined\" class=\"tab\">" + "\n" +
-      "<p>" + "<h2>Combined view" + "</h2>" + "</p>" + "\n"
+    val HTML_RUN_SUMMARY_TAB_CONTENT_HEADER: String = "<div id=\"runsummary\" class=\"tab\">" + "\n" +
+      "<p>" + "<h2>Summary of latest run" + "</h2>" + "</p>" + "\n"
+
+    val HTML_EMBED_SUMMARY_TAB_CONTENT_HEADER: String = "<div id=\"embedssummary\" class=\"tab active\">" + "\n" +
+      "<p>" + "<h2>Summary of editorial embeds" + "</h2>" + "</p>" + "\n"
 
     val HTML_TAB_CONTENT_FOOTER: String = "</div>" + "\n"
-*/
+
     //Page Tables
-    val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"elementSummary\">"+ "\n" +
-      "<thead>" + "\n" + "<caption> Summary of Editorial Embeds from " + dataSummary.totalNumberOfTests + " tested pages</caption>" +
+    val HTML_MOBILE_EDITORIAL_EMBEDS_TABLE_HEADERS: String = "<p> Summary of editorial embeds on mobile pages </p>" + "<table id=\"elementSummary\">"+ "\n" +
+      "<thead>" + "\n" + "<caption> Summary of editorial embeds from " + dataSummary.totalNumberOfTests + " pages tested on mobile</caption>" +
+      "<tr>" + "<th>Type of Embed</th>" + "<th>Number of pages with this embed-type</th>" + "<th>Chance of a page containing this embed-type</th>" + "<th>Number of pages that alerted for pageWeight</th>" + "<th>Chance of this embed-type triggering a pageWeight alert</th>" + "<th>Number of Pages that alerted for pageSpeed</th>" + "<th>Chance of this embed-type triggering a pageSpeed alert</th>" + "<th>Average Size of this embed-type (KB)</th>" + "<th>Average Time to First Paint of a page with this embed-type</th>" + "<th>Average SpeedIndex of a page with this embed-type</th>" +  "</tr>"+ "\n" +
+      "</thead>" +"\n" +
+      "<tbody>"
+
+    val HTML_DESKTOP_EDITORIAL_EMBEDS_TABLE_HEADERS: String = "<p> Summary of editorial embeds on desktop pages </p>" + "<table id=\"elementSummary\">"+ "\n" +
+      "<thead>" + "\n" + "<caption> Summary of editorial embeds from " + dataSummary.totalNumberOfTests + " pages tested on mobile and desktop</caption>" +
+      "<tr>" + "<th>Type of Embed</th>" + "<th>Number of pages with this embed-type</th>" + "<th>Chance of a page containing this embed-type</th>" + "<th>Number of pages that alerted for pageWeight</th>" + "<th>Chance of this embed-type triggering a pageWeight alert</th>" + "<th>Number of Pages that alerted for pageSpeed</th>" + "<th>Chance of this embed-type triggering a pageSpeed alert</th>" + "<th>Average Size of this embed-type (KB)</th>" + "<th>Average Time to First Paint of a page with this embed-type</th>" + "<th>Average SpeedIndex of a page with this embed-type</th>" +  "</tr>"+ "\n" +
+      "</thead>" +"\n" +
+      "<tbody>"
+
+    val HTML_COMBINED_EDITORIAL_EMBEDS_TABLE_HEADERS: String = "<p> Summary of editorial embeds on mobile pages </p>" + "<table id=\"elementSummary\">"+ "\n" +
+      "<thead>" + "\n" + "<caption> Summary of editorial embeds from " + dataSummary.totalNumberOfTests + " pages tested on mobile and desktop</caption>" +
       "<tr>" + "<th>Type of Embed</th>" + "<th>Number of pages with this embed-type</th>" + "<th>Chance of a page containing this embed-type</th>" + "<th>Number of pages that alerted for pageWeight</th>" + "<th>Chance of this embed-type triggering a pageWeight alert</th>" + "<th>Number of Pages that alerted for pageSpeed</th>" + "<th>Chance of this embed-type triggering a pageSpeed alert</th>" + "<th>Average Size of this embed-type (KB)</th>" + "<th>Average Time to First Paint of a page with this embed-type</th>" + "<th>Average SpeedIndex of a page with this embed-type</th>" +  "</tr>"+ "\n" +
       "</thead>" +"\n" +
       "<tbody>"
 
     val HTML_PAGE_SUMMARY_MOBILE_TABLE_HEADERS: String =       "<table id=\"pageSummary\">"+ "\n" +
-      "<thead>" + "\n" + "<caption> Summary of Pages tested on Mobile " + dataSummary.totalNumberOfMobileTests + " tested pages</caption>" +
+      "<thead>" + "\n" + "<caption> Summary of " + dataSummary.totalNumberOfMobileTests + " pages tested on Mobile</caption>" +
       "<tr>" + "<th>Type of Page</th>" + "<th>Number of tests for this page type</th>" + "<th>Number of pageweight alerts</th>" + "<th>Percentage of pageweight alerts</th>" + "<th>Number of pagespeed alerts</th>" + "<th>Percentage of pagespeed alerts</th>" + "<th>Average Size (KB)</th>" + "<th>Average Time to First Paint (ms)</th>" + "<th>Average SpeedIndex (ms)</th>" +  "</tr>"+ "\n" +
       "</thead>" +"\n" +
       "<tbody>" + "\n"
 
     val HTML_PAGE_SUMMARY_DESKTOP_TABLE_HEADERS: String =       "<table id=\"pageSummary\">"+ "\n" +
-      "<thead>" + "\n" + "<caption> Summary of Pages tested on Desktop " + dataSummary.totalNumberOfDesktopTests + " tested pages</caption>" +
+      "<thead>" + "\n" + "<caption> Summary of " + dataSummary.totalNumberOfDesktopTests + " pages tested on Desktop</caption>" +
       "<tr>" + "<th>Type of Page</th>" + "<th>Number of tests for this page type</th>" + "<th>Number of pageweight alerts</th>" + "<th>Percentage of pageweight alerts</th>" + "<th>Number of pagespeed alerts</th>" + "<th>Percentage of pagespeed alerts</th>" + "<th>Average Size (KB)</th>" + "<th>Average Time to First Paint (ms)</th>" + "<th>Average SpeedIndex (ms)</th>" +  "</tr>"+ "\n" +
       "</thead>" +"\n" +
       "<tbody>" + "\n"
@@ -104,10 +120,24 @@
 
     //HTML_PAGE
     val HTML_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER +
-      runDataToHTMLString() + "<p>&nbsp;</p>" +
+      HTML_PAGE_TABS_LIST +
+      HTML_TAB_CONTENT +
+      HTML_MOBILE_TAB_CONTENT_HEADER +
       mobilePageSummaryToHTMLString() + "<p>&nbsp;</p>" +
+      //mobileElementSummaryToHTMLString() +
+      HTML_TAB_CONTENT_FOOTER +
+      HTML_DESKTOP_TAB_CONTENT_HEADER +
       desktopPageSummaryToHTMLString() + "<p>&nbsp;</p>" +
-      elementSummaryToHTMLString() + HTML_FOOTER
+      //desktopElementSummaryToHTMLString() +
+      HTML_TAB_CONTENT_FOOTER +
+      HTML_RUN_SUMMARY_TAB_CONTENT_HEADER +
+      runDataToHTMLString() ++ "<p>&nbsp;</p>" +
+      HTML_TAB_CONTENT_FOOTER +
+      HTML_EMBED_SUMMARY_TAB_CONTENT_HEADER +
+      combinedElementSummaryToHTMLString()
+      HTML_TAB_CONTENT_FOOTER +
+      HTML_FOOTER
+
 
     def runDataToHTMLString(): String = {
       "<div>\n" +
@@ -122,24 +152,38 @@
         "<p style = \"margin-left: 100px\">Number of new pageSpeed alerts:                " + dataSummary.newPageSpeedAlerts.length + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of pageWeight alerts resolved this run: " + dataSummary.numberOfPageWeightAlertsResolvedThisRun + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of pageSpeed alerts resolved this run:  " + dataSummary.numberOfPageSpeedAlertsResolvedThisRun + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Date of oldest test:                           " + dataSummary.dateOfOldestTest + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Date of oldest alert:                          " + dataSummary.dateOfOldestTest + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts triggered:   " + dataSummary.totalNumberOfPageWeightAlertsTriggered + "</p>" +  "\n" +
-        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts resolved:    " + dataSummary.totalNumberOfPageWeightAlertsResolved + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Date of oldest test on record:                           " + dataSummary.dateOfOldestTest + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Date of oldest alert on record:                          " + dataSummary.dateOfOldestTest + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts triggered to date:   " + dataSummary.totalNumberOfPageWeightAlertsTriggered + "</p>" +  "\n" +
+        "<p style = \"margin-left: 100px\">Total Number of pageWeight alerts resolved to date:    " + dataSummary.totalNumberOfPageWeightAlertsResolved + "</p>" +  "\n" +
         "<p style = \"margin-left: 100px\">Number of failed tests:                        " + dataSummary.numberOfFailedTests + "</p>" +  "\n" +
         "</div>" + "\n"
     }
     
 
-    def elementSummaryToHTMLString(): String = {
-      val elementString: String = "<div><p>" + HTML_REPORT_TABLE_HEADERS +
-        dataSummary.sortedSummaryList.map(elementData => returnElementSummaryAsHTMLRow(elementData)).mkString +
+    def mobileElementSummaryToHTMLString(): String = {
+      val elementString: String = "<div><p>" + HTML_MOBILE_EDITORIAL_EMBEDS_TABLE_HEADERS +
+        dataSummary.sortedCombinedSummaryList.map(elementData => returnElementSummaryAsHTMLRow(elementData)).mkString +
+        HTML_TABLE_END + "</p></div>"
+      elementString
+    }
+
+    def desktopElementSummaryToHTMLString(): String = {
+      val elementString: String = "<div><p>" + HTML_DESKTOP_EDITORIAL_EMBEDS_TABLE_HEADERS +
+        dataSummary.sortedCombinedSummaryList.map(elementData => returnElementSummaryAsHTMLRow(elementData)).mkString +
+        HTML_TABLE_END + "</p></div>"
+      elementString
+    }
+
+    def combinedElementSummaryToHTMLString(): String = {
+      val elementString: String = "<div><p>" + HTML_COMBINED_EDITORIAL_EMBEDS_TABLE_HEADERS +
+        dataSummary.sortedCombinedSummaryList.map(elementData => returnElementSummaryAsHTMLRow(elementData)).mkString +
         HTML_TABLE_END + "</p></div>"
       elementString
     }
 
     def mobilePageSummaryToHTMLString(): String = {
-      "<div><p>" +
+      "<div><p>Summary of mobile pages: </p>" + 
       HTML_PAGE_SUMMARY_MOBILE_TABLE_HEADERS +
       returnPageSummaryAsHTMLRows(dataSummary.articlesMobileSummary) +
       returnPageSummaryAsHTMLRows(dataSummary.interactivesMobileSummary) +
@@ -147,11 +191,11 @@
       returnPageSummaryAsHTMLRows(dataSummary.gLabsMobileSummary) +
       returnPageSummaryAsHTMLRows(dataSummary.totalMobileSummary) +
       HTML_TABLE_END +
-      "</p></div>"
+      "</div>"
     }
 
     def desktopPageSummaryToHTMLString(): String = {
-      "<div><p>" +
+      "<div><p>Summary of desktop pages: </p>" +
       HTML_PAGE_SUMMARY_DESKTOP_TABLE_HEADERS +
         returnPageSummaryAsHTMLRows(dataSummary.articlesDesktopSummary) +
         returnPageSummaryAsHTMLRows(dataSummary.interactivesDesktopSummary) +
@@ -159,7 +203,7 @@
         returnPageSummaryAsHTMLRows(dataSummary.gLabsDesktopSummary) +
         returnPageSummaryAsHTMLRows(dataSummary.totalDesktopSummary) +
         HTML_TABLE_END +
-      "</p></div>"
+      "</div>"
     }
 
     def returnPageSummaryAsHTMLRows(pageSummary: dataSummary.PageSummaryData):  String = {
