@@ -1,6 +1,7 @@
 package app.api
 
 import app.apiutils.{PageElementFromHTMLTableRow, ResultsFromPreviousTests, PerformanceResultsObject}
+import com.gu.contentapi.client.model.v1.ContentType
 import org.joda.time.DateTime
 
 
@@ -493,36 +494,41 @@ val timeNow = DateTime.now
   }
 
   def summarisePageType(results: List[PerformanceResultsObject], total: Boolean): PageSummaryData = {
-    val contentType = results.head.getPageType
-    val pageType = {
-      if (results.head.gLabs && !total) {
-        "GLabs"
-      } else {
-        if (total) {
-          "Total"
+    if(results.nonEmpty) {
+      val contentType = results.head.getPageType
+      val pageType = {
+        if (results.head.gLabs && !total) {
+          "GLabs"
         } else {
-          contentType
+          if (total) {
+            "Total"
+          } else {
+            contentType
+          }
         }
       }
-    }
-    val testType = {
-      if(results.head.typeOfTest == results.tail.head.typeOfTest){
-        results.head.typeOfTestName
-      } else {
-        "Both Desktop and Mobile tests"
+      val testType = {
+        if (results.head.typeOfTest == results.tail.head.typeOfTest) {
+          results.head.typeOfTestName
+        } else {
+          "Both Desktop and Mobile tests"
+        }
       }
+
+      val numberOfTests = results.length
+      val numberOfPageWeightAlerts = results.count(_.alertStatusPageWeight)
+      val percentageOfPageWeightAlerts = roundAt(2)((numberOfPageWeightAlerts * 100).toDouble / numberOfTests)
+      val numberOfPageSpeedAlerts = results.count(_.alertStatusPageSpeed)
+      val percentageOfPageSpeedAlerts = roundAt(2)((numberOfPageSpeedAlerts * 100).toDouble / numberOfTests)
+      val averagePageWeight = roundAt(3)(results.map(_.kBInFullyLoaded).sum / results.length)
+      val averageTTFP = (results.map(_.timeFirstPaintInMs).sum.toDouble / results.length).toInt
+      val averageSpeedIndex = (results.map(_.speedIndex).sum.toDouble / results.length).toInt
+
+      PageSummaryData(pageType, testType, numberOfTests, numberOfPageWeightAlerts, percentageOfPageWeightAlerts, numberOfPageSpeedAlerts, percentageOfPageSpeedAlerts, averagePageWeight, averageTTFP, averageSpeedIndex)
+    } else {
+      println("summarisePageType was passed an empty list!")
+      PageSummaryData("Empty", "Desktop", 0, 0, 0, 0, 0, 0, 0, 0)
     }
-
-    val numberOfTests = results.length
-    val numberOfPageWeightAlerts = results.count(_.alertStatusPageWeight)
-    val percentageOfPageWeightAlerts = roundAt(2)((numberOfPageWeightAlerts * 100).toDouble/numberOfTests)
-    val numberOfPageSpeedAlerts = results.count(_.alertStatusPageSpeed)
-    val percentageOfPageSpeedAlerts = roundAt(2)((numberOfPageSpeedAlerts * 100).toDouble/numberOfTests)
-    val averagePageWeight = roundAt(3)(results.map(_.kBInFullyLoaded).sum/results.length)
-    val averageTTFP = (results.map(_.timeFirstPaintInMs).sum.toDouble/results.length).toInt
-    val averageSpeedIndex = (results.map(_.speedIndex).sum.toDouble/results.length).toInt
-
-    PageSummaryData(pageType, testType, numberOfTests, numberOfPageWeightAlerts, percentageOfPageWeightAlerts, numberOfPageSpeedAlerts, percentageOfPageSpeedAlerts, averagePageWeight, averageTTFP, averageSpeedIndex)
   }
 
   def summariseElement(elementName: String, pagesWithEmbed: List[PerformanceResultsObject], listOfEmbeds: List[PageElementFromHTMLTableRow]): ElementSummaryData = {
