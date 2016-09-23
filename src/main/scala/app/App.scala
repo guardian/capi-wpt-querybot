@@ -46,6 +46,8 @@ object App {
     val currentPageWeightAlertSummaryPage = "pageweightalertsummarypage.html"
     val currentInteractiveSummaryPage = "interactivesummarypage.html"
     val currentWeeklySummaryPage = "weeklysummarypage.html"
+    val weekyReport = "weekly-report/week_starting_" + startOfWeek.toDate + ".html"
+    val dailyRunData = "daily-run-data/run_data_for_" + jobStart.dayOfWeek + ".csv"
 
     val dotcomPageSpeedFilename = "dotcompagespeeddashboard.html"
 
@@ -653,12 +655,13 @@ object App {
         val summaryHTMLPage = new SummaryPage(resultSummary)
         val pageWeightAlertSummaryHTMLPage = new SummaryPage(pageWeightAlertsSummary)
         val interactiveAlertSummaryHTMLPage = new SummaryPage(interactiveAlertsSummary)
-        val weeklySummaryHTMLPage = new SummaryPage(weeklySummary)
+        val weeklySummaryHTMLPage = new WeeklyReport(weeklySummary)
     //write summary pages to file
         s3Interface.writeFileToS3(currentDataSummaryPage, summaryHTMLPage.toString())
         s3Interface.writeFileToS3(currentPageWeightAlertSummaryPage, pageWeightAlertSummaryHTMLPage.toString())
         s3Interface.writeFileToS3(currentInteractiveSummaryPage, interactiveAlertSummaryHTMLPage.toString())
         s3Interface.writeFileToS3(currentWeeklySummaryPage, weeklySummaryHTMLPage.toString())
+        s3Interface.writeFileToS3(weekyReport, weeklySummaryHTMLPage.toString())
 
     //write summaries to files
         println("writing run summary data to new file")

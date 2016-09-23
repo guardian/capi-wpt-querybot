@@ -23,6 +23,8 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
   val emailFileName = emailFile
 
 
+  //case class PeriodicSummary(period: String, averageRunTimeMs: Int, averageCAPIResultsPerRun: Int, averageNumberOfTestsPerRun: Int, totalCAPIResults: Int, totalNumberOfTests: Int, mobileArticle: DataSummary.PageSummaryData)
+
   def doesFileExist(fileKeyName: String): Boolean = {
     try {
       s3Client.getObjectMetadata(bucket, fileKeyName); true
@@ -281,6 +283,8 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
         ""
       }
     }
+
+  //def getPeriodicSummaryFileFromS3(filename: String):
 
   def writeFileToS3(fileName:String, outputString: String): Unit ={
     println(DateTime.now + " Writing the following file to S3:\n" + fileName + "\n")

@@ -25,6 +25,7 @@ abstract  class PageElement {
     val audioBoom = List("audio_clip_id", "audioboom")
     val brightcove = List("bcsecure", "player.h-cdn.com")
     val cnn = List("cnn.com","z.cdn.turner.com")
+    val commercial = List("https://static.theguardian.com/commercial")
     val dailymotion = List("dailymotion","dmcdn")
     val documentCloud = List("documentcloud")
     val facebook = List("facebook","fbcdn")
@@ -74,6 +75,7 @@ abstract  class PageElement {
     if(textContainsTextFromList(resource, audioBoom)){returnString = "audioBoom"}
     if(textContainsTextFromList(resource, brightcove)){returnString = "brightcove"}
     if(textContainsTextFromList(resource, cnn)){returnString = "cnn"}
+    if(textContainsTextFromList(resource, commercial)){returnString = "commercial"}
     if(textContainsTextFromList(resource, dailymotion)){returnString = "dailymotion"}
     if(textContainsTextFromList(resource, documentCloud)){returnString = "documentCloud"}
     if(textContainsTextFromList(resource, facebook)){returnString = "facebook"}
