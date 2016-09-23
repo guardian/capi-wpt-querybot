@@ -741,12 +741,25 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     assert(true)
   }*/
 
-  "not a test" should "generate list of pages that request insecure elements" in {
+  /*"not a test" should "generate list of pages that request insecure elements" in {
     val previousResults = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     val listOfPagesWithHTTPElements = previousResults.filter(_.fullElementList.exists(test => test.resource.take(5).contains("http:")))
     s3Interface.writeFileToS3("pagesWithInsecureElements.csv", listOfPagesWithHTTPElements.map(_.toCSVString()).mkString)
     println("written out file with " + listOfPagesWithHTTPElements.length + " rows")
     assert(true)
+  }*/
+
+  "not a test" should "generate list of interactive results" in {
+    val previousResults = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val listOfArticles = previousResults.filter(_.getPageType.contains("Article"))
+    println("found " + listOfArticles.length + " Articles")
+    val listOfInteractives = previousResults.filter(_.getPageType.contains("Interactive"))
+    println("found " + listOfInteractives.length + " Interactives")
+    val listOfPagesWithInteractiveEmbeds = listOfArticles.filter(_.fullElementList.exists(test => test.identifyPageElementType().contains("interactive")))
+    val resultsToWrite = listOfInteractives ::: listOfPagesWithInteractiveEmbeds
+    s3Interface.writeFileToS3("previousInteractiveResults.csv", resultsToWrite.map(_.toCSVString()).mkString)
+    println("written out file with " + resultsToWrite.length + " rows")
+    assert(listOfArticles.length > 0 && listOfInteractives.length > 0)
   }
 
   def getResult(resultUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String], articleUrls: ArticleUrls): PerformanceResultsObject = {

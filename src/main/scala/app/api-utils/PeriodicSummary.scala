@@ -1,14 +1,13 @@
 package app.api
 
 import app.apiutils.{PageElementFromHTMLTableRow, ResultsFromPreviousTests, PerformanceResultsObject}
-import com.gu.contentapi.client.model.v1.ContentType
 import org.joda.time.DateTime
 
 
 /**
- * Created by mmcnamara on 28/06/16.
+ * Created by mmcnamara on 09/09/16.
  */
-class DataSummary(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesFromCapi: Int, numberOfPagesTested: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests, alertsResultsObject: ResultsFromPreviousTests) {
+class PeriodicSummary(period: String, averageDurationOfRunMs: Int, averageNumberOfPagesFromCapi: Int, averageNumberOfPagesTestedPerRun: Int, numberOfPagesTestedTotal: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests, alertsResultsObject: ResultsFromPreviousTests) {
   /*
 Data summary
 Its time to take note of pages tested each run,
@@ -45,32 +44,32 @@ look through data - what are the main embeds
 
 
   case class PageSummaryData(pageType: String,
-                              testType: String,
-                              numberOfPagesTested: Int,
-                              numberOfPageWeightAlerts: Int,
-                              percentageOfPageWeightAlerts: Double,
-                              numberOfPageSpeedAlerts: Int,
-                              percentageOfPageSpeedAlerts: Double,
-                              averagePageWeight: Double,
-                              averageTTFP: Int,
-                              averageSpeedIndex: Int
+                             testType: String,
+                             numberOfPagesTested: Int,
+                             numberOfPageWeightAlerts: Int,
+                             percentageOfPageWeightAlerts: Double,
+                             numberOfPageSpeedAlerts: Int,
+                             percentageOfPageSpeedAlerts: Double,
+                             averagePageWeight: Double,
+                             averageTTFP: Int,
+                             averageSpeedIndex: Int
                               )
 
-val timeNow = DateTime.now
+  val timeNow = DateTime.now
   val today = timeNow.getDayOfYear
   val yesterday = timeNow.minusDays(1).getDayOfYear
 
-  val jobStartedTime = jobStarted
-  val jobFinishTime = jobFinished
-  val durationOfRunMs = jobFinished.getMillis - jobStarted.getMillis
-  val durationOfRunS = durationOfRunMs.toDouble / 1000
-  val durationOfRunMin = roundAt(2)(durationOfRunS / 60)
+  //val jobStartedTime = jobStarted
+  //val jobFinishTime = jobFinished
+  //val durationOfRunMs = jobFinished.getMillis - jobStarted.getMillis
+  //val durationOfRunS = durationOfRunMs.toDouble / 1000
+  //val durationOfRunMin = roundAt(2)(durationOfRunS / 60)
 
 
 
   //last run - number of pages pulled from capi
-  val numberOfPagesFromCAPI: Int = numberOfPagesFromCapi
-  val numberOfPagesSentToWPT: Int = numberOfPagesTested
+  //val numberOfPagesFromCAPI: Int = numberOfPagesFromCapi
+  //val numberOfPagesSentToWPT: Int = numberOfPagesTested
   val numberOfFailedTests = latestResults.count(_.timeToFirstByte < 0)
   /*  - number of pageWeight alerts raised on non-interactive content
     - number of pageSpeed alerts raised on non-interactive content
@@ -107,7 +106,7 @@ val timeNow = DateTime.now
 
   val hasAlertedOnWeightThisRun = resultsFromRun.filter(_.alertStatusPageWeight)
   val hasAlertedOnSpeedThisRun = resultsFromRun.filter(_.alertStatusPageSpeed)
-  
+
   val newPageWeightAlerts = for (result <- hasAlertedOnWeightThisRun if !hasPreviouslyAlertedOnWeight.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
   val newPageSpeedAlerts = for (result <- hasAlertedOnSpeedThisRun if !hasPreviouslyAlertedOnSpeed.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl, result.typeOfTest))) yield result
 
@@ -299,44 +298,44 @@ val timeNow = DateTime.now
   val unknownEmbedSummary = summariseElement("Unidentified element", pagesWithUnknownEmbed, unknownElement)
 
   val summaryList: List[ElementSummaryData] = List(
-        audioBoomSummary,
-        brightcoveSummary,
-        cnnSummary,
-        commercialSummary,
-        dailymotionSummary,
-        documentCloudSummary,
-        facebookSummary,
-        formstackSummary,
-        gifSummary,
-        googlemapsSummary,
-        guardianAudioSummary,
-        guardianCommentsSummary,
-        guardianVideosSummary,
-        guardianImagesSummary,
-        guardianUploadSummary,
-        guardianWitnessImageSummary,
-        guardianWitnessVideoSummary,
-        huluSummary,
-        imageEmbedSummary,
-        infostradaSummary,
-        instagramSummary,
-        interactiveSummary,
-        m3u8Summary,
-        mP3Summary,
-        mP4Summary,
-        parliamentLiveTvSummary,
-        scribdSummary,
-        soundCloudSummary,
-        spotifySummary,
-        twitterSummary,
-        uStreamSummary,
-        vevoSummary,
-        video3GPSummary,
-        vimeoSummary,
-        vineSummary,
-        webpSummary,
-        youTubeSummary,
-        unknownEmbedSummary
+    audioBoomSummary,
+    brightcoveSummary,
+    cnnSummary,
+    commercialSummary,
+    dailymotionSummary,
+    documentCloudSummary,
+    facebookSummary,
+    formstackSummary,
+    gifSummary,
+    googlemapsSummary,
+    guardianAudioSummary,
+    guardianCommentsSummary,
+    guardianVideosSummary,
+    guardianImagesSummary,
+    guardianUploadSummary,
+    guardianWitnessImageSummary,
+    guardianWitnessVideoSummary,
+    huluSummary,
+    imageEmbedSummary,
+    infostradaSummary,
+    instagramSummary,
+    interactiveSummary,
+    m3u8Summary,
+    mP3Summary,
+    mP4Summary,
+    parliamentLiveTvSummary,
+    scribdSummary,
+    soundCloudSummary,
+    spotifySummary,
+    twitterSummary,
+    uStreamSummary,
+    vevoSummary,
+    video3GPSummary,
+    vimeoSummary,
+    vineSummary,
+    webpSummary,
+    youTubeSummary,
+    unknownEmbedSummary
   )
 
   val sortedCombinedSummaryList = summaryList.sortWith(_.numberOfPagesWithEmbed > _.numberOfPagesWithEmbed)
@@ -465,12 +464,12 @@ val timeNow = DateTime.now
 
   def summaryDataToString(): String = {
     val runString: String = "Job Summary: \n" + "\n" +
-      "jobStarted at: " + jobStartedTime.toDateTime + "\n" +
-      "jobFinished at: " + jobFinishTime.toDateTime + "\n" +
-      "Duration of Run: " + durationOfRunMin + " minutes." + "\n" +
-      "Number of pages from CAPI queries: " + numberOfPagesFromCAPI + "\n" +
+    //  "jobStarted at: " + jobStartedTime.toDateTime + "\n" +
+    //  "jobFinished at: " + jobFinishTime.toDateTime + "\n" +
+    //  "Duration of Run: " + durationOfRunMin + " minutes." + "\n" +
+    //  "Number of pages from CAPI queries: " + numberOfPagesFromCAPI + "\n" +
       "Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun + "\n" +
-      "Number of pages tested: " + numberOfPagesSentToWPT + "\n" +
+     // "Number of pages tested: " + numberOfPagesSentToWPT + "\n" +
       "Number of failed tests: " + numberOfFailedTests + "\n" +
       "**** \n\n" + "\n"
     val elementString: String = summaryList.map(elementData => returnElementSummaryAsString(elementData)).mkString
@@ -487,12 +486,12 @@ val timeNow = DateTime.now
   def summaryDataToHTMLString(): String = {
     val runString: String = "<div>\n" +
       "<h3>Job Summary:" + "</h3>" + "\n" +
-      "<p style = \"margin-left: 40px\">jobStarted at:      " + jobStartedTime.toDateTime + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">jobFinished at:     " + jobFinishTime.toDateTime + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Duration of Run:    " + durationOfRunMin + " minutes." + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of pages from CAPI queries: " + numberOfPagesFromCAPI + "</p>" +  "\n" +
+    //  "<p style = \"margin-left: 40px\">jobStarted at:      " + jobStartedTime.toDateTime + "</p>" +  "\n" +
+    //  "<p style = \"margin-left: 40px\">jobFinished at:     " + jobFinishTime.toDateTime + "</p>" +  "\n" +
+    //  "<p style = \"margin-left: 40px\">Duration of Run:    " + durationOfRunMin + " minutes." + "</p>" +  "\n" +
+    //  "<p style = \"margin-left: 40px\">Number of pages from CAPI queries: " + numberOfPagesFromCAPI + "</p>" +  "\n" +
       "<p style = \"margin-left: 40px\">Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of pages tested: " + numberOfPagesSentToWPT + "</p>" +  "\n" +
+    //  "<p style = \"margin-left: 40px\">Number of pages tested: " + numberOfPagesSentToWPT + "</p>" +  "\n" +
       "<p style = \"margin-left: 40px\">Number of failed tests: " + numberOfFailedTests + "</p>" +  "\n" +
       "</div>" + "\n"
     val elementString: String = sortedCombinedSummaryList.map(elementData => returnElementSummaryAsHTMLString(elementData)).mkString
@@ -594,7 +593,7 @@ val timeNow = DateTime.now
 
   def returnElementSummaryAsHTMLString(elementSummary: ElementSummaryData): String = {
     "<div>\n" +
-    "<h3> " + elementSummary.title + " </h3>\n" +
+      "<h3> " + elementSummary.title + " </h3>\n" +
       "<p style = \"margin-left: 40px\"> Number of Pages with this embed-type: " + elementSummary.numberOfPagesWithEmbed + " </p>\n" +
       "<p style = \"margin-left: 40px\"> Number of Pages with  this embed-type that alerted for pageWeight: " + elementSummary.numberOfPageWeightAlerts + " </p>\n" +
       "<p style = \"margin-left: 40px\"> Average Size of this embed-type: " + elementSummary.averageSizeOfEmbeds + " KB </p>\n" +
