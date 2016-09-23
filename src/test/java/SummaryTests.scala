@@ -112,13 +112,13 @@
     //write summaries to files
     val localFiles = new LocalFileOperations
 
-    "Element summary" should "be returned as string" in {
+/*    "Element summary" should "be returned as string" in {
       val elementSummary = dataSummary.summaryList.head
       val dataSummaryString = dataSummary.returnElementSummaryAsHTMLString(elementSummary)
       println("\n\n\n Single summary: \n" + dataSummaryString)
-    }
+    }*/
 
-    "Data Summary object " should " be able to produce a data summary from the results object" in {
+/*    "Data Summary object " should " be able to produce a data summary from the results object" in {
       println("writing run summary data to new file")
       val summaryPage = new SummaryPage(dataSummary)
       val summaryPageHTMLString = summaryPage.toString()
@@ -131,16 +131,22 @@
       s3Interface.writeFileToS3(runSummaryHTMLFile, summaryPageHTMLString)
       dataSummary.printSummaryDataToScreen()
       assert(true)
-    }
+    }*/
 
-  /*  "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
+    "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
       val listAudioBoomElement = previousResults.filter(_.testUrl.contains("/world/2015/mar/16/london-teenagers-stopped-syria-parents-islamic-state"))
       val pageAndElements = listAudioBoomElement.map(page => (page.testUrl, page.editorialElementList.map(_.resource).mkString, page.editorialElementList.map(_.determinedResourceType)))
       val samplePage = new PageElementSamples(dataSummary)
+      val listOfCommercialPages = dataSummary.pagesWithCommercialEmbed.map(result => "<a href=\"" + result.testUrl + "\">" + result.testUrl +"</a>\n").mkString
+      val listOfCommercialAmpPages = dataSummary.pagesWithCommercialEmbed.map(result => "<a href=\"" + result.testUrl.replace("https://www","https://amp") + "\">" + result.testUrl.replace("https://www","https://amp") +"</a>\n").mkString
+      val output = samplePage.HTML_PAGE_HEAD + listOfCommercialPages + samplePage.HTML_FOOTER
+      val ampOutput = samplePage.HTML_PAGE_HEAD + listOfCommercialAmpPages + samplePage.HTML_FOOTER
 //      localFiles.writeLocalResultFile("pageElementSamplePages.html", samplePage.toString())
-      s3Interface.writeFileToS3("pageElementSamplePages.html", samplePage.toString())
+      s3Interface.writeFileToS3("pageElementSamplePagesTest.html", samplePage.toString())
+      s3Interface.writeFileToS3("listOfCommercialPages.html", output)
+      s3Interface.writeFileToS3("listOfCommercialAmpPages.html", ampOutput)
       assert(true)
-    }*/
+    }
 
 /*    "Not a test but I " should "be able to get a list of pages with an example of each embed" in {
 

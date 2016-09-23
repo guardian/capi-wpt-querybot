@@ -220,7 +220,6 @@
       "<tr>"
     }
 
-
     def returnElementSummaryAsHTMLRow(elementSummary: dataSummary.ElementSummaryData): String = {
         "<tr>" + "\n" +
         "<td>" + elementSummary.title + "</td>" + "\n" +
@@ -235,6 +234,50 @@
         "<td>" + elementSummary.averageSpeedIndexMs + " ms"+ "</td>" + "\n" +
         "</tr>" + "\n"
     }
+
+
+    def mobilePageSummaryToCSV(): String = {
+      returnPageSummaryAsCSV(dataSummary.articlesMobileSummary) + "," +
+        returnPageSummaryAsCSV(dataSummary.interactivesMobileSummary) + "," +
+        returnPageSummaryAsCSV(dataSummary.liveBlogsMobileSummary) + "," +
+        returnPageSummaryAsCSV(dataSummary.gLabsMobileSummary) + "," +
+        returnPageSummaryAsCSV(dataSummary.totalMobileSummary)
+    }
+
+    def desktopPageSummaryToCSV(): String = {
+      returnPageSummaryAsCSV(dataSummary.articlesDesktopSummary) + "," +
+        returnPageSummaryAsCSV(dataSummary.interactivesDesktopSummary) + "," +
+        returnPageSummaryAsCSV(dataSummary.liveBlogsDesktopSummary) + "," +
+        returnPageSummaryAsCSV(dataSummary.gLabsDesktopSummary) + "," +
+        returnPageSummaryAsCSV(dataSummary.totalDesktopSummary)
+    }
+
+
+    def returnPageSummaryAsCSV(pageSummary: dataSummary.PageSummaryData):  String = {
+      pageSummary.pageType + "," +
+        pageSummary.testType + "," +
+        pageSummary.numberOfPageWeightAlerts + "," +
+        pageSummary.percentageOfPageWeightAlerts + "," +
+        pageSummary.numberOfPageSpeedAlerts + "," +
+        pageSummary.percentageOfPageSpeedAlerts + "," +
+        pageSummary.averagePageWeight + "," +
+        pageSummary.averageTTFP + "," +
+        pageSummary.averageSpeedIndex
+    }
+
+    def returnElementSummaryAsCSV(elementSummary: dataSummary.ElementSummaryData): String = {
+        elementSummary.title + "," +
+        elementSummary.numberOfPagesWithEmbed + "," +
+        elementSummary.percentageOfPagesWithEmbed + "," +
+        elementSummary.numberOfPageWeightAlerts + "," +
+        elementSummary.percentageOfPageWeightAlerts + "," +
+        elementSummary.numberOfPageSpeedAlerts + "," +
+        elementSummary.percentageOfPageSpeedAlerts + "," +
+        elementSummary.averageSizeOfEmbeds + "," +
+        elementSummary.averageTimeFirstPaint + "," +
+        elementSummary.averageSpeedIndexMs
+    }
+
 
     def roundAt(p: Int)(n: Double): Double = { val s = math pow (10, p); (math round n * s) / s }
 

@@ -46,6 +46,8 @@ println(capiTimeToString(capitime3))
 
 val now = DateTime.now()
 val hour = now.hourOfDay.get
+val date = now.toDate
+
 
 
 
