@@ -118,6 +118,8 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     elementList.filterNot(isAStandardPageElement(_))
   }
 
+  def isNotInteractiveOrGLabs: Boolean = {!getPageType.contains("Interactive") && (!gLabs)}
+
   def isAStandardPageElement(element: PageElementFromHTMLTableRow): Boolean = {
     element.resource.contains(testUrl) ||
     element.resource.contains("assets.guim.co.uk/stylesheets") ||
