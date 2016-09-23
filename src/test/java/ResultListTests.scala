@@ -563,7 +563,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
 }
 */
 
-/*  "vals in previous results object " should " be correct" in {
+  /*"vals in previous results object " should " be correct" in {
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
     println("\n\n\n ***** There are " + testResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
@@ -630,8 +630,8 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
    // dataSummary.printSummaryDataToScreen()
     s3Interface.writeFileToS3(outputFile, previousResults.map(_.toCSVString()).mkString)
     assert(true)
-  }*/
-
+  }
+*/
 
 
 /*  "Data Summary object " should " be able to produce a data summary from the results object" in {
@@ -693,7 +693,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     assert(numberOfEmptyElementLists == 0)
   }*/
 
- /* "I" should "be able to get a list of resutls with no elements" in {
+  /*"I" should "be able to get a list of resutls with no elements" in {
     val previousResultsHandler = new ResultsFromPreviousTests(previousResults.take(500))
     val listWithElements = previousResultsHandler.previousResults.filter(_.editorialElementList.nonEmpty)
     val listWithNoElements = previousResultsHandler.previousResults.filter(_.editorialElementList.isEmpty)
@@ -741,13 +741,13 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     assert(true)
   }*/
 
-  "not a test" should "generate list of pages that request insecure elements" in {
+  /*"not a test" should "generate list of pages that request insecure elements" in {
     val previousResults = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
     val listOfPagesWithHTTPElements = previousResults.filter(_.fullElementList.exists(test => test.resource.take(5).contains("http:")))
     s3Interface.writeFileToS3("pagesWithInsecureElements.csv", listOfPagesWithHTTPElements.map(_.toCSVString()).mkString)
     println("written out file with " + listOfPagesWithHTTPElements.length + " rows")
     assert(true)
-  }
+  }*/
 
   def getResult(resultUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String], articleUrls: ArticleUrls): PerformanceResultsObject = {
     //val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
