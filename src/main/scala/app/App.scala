@@ -178,7 +178,7 @@ object App {
     //val listofLargeInteractives: List[String] = s3Interface.getUrls(interactiveSampleFileName)
 
     //obtain list of items previously alerted on
-    val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val previousResults: List[PerformanceResultsObject] = (s3Interface.getResultsFileFromS3(resultsFromPreviousTests)).take(5000)
     /*    val localInput = new LocalFileOperations
     val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
     val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
@@ -440,7 +440,7 @@ object App {
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
 
     println("combinedResultsForFile length = " + combinedResultsForFile.length)
-    val resultsToRecord = (sorter.orderListByDatePublished(combinedResultsForFile) ::: previousTestResultsHandler.oldResults).take(6000)
+    val resultsToRecord = (sorter.orderListByDatePublished(combinedResultsForFile) ::: previousTestResultsHandler.oldResults).take(5000)
 
     //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
     println("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
