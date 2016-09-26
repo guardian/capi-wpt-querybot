@@ -443,7 +443,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
 }
 */
 
-/*  "Remove duplicates function" should "work as expected" in {
+"Remove duplicates function" should "work as expected" in {
   //Create new S3 Client
   val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
   val s3BucketName = "capi-wpt-querybot"
@@ -465,46 +465,46 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
   val wptApiKey: String = configArray(2)
   val wptLocation: String = configArray(3)
 
+  val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+  val resultsFromPreviousTestsBigTest = "resultsFromPreviousTests_really-big.csv"
+  val resultsOutput = "dedupedResultsFromPreviousTests_really-big.csv"
 
-
-   val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
-  //    val resultsFromPreviousTests = "resultsFromPreviousTestsTest.csv"
-  //    val resultsFromPreviousTestsTestVersion = "resultsFromPreviousTestsTestOutput.csv"
-  //   val resultsFromPreviousTests = "elementtestinput.csv"
-  //   val resultsFromPreviousTestsTestVersion = "elementtestoutput.csv"
-  //val resultsFromPreviousTests = "elementtestoutput.csv"
-  val resultsFromPreviousTestsTestVersion = "elementtestoutputresuts.csv"
-  val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+  val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTestsBigTest)
   val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
 
   val originalLength = previousResults.length
-  val listOfDupes = for (result <- previousTestResultsHandler.previousResults if previousTestResultsHandler.previousResults.map(page => (page.testUrl, page.typeOfTest)).count(_ == (result.testUrl,result.typeOfTest)) > 1) yield result
+  val listOfDupes = for (result <- previousTestResultsHandler.previousResults if previousTestResultsHandler.previousResults.map(page => (page.testUrl, page.typeOfTest, page.getPageLastUpdated)).count(_ == (result.testUrl,result.typeOfTest, result.getPageLastUpdated)) > 1) yield result
   var duplicatesPresent = false
   var allIsWell = false
+  println("\n\n\n\n file contains " + previousTestResultsHandler.previousResults.length + " records. \n")
 
   if (listOfDupes.nonEmpty) {
-    println("\n\n\n\n ******** Duplicates found in previous results file! ****** \n Found " + listOfDupes.length + " duplicates")
+    println("******** Duplicates found in previous results file! ****** \n Found " + listOfDupes.length + " duplicates")
     duplicatesPresent = true
   }
-  val dedupedList = previousTestResultsHandler.removeDuplicates(previousTestResultsHandler.previousResults)
+  val dedupedList = previousTestResultsHandler.dedupeList(previousTestResultsHandler.previousResults)
   if (duplicatesPresent && dedupedList.length < originalLength){
     println("duplicates found and deduped list has been shortened")
     println("checking for dupes")
-    val secondTestForDupes = for (result <- dedupedList if dedupedList.map(page => (page.testUrl, page.typeOfTest)).count(_ == (result.testUrl,result.typeOfTest)) > 1) yield result
+    val secondTestForDupes = for (result <- dedupedList if dedupedList.map(page => (page.testUrl, page.typeOfTest, page.getPageLastUpdated)).count(_ == (result.testUrl,result.typeOfTest,result.getPageLastUpdated)) > 1) yield result
     if(secondTestForDupes.isEmpty){
       println("couldn't find any more dupes - we cleaned them all!")
+      println("deduplicated List length is: " + dedupedList.length)
       allIsWell = true
     } else{
       println("remove dupes did not remove all dupes")
+      println("deduplicated List length is: " + dedupedList.length)
+      println("there are " + secondTestForDupes.length + " duplicate records remaining")
     }
   } else{
     if(!duplicatesPresent && dedupedList.length == originalLength){
       allIsWell = true
       println("no duplicates found")
+      s3Interface.writeFileToS3(resultsOutput, dedupedList.map(_.toCSVString()).mkString)
     }
   }
   assert(allIsWell)
-}*/
+}
 /*
   "Getting data from results file" should " allow me to repopulate data from tests" in {
   //Create new S3 Client
