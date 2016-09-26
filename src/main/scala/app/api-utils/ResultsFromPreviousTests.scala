@@ -16,7 +16,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
   val cutoffTime96Hours: Long = DateTime.now.minusHours(96).getMillis
-  val previousResults: List[PerformanceResultsObject] = resultsList
+  val previousResults: List[PerformanceResultsObject] = dedupeList(resultsList)
   //val previousResults: List[PerformanceResultsObject] = resultsList
 
   val resultsFromLast24Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime) yield result
@@ -97,18 +97,15 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   }*/
 
-  def dedupeList(inputList: List[PerformanceResultsObject], cleanList: List[PerformanceResultsObject]): List[PerformanceResultsObject] ={
-    if(inputList.isEmpty){
-      cleanList
-    } else {
-      val urlAndTestType = (inputList.head.testUrl, inputList.head.typeOfTest)
-      val cleanListUrlAndTestType = cleanList.map(page => (page.testUrl, page.typeOfTest))
-      if(cleanListUrlAndTestType.exists(_ == urlAndTestType)){
-        dedupeList(inputList.tail, cleanList)
-      } else {
-        dedupeList(inputList.tail, cleanList ::: List(inputList.head))
+
+  def dedupeList(inputList: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+      var workingList: List[PerformanceResultsObject] = List()
+    for (result <- inputList) {
+      if(!workingList.map(page => (page.testUrl, page.typeOfTest, page.getPageLastUpdated)).contains((result.testUrl,result.typeOfTest,result.getPageLastUpdated))){
+        workingList = workingList ::: List(result)
       }
     }
+    workingList
   }
 
   def isResultADupe(result: PerformanceResultsObject, resultList: List[PerformanceResultsObject]): Boolean = {
@@ -119,6 +116,8 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
       resultIncidenceCount > 1
     }
   }
+
+
 
 
   //query full list

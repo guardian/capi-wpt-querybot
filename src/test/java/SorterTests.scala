@@ -47,6 +47,7 @@ import org.scalatest._
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
     val resultsFromSorterTest1 = "resultsFromPreviousTestsSorter1.csv"
     val resultsFromSorterTest2 = "resultsFromPreviousTestsSorter2.csv"
+    val reallyBigtest = "resultsFromPreviousTests_really-big.csv"
 
 
     //Create new S3 Client
@@ -90,17 +91,26 @@ import org.scalatest._
     val visualsApiUrl: String = configArray(6)
 
     //obtain list of items previously alerted on
-    val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(reallyBigtest)
     val previousResultsHandler = new ResultsFromPreviousTests(previousResults)
     val sorter = new ListSorter
 
     "OrderedByDateLastPublished called on a list of results " should "return a list ordered by dateLastPublished" in {
+      println("sorting by weight")
+      //val reorderByWeight = sorter.orderListByWeight(previousResults)
       val reorderByWeight = sorter.orderListByWeight(previousResults)
-      val reorderedList = sorter.orderListByDatePublished(reorderByWeight)
-      println("First Record pageLastUpdated: " + previousResults.head.pageLastUpdated.isEmpty)
-      println("First Record first Published: " + previousResults.head.firstPublished.isEmpty)
-      s3Interface.writeFileToS3(resultsFromSorterTest1, reorderedList.map(_.toCSVString()).mkString)
-      assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == previousResults.length)
+      val resultsHandler = new ResultsFromPreviousTests(reorderByWeight)
+      if (reorderByWeight.nonEmpty) {
+        println("sorting by date")
+        val reorderedList = sorter.orderListByDatePublished(resultsHandler.previousResults)
+        println("First Record pageLastUpdated: " + previousResults.head.pageLastUpdated.isEmpty)
+        println("First Record first Published: " + previousResults.head.firstPublished.isEmpty)
+        s3Interface.writeFileToS3(resultsFromSorterTest1, reorderedList.map(_.toCSVString()).mkString)
+        assert((reorderedList.head.timeLastLaunchedAsLong() >= reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() >= reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == resultsHandler.previousResults.length)
+      } else {
+        println("reorder by weight lost all results")
+          assert(reorderByWeight.length > 1)
+        }
     }
 
     "OrderedByDateLastPublished called on a list of results a second time " should "return a list ordered by dateLastPublished" in {
@@ -108,26 +118,39 @@ import org.scalatest._
       val reorderByWeight = sorter.orderListByWeight(resultsFromLastTest)
       val reorderedList = sorter.orderListByDatePublished(reorderByWeight)
       s3Interface.writeFileToS3(resultsFromSorterTest2, reorderedList.map(_.toCSVString()).mkString)
-      assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == previousResults.length)
+      assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == resultsFromLastTest.length)
     }
 
-/*    "OrderedByDateLastPublished called on a list of results that is 24 hour old" should "return a list ordered by dateLastPublished" in {
+    "OrderedByDateLastPublished called on a list of results that is 24 hour old" should "return a list ordered by dateLastPublished" in {
       val resultsFromLastTest: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromSorterTest1)
-      val reorderedList = sorter.orderListByDatePublished(resultsFromLastTest)
+      val resultsHandler = new ResultsFromPreviousTests(resultsFromLastTest)
+      val reorderedList = sorter.orderListByDatePublished(resultsHandler.oldResults)
       s3Interface.writeFileToS3(resultsFromSorterTest2, reorderedList.map(_.toCSVString()).mkString)
-      assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == previousResults.length)
-    }*/
+      assert((reorderedList.head.timeLastLaunchedAsLong() > reorderedList.tail.tail.head.timeLastLaunchedAsLong()) && (reorderedList.head.timeLastLaunchedAsLong() > reorderedList.last.timeLastLaunchedAsLong()) && reorderedList.length == resultsHandler.oldResults.length)
+    }
 
 
     "OrderedByPageWeight called on a list of results " should "return a list ordered by pageWeight" in {
-      val reorderedList = sorter.orderListByWeight(previousResults)
-      assert((reorderedList.head.bytesInFullyLoaded > reorderedList.tail.head.bytesInFullyLoaded) && (reorderedList.head.bytesInFullyLoaded > reorderedList.last.bytesInFullyLoaded) && reorderedList.length == previousResults.length)
+      val reorderedList = sorter.orderListByWeight(previousResultsHandler.previousResults)
+      assert((reorderedList.head.bytesInFullyLoaded >= reorderedList.tail.head.bytesInFullyLoaded) && (reorderedList.head.bytesInFullyLoaded >= reorderedList.last.bytesInFullyLoaded) && reorderedList.length == previousResultsHandler.previousResults.length)
     }
 
+    "OrderedByPageSpeed called on a list of results " should "return a list ordered by pageWeight" in {
+      val reorderedList = sorter.orderListBySpeed(previousResultsHandler.previousResults)
+      assert((reorderedList.head.bytesInFullyLoaded >= reorderedList.tail.head.bytesInFullyLoaded) && (reorderedList.head.bytesInFullyLoaded >= reorderedList.last.bytesInFullyLoaded) && reorderedList.length == previousResultsHandler.previousResults.length)
+    }
+
+    "OrderedInteractivesByPageSpeed called on a list of results " should "return a list ordered by pageWeight" in {
+      val reorderedList = sorter.orderInteractivesBySpeed(previousResultsHandler.previousResults)
+      assert((reorderedList.head.bytesInFullyLoaded >= reorderedList.tail.head.bytesInFullyLoaded) && (reorderedList.head.bytesInFullyLoaded >= reorderedList.last.bytesInFullyLoaded) && reorderedList.length == previousResultsHandler.previousResults.length)
+    }
+
+
+    /*
     "OrderByDatePublished called on large list" should "return same number of records" in {
       val sizeOfResults = previousResults.length
-      val sortedList = sorter.orderListByDatePublished(previousResults)
+      val sortedList = sorter.orderListByDatePublished2(previousResults)
       val sizeOfSortedList = sortedList.length
       sizeOfSortedList shouldEqual sizeOfResults
-    }
+    }*/
   }
