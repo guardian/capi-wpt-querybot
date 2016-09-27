@@ -45,8 +45,8 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   val oldestResult = previousResults.last
 
   val recentButNoRetestRequired: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if !result.needsRetest()) yield result
-  val hasPreviouslyAlerted: List[PerformanceResultsObject] = for (result <- previousResultsToRetest if result.alertStatusPageWeight || result.alertStatusPageSpeed) yield result
-  val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = previousResultsToRetest.filter(_.alertStatusPageWeight)
+  val hasPreviouslyAlerted: List[PerformanceResultsObject] = for (result <- dedupedPreviousResultsToRestest if result.alertStatusPageWeight || result.alertStatusPageSpeed) yield result
+  val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = dedupedPreviousResultsToRestest.filter(_.alertStatusPageWeight)
 
   val resultsWithNoPageElements = (recentButNoRetestRequired ::: oldResults).filter(_.editorialElementList.isEmpty)
 
