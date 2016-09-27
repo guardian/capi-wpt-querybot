@@ -112,11 +112,11 @@
     //write summaries to files
     val localFiles = new LocalFileOperations
 
-    "Element summary" should "be returned as string" in {
+   /* "Element summary" should "be returned as string" in {
       val elementSummary = dataSummary.summaryList.head
       val dataSummaryString = dataSummary.returnElementSummaryAsHTMLString(elementSummary)
       println("\n\n\n Single summary: \n" + dataSummaryString)
-    }
+    }*/
 
     "Data Summary object " should " be able to produce a data summary from the results object" in {
       println("writing run summary data to new file")
