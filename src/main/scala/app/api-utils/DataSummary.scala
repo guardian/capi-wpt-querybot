@@ -508,7 +508,8 @@ val timeNow = DateTime.now
         }
       }
       val testType = {
-        if (results.head.typeOfTest == results.tail.head.typeOfTest) {
+        if ((results.head.typeOfTestName.contains("Mobile") && (results.count(_.typeOfTestName.contains("Desktop")) == 0)) ||
+          (results.head.typeOfTestName.contains("Desktop") && (results.count(_.typeOfTestName.contains("Mobile")) == 0))) {
           results.head.typeOfTestName
         } else {
           "Both Desktop and Mobile tests"
