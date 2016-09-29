@@ -91,6 +91,9 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   val visualsApiUrl: String = configArray(6)
 
 
+  val previousResults = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+  val previousResultsHandler = new ResultsFromPreviousTests(previousResults)
+
   val urlsToTest = List(
     "https://www.theguardian.com/education/live/2016/aug/25/gcse-results-day-2016-uk-students-get-their-grades-live",
     "https://www.theguardian.com/community/gallery/2015/oct/07/baking-disasters-im-sure-it-tastes-nice-readers-share-their-worst",
@@ -442,7 +445,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
   println("size of interactive urls from CAPI = " + interactiveUrls.length)
 }
 */
-
+/*
 "Remove duplicates function" should "work as expected" in {
   //Create new S3 Client
   val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
@@ -504,7 +507,30 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     }
   }
   assert(allIsWell)
-}
+}*/
+  "previous results to retest" should "display correct results" in {
+    val resultsToRetest = previousResultsHandler.dedupedPreviousResultsToRestest
+    println("dedupedPreviousResultsToRetest\n")
+    println(resultsToRetest.map(_.testUrl + "\n"))
+
+    val hasAlertCount = previousResultsHandler.dedupedPreviousResultsToRestest.count(_.hasAlert)
+    println("\n\n\nhasAlertCount\n")
+    println( hasAlertCount + " pages out of " + previousResultsHandler.dedupedPreviousResultsToRestest.length + " in list.")
+
+    val hasPreviouslyAlerted = previousResultsHandler.hasPreviouslyAlerted
+    println("\n\n\nhasPreviouslyAlerted\n")
+    println(hasPreviouslyAlerted.map(_.testUrl + "\n"))
+
+    val pagesNotYetAlertedOn = previousResultsHandler.returnPagesNotYetAlertedOn(resultsToRetest)
+    val nonLiveblogs = pagesNotYetAlertedOn.filter(!_.liveBloggingNow.getOrElse(false))
+    println("\n\n\n pagesNotYetAlertedOn\n")
+    println(pagesNotYetAlertedOn.map(_.testUrl + "\n"))
+
+    println("\n\n\n nonLiveblogs\n")
+    println(nonLiveblogs.map(_.testUrl + "\n"))
+    assert(nonLiveblogs.isEmpty)
+  }
+
 /*
   "Getting data from results file" should " allow me to repopulate data from tests" in {
   //Create new S3 Client
