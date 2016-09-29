@@ -27,13 +27,13 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   val dedupedMobilePreviousResultsToRetest = for (result <- mobilePreviousResultsToReTest if!desktopPreviousResultsToReTest.map(_.testUrl).contains(result.testUrl)) yield result
   val dedupedStandardResultsToRestest: List[PerformanceResultsObject] = (dedupedMobilePreviousResultsToRetest ::: desktopPreviousResultsToReTest).filter(_.isNotInteractiveOrGLabs)
 
-  val interactivesFromLast96Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime96Hours && result.getPageType.contains("Interactive")) yield result
+  val interactivesFromLast96Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime96Hours && result.getPageType.contains("Interactive") && result.hasAlert) yield result
   val interactiveDesktopPagesToRetest = interactivesFromLast96Hours.filter(_.typeOfTest.contains("Desktop"))
   val interactiveMobilePagesToRetest = interactivesFromLast96Hours.filter(_.typeOfTest.contains("Android/3G"))
   val dedupedMobileInteractivePreviousResultsToRetest = for (result <- interactiveMobilePagesToRetest if!interactiveDesktopPagesToRetest.map(_.testUrl).contains(result.testUrl)) yield result
   val dedupedInteractivePreviousResultsToRetest: List[PerformanceResultsObject] = dedupedMobileInteractivePreviousResultsToRetest ::: interactiveDesktopPagesToRetest
 
-  val gLabsFromLast96Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime96Hours && result.gLabs) yield result
+  val gLabsFromLast96Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime96Hours && result.gLabs && result.hasAlert) yield result
   val gLabsDesktopPagesToRetest = gLabsFromLast96Hours.filter(_.typeOfTest.contains("Desktop"))
   val gLabsMobilePagesToRetest = gLabsFromLast96Hours.filter(_.typeOfTest.contains("Android/3G"))
   val dedupedMobileGLabsPreviousResultsToRetest = for (result <- gLabsMobilePagesToRetest if!gLabsDesktopPagesToRetest.map(_.testUrl).contains(result.testUrl)) yield result
@@ -41,12 +41,15 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   val dedupedPreviousResultsToRestest: List[PerformanceResultsObject] = dedupedStandardResultsToRestest ::: dedupedInteractivePreviousResultsToRetest ::: dedupedGLabsPreviousResultsToRetest
 
+
   val oldResults = for (result <- previousResults if result.mostRecentUpdate < cutoffTime) yield result
   val oldestResult = previousResults.last
 
   val recentButNoRetestRequired: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if !result.needsRetest()) yield result
-  val hasPreviouslyAlerted: List[PerformanceResultsObject] = for (result <- dedupedPreviousResultsToRestest if result.alertStatusPageWeight || result.alertStatusPageSpeed) yield result
-  val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = dedupedPreviousResultsToRestest.filter(_.alertStatusPageWeight)
+
+  val pagesThatMightHAveAlertedRecently = resultsFromLast24Hours ::: interactivesFromLast96Hours ::: gLabsFromLast96Hours
+  val hasPreviouslyAlerted: List[PerformanceResultsObject] = pagesThatMightHAveAlertedRecently.filter(_.hasAlert)
+  val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = pagesThatMightHAveAlertedRecently.filter(_.alertStatusPageWeight)
 
   val resultsWithNoPageElements = (recentButNoRetestRequired ::: oldResults).filter(_.editorialElementList.isEmpty)
 

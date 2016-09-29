@@ -144,10 +144,12 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
 
 
-
+  def hasAlert: Boolean = {
+    alertStatusPageWeight || alertStatusPageSpeed
+  }
 
     def needsRetest(): Boolean = {
-    getLiveBloggingNow || alertStatusPageWeight || (alertStatusPageSpeed && getPageType.contains("Interactive"))
+    getLiveBloggingNow || alertStatusPageWeight || (alertStatusPageSpeed && (getPageType.contains("Interactive") || gLabs))
   }
 
   def toStringList(): List[String] = {

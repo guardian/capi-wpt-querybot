@@ -45,7 +45,7 @@
     val interactiveSampleFileName = "interactivesamples.conf"
     val visualsPagesFileName = "visuals.conf"
 
-    val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    val resultsFromPreviousTests = "resultsFromPreviousTests_really-big.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAlertsUpdated.csv"
     //val resultsFromPreviousTests = "resultsFromPreviousTestsGenerateSamplePages.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAmalgamated.csv"
@@ -263,6 +263,25 @@
       s3Interface.writeFileToS3("samplePagesForEmbedsFromAlerts.txt", "Sample Pages for each embed type: \n \n" + output)
       assert(true)
     }*/
+
+        "Not a test but I " should "be able to get a list of pages with a given embed" in {
+
+      def getPage(pageList: List[PerformanceResultsObject]): List[String] = {
+        if (pageList.nonEmpty) {
+          pageList.map(_.testUrl + "\n")
+        } else {
+          List("no urls")
+        }
+      }
+
+      val elementList = dataSummary.pagesWithGoogleMapsEmbed
+      val pageList: List[String] = getPage(elementList)
+      val output: String = pageList.mkString
+
+      s3Interface.writeFileToS3("pageswithGoogleMaps.txt", output)
+      assert(true)
+    }
+
 
   }
 
