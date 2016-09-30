@@ -45,7 +45,8 @@
     val interactiveSampleFileName = "interactivesamples.conf"
     val visualsPagesFileName = "visuals.conf"
 
-    val resultsFromPreviousTests = "resultsFromPreviousTests_really-big.csv"
+    val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    val resultsFromPreviousTestsBig = "resultsFromPreviousTests_really-big.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAlertsUpdated.csv"
     //val resultsFromPreviousTests = "resultsFromPreviousTestsGenerateSamplePages.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAmalgamated.csv"
@@ -56,7 +57,7 @@
 
     val runSummaryFile = "runSummaryStringtestTestAlerts.txt"
     //val runSummaryHTMLFile = "runSummaryHTMLTestAlerts.html"
-    val runSummaryHTMLFile = "summarypagetest.html"
+    val runSummaryHTMLFile = "summarypagesizetest.html"
 
 
     //Create new S3 Client
@@ -100,6 +101,8 @@
     val visualsApiUrl: String = configArray(6)
 
     val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val previousResultsBig: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTestsBig)
+
     val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
     val testResultsHandler = new ResultsFromPreviousTests(previousResults)
     val alertsResultsHandler = new ResultsFromPreviousTests(previousPageWeightAlerts)
@@ -122,25 +125,43 @@
       println("writing run summary data to new file")
       val summaryPage = new SummaryPage(dataSummary)
       val summaryPageHTMLString = summaryPage.toString()
-      //s3Interface.writeFileToS3(runSummaryFile, dataSummary.summaryDataToString())
-      //s3Interface.writeFileToS3(runSummaryHTMLFile, summaryPageHTMLString)
-
-      //localFiles.writeLocalResultFile(runSummaryFile, dataSummary.summaryDataToString())
-      //localFiles.writeLocalResultFile(runSummaryHTMLFile, summaryPageHTMLString)
-      s3Interface.writeFileToS3(runSummaryFile, dataSummary.summaryDataToString())
       s3Interface.writeFileToS3(runSummaryHTMLFile, summaryPageHTMLString)
       dataSummary.printSummaryDataToScreen()
       assert(true)
+
     }
 
-  /*  "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
-      val listAudioBoomElement = previousResults.filter(_.testUrl.contains("/world/2015/mar/16/london-teenagers-stopped-syria-parents-islamic-state"))
-      val pageAndElements = listAudioBoomElement.map(page => (page.testUrl, page.editorialElementList.map(_.resource).mkString, page.editorialElementList.map(_.determinedResourceType)))
-      val samplePage = new PageElementSamples(dataSummary)
-//      localFiles.writeLocalResultFile("pageElementSamplePages.html", samplePage.toString())
-      s3Interface.writeFileToS3("pageElementSamplePages.html", samplePage.toString())
+ /*   "Data Summary object " should " be able to produce a data summary from the results object" in {
+      println("writing run summary data to new file")
+      val lastDateOfPreviousResults = previousResults.last.timeOfTest
+      val endOfRun = previousResultsBig.filter(_.timeOfTest.matches(lastDateOfPreviousResults)).take(1)
+      val resultsToReport = {if(endOfRun.nonEmpty) {
+        val indexEndOfRun = previousResultsBig.indexOf(endOfRun.head)
+        previousResults ::: previousResultsBig.drop(indexEndOfRun)
+       } else {
+        previousResults ::: previousResultsBig
+       }
+      }
+
+      val testReportResultHandler = new ResultsFromPreviousTests(resultsToReport)
+      val reportDataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testReportResultHandler, alertsResultsHandler)
+      val summaryPage = new SummaryPage(reportDataSummary)
+      val summaryPageHTMLString = summaryPage.toString()
+      s3Interface.writeFileToS3(runSummaryHTMLFile, summaryPageHTMLString)
+      dataSummary.printSummaryDataToScreen()
       assert(true)
-    }*/
+
+    }
+*/
+
+    /*  "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
+        val listAudioBoomElement = previousResults.filter(_.testUrl.contains("/world/2015/mar/16/london-teenagers-stopped-syria-parents-islamic-state"))
+        val pageAndElements = listAudioBoomElement.map(page => (page.testUrl, page.editorialElementList.map(_.resource).mkString, page.editorialElementList.map(_.determinedResourceType)))
+        val samplePage = new PageElementSamples(dataSummary)
+  //      localFiles.writeLocalResultFile("pageElementSamplePages.html", samplePage.toString())
+        s3Interface.writeFileToS3("pageElementSamplePages.html", samplePage.toString())
+        assert(true)
+      }*/
 
 /*    "Not a test but I " should "be able to get a list of pages with an example of each embed" in {
 
@@ -264,7 +285,7 @@
       assert(true)
     }*/
 
-        "Not a test but I " should "be able to get a list of pages with a given embed" in {
+/*        "Not a test but I " should "be able to get a list of pages with a given embed" in {
 
       def getPage(pageList: List[PerformanceResultsObject]): List[String] = {
         if (pageList.nonEmpty) {
@@ -274,11 +295,28 @@
         }
       }
 
-      val elementList = dataSummary.pagesWithGoogleMapsEmbed
+      val elementList = dataSummary.pagesWithSoundCloudEmbed
       val pageList: List[String] = getPage(elementList)
       val output: String = pageList.mkString
 
-      s3Interface.writeFileToS3("pageswithGoogleMaps.txt", output)
+      s3Interface.writeFileToS3("pageswithSoundcloudEmbed.txt", output)
+      assert(true)
+    }
+*/
+
+    "Not a test but I " should "be able to get a list of embeds of a given type" in {
+
+      def getPage(pageList: List[PerformanceResultsObject]): List[String] = {
+        if (pageList.nonEmpty) {
+          pageList.map(_.testUrl + "\n")
+        } else {
+          List("no urls")
+        }
+      }
+
+      val elementList = dataSummary.unknownElement
+
+      s3Interface.writeFileToS3("unknownElement.txt", "List of Unknown element resource urls\n" + elementList.map(_.resource + "\n").mkString)
       assert(true)
     }
 
