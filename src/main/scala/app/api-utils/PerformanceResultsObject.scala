@@ -124,21 +124,28 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     element.resource.contains(testUrl) ||
     element.resource.contains("assets.guim.co.uk/stylesheets") ||
     element.resource.contains("assets.guim.co.uk/javascripts") ||
+    element.resource.contains("assets.guim.co.uk/images/favicons") ||
     element.resource.contains("assets.guim.co.uk/fonts") ||
+    element.resource.contains("pasteup.guim.co.uk/fonts") ||
+    element.resource.contains("sp-bootstrap.global.ssl.fastly.net/5.2.0/fonts") ||
     element.resource.contains("www.google-analytics.com") ||
+    element.resource.contains("ssl.google-analytics.com") ||
     element.resource.contains("idapi.theguardian.com") ||
     element.resource.contains("www.theguardian.com/email") ||
     element.resource.contains("exclude-tag=tone/advertisement-features") ||
-    element.resource.contains("api.nextgen.guardianapps.co.uk/related") ||
-    element.resource.contains("api.nextgen.guardianapps.co.uk/most-read") ||
+    element.resource.contains("api.nextgen.guardianapps.co.uk") ||
     element.resource.contains("ophan") ||
     element.resource.contains("idapi.theguardian.com") ||
     element.resource.contains("api.nextgen.guardianapps.co.uk/news-alert") ||
     element.resource.contains("hits.secure.theguardian.com") ||
+    element.resource.contains("hits-secure.theguardian.com") ||
     element.resource.contains("api.nextgen.guardianapps.co.uk/discussion") ||
+    element.resource.contains("assets.guim.co.uk/discussion") ||
     element.resource.contains("members-data") ||
     element.resource.contains("beacon") ||
     element.resource.contains("api.nextgen.guardianapps.co.uk/related") ||
+    element.resource.contains("service-worker") ||
+    element.resource.contains("sb.scorecardresearch.com") ||
     element.resource.contains("data:application/x-font-woff")
   }
 
