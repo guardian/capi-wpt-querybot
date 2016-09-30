@@ -57,7 +57,7 @@ abstract  class PageElement {
     val vimeo = List("vimeocdn", "vimeo.com")
     val vine = List("vine.co")
     val webp = List("webp")
-    val youTube = List("ytimg")
+    val youTube = List("ytimg", "youtube.com")
 
     var returnString = "unknownElement"
     //check for generic formats
