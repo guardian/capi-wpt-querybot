@@ -268,6 +268,7 @@ class PageElementFromString(rowResource: String,
 
 class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
   //assumes string starts with "<tr>" and ends with "</tr>" and that elements are encapsulated by <td class=["Some kind of class"]> .... </td>
+  println("htmlTableRow:\n" + htmlTableRow)
   val requestNumberClassname: String = "reqNum"
   val resourceClassname: String = "reqUrl"
   val contentTypeClassname: String = "reqMime"
