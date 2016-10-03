@@ -215,7 +215,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       val length = elementArray.length
       var index = 0
       var elementList: List[PageElementFromHTMLTableRow] = List()
-      while(index < length-1){
+      while((index < length-1) && (!elementArray(index + 1).matches(""))){
         if((elementArray(index+2).length > 8) || elementArray(index+2).matches("-")){
           val newElement: PageElementFromHTMLTableRow = new PageElementFromParameters(elementArray(index) +
           elementArray(index + 1),
