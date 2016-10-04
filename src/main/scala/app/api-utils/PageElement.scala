@@ -26,10 +26,12 @@ abstract  class PageElement {
     val brightcove = List("bcsecure", "player.h-cdn.com")
     val cnn = List("cnn.com","z.cdn.turner.com")
     val dailymotion = List("dailymotion","dmcdn")
+    val datawrapper = List("datawrapper.dwcdn.net")
     val documentCloud = List("documentcloud")
     val facebook = List("facebook","fbcdn")
     val formstack = List("formstack")
     val googlemaps = List("maps.google.com", "maps.gstatic.com", "maps.googleapis.com", "www.google.com/maps")
+    val gLabs = List("labs.theguardian")
     val guardianAudio = List("audio.guim")
     val guardianComments = List("comment-permalink","profile.theguardian.com", "avatar.guim.co.uk/user")
     val guardianVideos = List("cdn.theguardian.tv")
@@ -47,6 +49,7 @@ abstract  class PageElement {
     val otherImage = List(".jpg", ".png", ".jpeg", ".JPEG", ".JPG", ".PNG")
     val otherVideo = List(".mp4")
     val parliamentLiveTv = List("parliamentlive.tv", "kaltura")
+    val reuters = List("reuters")
     val scribd = List("scribd")
     val soundCloud = List("sndcdn.com", "soundcloud")
     val spotify = List("scdn.co", "spotify")
@@ -75,9 +78,11 @@ abstract  class PageElement {
     if(textContainsTextFromList(resource, brightcove)){returnString = "brightcove"}
     if(textContainsTextFromList(resource, cnn)){returnString = "cnn"}
     if(textContainsTextFromList(resource, dailymotion)){returnString = "dailymotion"}
+    if(textContainsTextFromList(resource, datawrapper)){returnString = "datawrapper"}
     if(textContainsTextFromList(resource, documentCloud)){returnString = "documentCloud"}
     if(textContainsTextFromList(resource, facebook)){returnString = "facebook"}
     if(textContainsTextFromList(resource, formstack)){returnString = "formstack"}
+    if(textContainsTextFromList(resource, gLabs)){returnString = "gLabs"}
     if(textContainsTextFromList(resource, googlemaps)){returnString = "googlemaps"}
     if(textContainsTextFromList(resource, guardianAudio)){returnString = "guardianAudio"}
     if(textContainsTextFromList(resource, guardianComments)){returnString = "guardianComments"}
@@ -91,6 +96,7 @@ abstract  class PageElement {
     if(textContainsTextFromList(resource, instagram)){returnString = "instagram"}
     if(textContainsTextFromList(resource, interactive)){returnString = "interactive"}
     if(textContainsTextFromList(resource, parliamentLiveTv)){returnString = "parliamentLiveTv"}
+    if(textContainsTextFromList(resource, reuters)){returnString = "reuters"}
     if(textContainsTextFromList(resource, scribd)){returnString = "scribd"}
     if(textContainsTextFromList(resource, soundCloud)){returnString = "soundCloud"}
     if(textContainsTextFromList(resource, spotify)){returnString = "spotify"}
@@ -268,7 +274,6 @@ class PageElementFromString(rowResource: String,
 
 class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
   //assumes string starts with "<tr>" and ends with "</tr>" and that elements are encapsulated by <td class=["Some kind of class"]> .... </td>
-  println("htmlTableRow:\n" + htmlTableRow)
   val requestNumberClassname: String = "reqNum"
   val resourceClassname: String = "reqUrl"
   val contentTypeClassname: String = "reqMime"

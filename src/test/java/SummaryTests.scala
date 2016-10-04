@@ -57,8 +57,10 @@
 
     val runSummaryFile = "runSummaryStringtestTestAlerts.txt"
     //val runSummaryHTMLFile = "runSummaryHTMLTestAlerts.html"
-    val runSummaryHTMLFile = "summarypagesizetest.html"
+    val runSummaryHTMLFile = "summarypagetest.html"
+    val runSummaryHTMLFileLargeTest = "summarypagesizetest.html"
 
+    val pageElementSamplesPage = "samplepageTest.html"
 
     //Create new S3 Client
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
@@ -121,7 +123,7 @@
       println("\n\n\n Single summary: \n" + dataSummaryString)
     }*/
 
-    "Data Summary object " should " be able to produce a data summary from the results object" in {
+ /*   "Data Summary object " should " be able to produce a data summary from the results object" in {
       println("writing run summary data to new file")
       val summaryPage = new SummaryPage(dataSummary)
       val summaryPageHTMLString = summaryPage.toString()
@@ -129,9 +131,9 @@
       dataSummary.printSummaryDataToScreen()
       assert(true)
 
-    }
+    }*/
 
- /*   "Data Summary object " should " be able to produce a data summary from the results object" in {
+/*    "Data Summary object " should " be able to produce a data summary and list of page samples from the results object" in {
       println("writing run summary data to new file")
       val lastDateOfPreviousResults = previousResults.last.timeOfTest
       val endOfRun = previousResultsBig.filter(_.timeOfTest.matches(lastDateOfPreviousResults)).take(1)
@@ -147,8 +149,10 @@
       val reportDataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testReportResultHandler, alertsResultsHandler)
       val summaryPage = new SummaryPage(reportDataSummary)
       val summaryPageHTMLString = summaryPage.toString()
-      s3Interface.writeFileToS3(runSummaryHTMLFile, summaryPageHTMLString)
-      dataSummary.printSummaryDataToScreen()
+      val samplesPage = new PageElementSamples(reportDataSummary)
+      s3Interface.writeFileToS3(runSummaryHTMLFileLargeTest, summaryPageHTMLString)
+      s3Interface.writeFileToS3(pageElementSamplesPage, samplesPage.toString())
+
       assert(true)
 
     }
@@ -285,7 +289,8 @@
       assert(true)
     }*/
 
-/*        "Not a test but I " should "be able to get a list of pages with a given embed" in {
+
+        "Not a test but I " should "be able to get a list of pages with a given embed" in {
 
       def getPage(pageList: List[PerformanceResultsObject]): List[String] = {
         if (pageList.nonEmpty) {
@@ -295,16 +300,29 @@
         }
       }
 
-      val elementList = dataSummary.pagesWithSoundCloudEmbed
-      val pageList: List[String] = getPage(elementList)
-      val output: String = pageList.mkString
+      val lastDateOfPreviousResults = previousResults.last.timeOfTest
+      val endOfRun = previousResultsBig.filter(_.timeOfTest.matches(lastDateOfPreviousResults)).take(1)
+      val resultsToReport = {if(endOfRun.nonEmpty) {
+        val indexEndOfRun = previousResultsBig.indexOf(endOfRun.head)
+        previousResults ::: previousResultsBig.drop(indexEndOfRun)
+      } else {
+        previousResults ::: previousResultsBig
+      }
+      }
 
-      s3Interface.writeFileToS3("pageswithSoundcloudEmbed.txt", output)
+      val testReportResultHandler = new ResultsFromPreviousTests(resultsToReport)
+      val reportDataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testReportResultHandler, alertsResultsHandler)
+
+      val elementList = reportDataSummary.pagesWithGoogleMapsEmbed
+      val pageList: List[String] = getPage(elementList)
+      val output: String = pageList.map(url => url + "\n").mkString
+
+      s3Interface.writeFileToS3("pageswithGoogleMaps.txt", output)
       assert(true)
     }
-*/
 
-    "Not a test but I " should "be able to get a list of embeds of a given type" in {
+
+/*    "Not a test but I " should "be able to get a list of embeds of a given type" in {
 
       def getPage(pageList: List[PerformanceResultsObject]): List[String] = {
         if (pageList.nonEmpty) {
@@ -319,7 +337,7 @@
       s3Interface.writeFileToS3("unknownElement.txt", "List of Unknown element resource urls\n" + elementList.map(_.resource + "\n").mkString)
       assert(true)
     }
-
+*/
 
   }
 
