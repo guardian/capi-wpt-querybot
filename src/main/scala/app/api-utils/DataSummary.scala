@@ -180,10 +180,12 @@ val timeNow = DateTime.now
   val pagesWithBrightcoveEmbed = allResults.filter(pageContainsElementType(_, "brightcove"))
   val pagesWithCNNEmbed = allResults.filter(pageContainsElementType(_, "cnn"))
   val pagesWithDailyMotionEmbed = allResults.filter(pageContainsElementType(_, "dailymotion"))
+  val pagesWithDataWrapperEmbed = allResults.filter(pageContainsElementType(_, "datawrapper"))
   val pagesWithDocumentCloudEmbed = allResults.filter(pageContainsElementType(_, "documentCloud"))
   val pagesWithFacebookEmbed = allResults.filter(pageContainsElementType(_, "facebook"))
   val pagesWithFormStackEmbed = allResults.filter(pageContainsElementType(_, "formstack"))
   val pagesWithGifEmbed = allResults.filter(pageContainsElementType(_, "Gif Embed"))
+  val pagesWithGLabsEmbed = allResults.filter(pageContainsElementType(_, "gLabs"))
   val pagesWithGoogleMapsEmbed = allResults.filter(pageContainsElementType(_, "googlemaps"))
   val pagesWithGuardianAudio = allResults.filter(pageContainsElementType(_, "guardianAudio"))
   val pagesWithGuardianCommentsEmbed = allResults.filter(pageContainsElementType(_, "guardianComments"))
@@ -201,6 +203,7 @@ val timeNow = DateTime.now
   val pagesWithMP3Embed = allResults.filter(pageContainsElementType(_, "Audio Embed"))
   val pagesWithMP4Embed = allResults.filter(pageContainsElementType(_, "Video Embed"))
   val pagesWithParliamentLiveTvEmbed = allResults.filter(pageContainsElementType(_, "parliamentLiveTv"))
+  val pagesWithReutersEmbed = allResults.filter(pageContainsElementType(_, "reuters"))
   val pagesWithScribdEmbed = allResults.filter(pageContainsElementType(_, "scribd"))
   val pagesWithSoundCloudEmbed = allResults.filter(pageContainsElementType(_, "soundCloud"))
   val pagesWithSpotifyEmbed = allResults.filter(pageContainsElementType(_, "spotify"))
@@ -221,10 +224,12 @@ val timeNow = DateTime.now
   val brightcove: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("brightcove", List())
   val cnn: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("cnn", List())
   val dailymotion: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("dailymotion", List())
+  val datawrapper: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("datawrapper", List())
   val documentCloud: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("documentCloud", List())
   val facebook: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("facebook", List())
   val formstack: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("formstack", List())
   val gif: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("Gif Embed", List())
+  val gLabsEmbed: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("gLabs", List())
   val googlemaps: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("googlemaps", List())
   val guardianAudio: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("guardianAudio", List())
   val guardianComments: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("guardianComments", List())
@@ -242,6 +247,7 @@ val timeNow = DateTime.now
   val mP3: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("Audio Embed", List())
   val mP4: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("Video Embed", List())
   val parliamentLiveTv: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("parliamentLiveTv", List())
+  val reuters: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("reuters", List())
   val scribd: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("scribd", List())
   val soundCloud: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("soundCloud", List())
   val spotify: List[PageElementFromHTMLTableRow] = mapOfElementsByType.getOrElse("spotify", List())
@@ -261,10 +267,12 @@ val timeNow = DateTime.now
   val brightcoveSummary = summariseElement("brightcove", pagesWithBrightcoveEmbed, brightcove)
   val cnnSummary = summariseElement("cnn", pagesWithCNNEmbed, cnn)
   val dailymotionSummary = summariseElement("dailymotion", pagesWithDailyMotionEmbed, dailymotion)
+  val dataWrapperSummary = summariseElement("datawrapper", pagesWithDataWrapperEmbed, datawrapper)
   val documentCloudSummary = summariseElement("documentCloud", pagesWithDocumentCloudEmbed, documentCloud)
   val facebookSummary = summariseElement("facebook", pagesWithFacebookEmbed, facebook)
   val formstackSummary = summariseElement("formstack", pagesWithFormStackEmbed, formstack)
   val gifSummary = summariseElement("gif", pagesWithGifEmbed, gif)
+  val gLabsEmbedSummary = summariseElement("gLabs", pagesWithGLabsEmbed, gLabsEmbed)
   val googlemapsSummary = summariseElement("googlemaps", pagesWithGoogleMapsEmbed, googlemaps)
   val guardianAudioSummary = summariseElement("guardianAudio", pagesWithGuardianAudio, guardianAudio)
   val guardianCommentsSummary = summariseElement("guardianComments", pagesWithGuardianCommentsEmbed, guardianComments)
@@ -282,6 +290,7 @@ val timeNow = DateTime.now
   val mP3Summary = summariseElement("mp3 video format)", pagesWithMP3Embed, mP3)
   val mP4Summary = summariseElement("mp4 video format", pagesWithMP4Embed, mP4)
   val parliamentLiveTvSummary = summariseElement("parliamentLiveTv", pagesWithParliamentLiveTvEmbed, parliamentLiveTv)
+  val reutersSummary = summariseElement("reuters", pagesWithReutersEmbed, reuters)
   val scribdSummary = summariseElement("scribd", pagesWithScribdEmbed, scribd)
   val soundCloudSummary = summariseElement("soundCloud", pagesWithSoundCloudEmbed, soundCloud)
   val spotifySummary = summariseElement("spotify", pagesWithSpotifyEmbed, spotify)
@@ -300,10 +309,12 @@ val timeNow = DateTime.now
         brightcoveSummary,
         cnnSummary,
         dailymotionSummary,
+        dataWrapperSummary,
         documentCloudSummary,
         facebookSummary,
         formstackSummary,
         gifSummary,
+        gLabsEmbedSummary,
         googlemapsSummary,
         guardianAudioSummary,
         guardianCommentsSummary,
@@ -321,6 +332,7 @@ val timeNow = DateTime.now
         mP3Summary,
         mP4Summary,
         parliamentLiveTvSummary,
+        reutersSummary,
         scribdSummary,
         soundCloudSummary,
         spotifySummary,
@@ -345,10 +357,12 @@ val timeNow = DateTime.now
     val brightcove = getPage(pagesWithBrightcoveEmbed)
     val cnn = getPage(pagesWithCNNEmbed)
     val dailymotion = getPage(pagesWithDailyMotionEmbed)
+    val dataWrapper = getPage(pagesWithDataWrapperEmbed)
     val documentCloud = getPage(pagesWithDocumentCloudEmbed)
     val facebook = getPage(pagesWithFacebookEmbed)
     val formStack = getPage(pagesWithFormStackEmbed)
     val gif = getPage(pagesWithGifEmbed)
+    val gLabs = getPage(pagesWithGLabsEmbed)
     val googleMaps = getPage(pagesWithGoogleMapsEmbed)
     val guardianAudio = getPage(pagesWithGuardianAudio)
     val guardianComments = getPage(pagesWithGuardianCommentsEmbed)
@@ -366,6 +380,7 @@ val timeNow = DateTime.now
     val mp3 = getPage(pagesWithMP3Embed)
     val mp4 = getPage(pagesWithMP4Embed)
     val parliamentLiveTv = getPage(pagesWithParliamentLiveTvEmbed)
+    val reuters = getPage(pagesWithReutersEmbed)
     val scribd = getPage(pagesWithScribdEmbed)
     val soundCloud = getPage(pagesWithSoundCloudEmbed)
     val spotify = getPage(pagesWithSpotifyEmbed)
@@ -383,11 +398,13 @@ val timeNow = DateTime.now
       audioboom,
       brightcove,
       cnn,
+      dataWrapper,
       dailymotion,
       documentCloud,
       facebook,
       formStack,
       gif,
+      gLabs,
       googleMaps,
       guardianAudio,
       guardianComments,
@@ -405,6 +422,7 @@ val timeNow = DateTime.now
       mp3,
       mp4,
       parliamentLiveTv,
+      reuters,
       scribd,
       soundCloud,
       spotify,
