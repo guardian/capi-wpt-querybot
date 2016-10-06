@@ -13,4 +13,15 @@ jQuery(document).ready(function() {
 
         e.preventDefault();
     });
+    jQuery('.meta-tabs .tab-links-meta a').on('click', function(e)  {
+        var currentAttrValue = jQuery(this).attr('href');
+
+        // Show/Hide Tabs
+        jQuery('.meta-tabs ' + currentAttrValue).show().siblings().hide();
+
+        // Change/remove current tab to active
+        jQuery(this).parent('li').addClass('selected').siblings().removeClass('selected');
+
+        e.preventDefault();
+    });
 });

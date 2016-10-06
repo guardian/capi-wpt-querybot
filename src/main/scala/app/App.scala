@@ -639,32 +639,34 @@ object App {
       0.0
     }
 
+
     //generate summaries
         val resultSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
         val pageWeightAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newPageWeightAlerts, new ResultsFromPreviousTests(previousPageWeightAlerts), new ResultsFromPreviousTests(previousPageWeightAlerts))
         val interactiveAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newInteractiveAlertsList, new ResultsFromPreviousTests(previousInteractiveAlerts), new ResultsFromPreviousTests(previousInteractiveAlerts))
-
-        val resultsFromThisWeek = previousTestResultsHandler.previousResults.filter(_.getPageLastUpdated > startOfWeek.getMillis)
-        val alertsFromThisWeek = previousPageWeightAlerts.filter(_.getPageLastUpdated > startOfWeek.getMillis)
-
-        val weeklySummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, combinedResultsList, new ResultsFromPreviousTests(resultsFromThisWeek), new ResultsFromPreviousTests(alertsFromThisWeek))
+        val periodicReport = new PeriodicReport(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
 
     //generate summary pages
         val summaryHTMLPage = new SummaryPage(resultSummary)
         val pageWeightAlertSummaryHTMLPage = new SummaryPage(pageWeightAlertsSummary)
         val interactiveAlertSummaryHTMLPage = new SummaryPage(interactiveAlertsSummary)
-        val weeklySummaryHTMLPage = new SummaryPage(weeklySummary)
+        val periodicReportHTMLPage = new PeriodicReportPage(periodicReport)
     //write summary pages to file
         s3Interface.writeFileToS3(currentDataSummaryPage, summaryHTMLPage.toString())
         s3Interface.writeFileToS3(currentPageWeightAlertSummaryPage, pageWeightAlertSummaryHTMLPage.toString())
         s3Interface.writeFileToS3(currentInteractiveSummaryPage, interactiveAlertSummaryHTMLPage.toString())
-        s3Interface.writeFileToS3(currentWeeklySummaryPage, weeklySummaryHTMLPage.toString())
+        s3Interface.writeFileToS3(currentWeeklySummaryPage, periodicReportHTMLPage.toString())
 
     //write summaries to files
         println("writing run summary data to new file")
         s3Interface.writeFileToS3(runSummaryFile, resultSummary.summaryDataToString())
         s3Interface.writeFileToS3(pageWeightAlertSummaryFile, pageWeightAlertsSummary.summaryDataToString())
         s3Interface.writeFileToS3(interactiveAlertSummaryFile, interactiveAlertsSummary.summaryDataToString())
+
+    if (jobStart.dayOfWeek.get == 7 && (jobStart.hourOfDay().get == 23 || jobFinish.hourOfDay().get == 23)){
+      println("end of week!")
+
+    }
 
 
 
@@ -700,6 +702,7 @@ object App {
     if(!iamTestingLocally){
       s3Interface.writeFileToS3(runLog, runlogToWrite.mkString)
     }
+
 
     println("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.")
     println("Breakdown of articles returned from CAPI\n"+ 

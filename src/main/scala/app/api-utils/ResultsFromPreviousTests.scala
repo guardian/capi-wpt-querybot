@@ -4,6 +4,8 @@ import app.api.S3Operations
 import com.gu.contentapi.client.model.v1.{Tag, CapiDateTime, ContentFields}
 import org.joda.time.DateTime
 
+import scala.xml.Elem
+
 /**
  * Created by mmcnamara on 31/05/16.
  */
@@ -43,7 +45,6 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
 
   val oldResults = for (result <- previousResults if result.mostRecentUpdate < cutoffTime) yield result
-  val oldestResult = previousResults.last
 
   val recentButNoRetestRequired: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if !result.needsRetest()) yield result
 
@@ -53,7 +54,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   val resultsWithNoPageElements = (recentButNoRetestRequired ::: oldResults).filter(_.editorialElementList.isEmpty)
 
-  val timeOfOldestTest = oldestResult.timeOfTest
+  val timeOfOldestTest = if(previousResults.nonEmpty){previousResults.last.timeOfTest}else{new DateTime(0).toString}
 
   def returnPagesNotYetTested(list: List[(Option[ContentFields], Seq[Tag], String)]): List[(Option[ContentFields], Seq[Tag], String)] = {
     val pagesNotYetTested: List[(Option[ContentFields], Seq[Tag], String)] = for (page <- list if !previousResults.map(_.testUrl).contains(page._3)) yield page
@@ -362,7 +363,6 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     val result: PerformanceResultsObject = wpt.getResults(pageUrl, xmlResultUrl)
     result
   }
-
 
 }
 
