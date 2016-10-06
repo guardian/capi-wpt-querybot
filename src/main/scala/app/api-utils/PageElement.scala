@@ -28,7 +28,7 @@ abstract  class PageElement {
     val dailymotion = List("dailymotion","dmcdn")
     val datawrapper = List("datawrapper.dwcdn.net")
     val documentCloud = List("documentcloud")
-    val facebook = List("facebook","fbcdn")
+    val facebook = List("fbcdn")
     val formstack = List("formstack")
     val googlemaps = List("maps.google.com", "maps.gstatic.com", "maps.googleapis.com", "www.google.com/maps")
     val gLabs = List("labs.theguardian")

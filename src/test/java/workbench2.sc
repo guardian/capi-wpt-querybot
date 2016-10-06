@@ -47,5 +47,7 @@ println(capiTimeToString(capitime3))
 val now = DateTime.now()
 val hour = now.hourOfDay.get
 
+val dateTimeold = new DateTime(0)
 
+println(DateTime.now.plusDays(3).dayOfWeek().get)
 

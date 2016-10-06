@@ -57,7 +57,16 @@ li:target a, li:target a:hover {
     display:none;
 }
 
+
 .tab.active {
+    display:block;
+}
+
+.meta-tab {
+    display:none;
+}
+
+.meta-tab.selected {
     display:block;
 }
 

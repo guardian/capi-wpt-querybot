@@ -47,6 +47,7 @@
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
     val resultsFromPreviousTestsBig = "resultsFromPreviousTests_really-big.csv"
+    val periodicReportTest = "periodicReportTest.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAlertsUpdated.csv"
     //val resultsFromPreviousTests = "resultsFromPreviousTestsGenerateSamplePages.csv"
     //val resultsFromPreviousTests = "resultFromPreviousTestsAmalgamated.csv"
@@ -61,6 +62,7 @@
     val runSummaryHTMLFileLargeTest = "summarypagesizetest.html"
 
     val pageElementSamplesPage = "samplepageTest.html"
+    val periodicReportPage = "periodicreport.html"
 
     //Create new S3 Client
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
@@ -132,8 +134,8 @@
       assert(true)
 
     }*/
-
-/*    "Data Summary object " should " be able to produce a data summary and list of page samples from the results object" in {
+/*
+    "Data Summary object " should " be able to produce a data summary and list of page samples from the results object" in {
       println("writing run summary data to new file")
       val lastDateOfPreviousResults = previousResults.last.timeOfTest
       val endOfRun = previousResultsBig.filter(_.timeOfTest.matches(lastDateOfPreviousResults)).take(1)
@@ -157,6 +159,30 @@
 
     }
 */
+/*    "Periodic Report object " should " be able to produce a full report from the results object" in {
+      println("writing run summary data to new file")
+     /* val lastDateOfPreviousResults = previousResults.last.timeOfTest
+      val endOfRun = previousResultsBig.filter(_.timeOfTest.matches(lastDateOfPreviousResults)).take(1)
+      val resultsToReport = {if(endOfRun.nonEmpty) {
+        val indexEndOfRun = previousResultsBig.indexOf(endOfRun.head)
+        previousResults ::: previousResultsBig.drop(indexEndOfRun)
+       } else {
+        previousResults ::: previousResultsBig
+       }
+      }*/
+
+     // val testReportResultHandler = new ResultsFromPreviousTests(resultsToReport)
+     val testReportResultHandler = new ResultsFromPreviousTests(previousResults)
+      val periodicReportSummary = new PeriodicReport(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testReportResultHandler, alertsResultsHandler)
+      val periodicReportPage = new PeriodicReportPage(periodicReportSummary)
+      val summaryPageHTMLString = periodicReportPage.toString()
+      s3Interface.writeFileToS3(periodicReportTest, summaryPageHTMLString)
+      assert(true)
+
+    }
+*/
+
+
 
     /*  "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
         val listAudioBoomElement = previousResults.filter(_.testUrl.contains("/world/2015/mar/16/london-teenagers-stopped-syria-parents-islamic-state"))
@@ -290,7 +316,7 @@
     }*/
 
 
-        "Not a test but I " should "be able to get a list of pages with a given embed" in {
+/*        "Not a test but I " should "be able to get a list of pages with a given embed" in {
 
       def getPage(pageList: List[PerformanceResultsObject]): List[String] = {
         if (pageList.nonEmpty) {
@@ -313,16 +339,16 @@
       val testReportResultHandler = new ResultsFromPreviousTests(resultsToReport)
       val reportDataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testReportResultHandler, alertsResultsHandler)
 
-      val elementList = reportDataSummary.pagesWithGoogleMapsEmbed
+      val elementList = reportDataSummary.pagesWithUnknownEmbed
       val pageList: List[String] = getPage(elementList)
       val output: String = pageList.map(url => url + "\n").mkString
 
-      s3Interface.writeFileToS3("pageswithGoogleMaps.txt", output)
+      s3Interface.writeFileToS3("pageswithUnknownElements.txt", output)
       assert(true)
     }
+*/
 
-
-/*    "Not a test but I " should "be able to get a list of embeds of a given type" in {
+    "Not a test but I " should "be able to get a list of embeds of a given type" in {
 
       def getPage(pageList: List[PerformanceResultsObject]): List[String] = {
         if (pageList.nonEmpty) {
@@ -337,7 +363,7 @@
       s3Interface.writeFileToS3("unknownElement.txt", "List of Unknown element resource urls\n" + elementList.map(_.resource + "\n").mkString)
       assert(true)
     }
-*/
+
 
   }
 
