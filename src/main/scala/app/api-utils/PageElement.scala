@@ -37,7 +37,7 @@ abstract  class PageElement {
     val guardianVideos = List("cdn.theguardian.tv")
     val guardianImages = List("i.guim.co.uk/img","media.guim.co.uk")
     val guardianUpload = List("uploads.guim.co.uk")
-    val guardianWitnessImage = List("n0tice-static.s3.amazonaws.com/image/")
+    val guardianWitnessImage = List("n0tice-static.s3.amazonaws.com/image/", "contribly-public.s3.amazonaws.com/media/")
     val guardianWitnessVideo = List("https://n0tice-static.s3.amazonaws.com/video/thumbnails", "googlevideo.com")
     val hulu = List("hulu", "embed.ly")
     val infostrada = List("infostrada")
