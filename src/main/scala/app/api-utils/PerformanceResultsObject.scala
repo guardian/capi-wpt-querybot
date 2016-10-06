@@ -146,6 +146,8 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     element.resource.contains("api.nextgen.guardianapps.co.uk/related") ||
     element.resource.contains("service-worker") ||
     element.resource.contains("sb.scorecardresearch.com") ||
+    element.resource.contains("graph.facebook") ||
+    element.resource.contains("www.facebook.com/tr?id=") ||
     element.resource.contains("data:application/x-font-woff")
   }
 

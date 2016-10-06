@@ -238,9 +238,31 @@
 
     def roundAt(p: Int)(n: Double): Double = { val s = math pow (10, p); (math round n * s) / s }
 
+    def toHTML_TAB_String(): String = {
+      val HTML_TAB: String =
+        HTML_PAGE_TABS_LIST +
+          HTML_TAB_CONTENT +
+          HTML_MOBILE_TAB_CONTENT_HEADER +
+          mobilePageSummaryToHTMLString() + "<p>&nbsp;</p>" +
+          HTML_TAB_CONTENT_FOOTER +
+          HTML_DESKTOP_TAB_CONTENT_HEADER +
+          desktopPageSummaryToHTMLString() + "<p>&nbsp;</p>" +
+          HTML_TAB_CONTENT_FOOTER +
+          HTML_RUN_SUMMARY_TAB_CONTENT_HEADER +
+          runDataToHTMLString() ++ "<p>&nbsp;</p>" +
+          HTML_TAB_CONTENT_FOOTER +
+          HTML_EMBED_SUMMARY_TAB_CONTENT_HEADER +
+          combinedElementSummaryToHTMLString() +
+      HTML_TAB_CONTENT_FOOTER +
+        HTML_FOOTER + "</div>"
+      HTML_TAB
+    }
+
     override def toString(): String = {
       HTML_PAGE
     }
+
+
 
     //  def initialisePageForArticle: String = {
     //    hTMLPageHeader + hTMLTitleArticle + hTMLJobStarted
