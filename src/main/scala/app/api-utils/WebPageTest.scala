@@ -215,41 +215,49 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       testResults = scala.xml.XML.loadString(response.body.string)
     }
     averageIteratorCount = ((averageIteratorCount * (numberOfTestResultsSought - 1)) + iterator) / numberOfTestResultsSought
-    if ((testResults \\ "statusCode").text.toInt == 200) {
-      //Add one final request as occasionally 200 code comes before the data we want.
-      Thread.sleep(3000)
-      response = httpClient.newCall(request).execute()
-      testResults = scala.xml.XML.loadString(response.body.string)
-      if ((testResults \\ "response" \ "data" \ "successfulFVRuns").text.toInt > 0) {
-        println("\n" + DateTime.now + " statusCode == 200: Page ready after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds\n Refining results")
-        try {
-          val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
-          numberOfSuccessfulTests += 1
-          refineResults(pageUrl, testResults, elementsList)
-        } catch {
-          case _: Throwable => {
-            println("Page failed for some reason")
-            numberOfFailedTests += 1
-            failedTestUnknown(pageUrl, testResults)
+    if(iterator < maxCount) {
+      if ((testResults \\ "statusCode").text.toInt == 200) {
+        //Add one final request as occasionally 200 code comes before the data we want.
+        Thread.sleep(3000)
+        response = httpClient.newCall(request).execute()
+        testResults = scala.xml.XML.loadString(response.body.string)
+        if ((testResults \\ "response" \ "data" \ "successfulFVRuns").text.toInt > 0) {
+          println("\n" + DateTime.now + " statusCode == 200: Page ready after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds\n Refining results")
+          try {
+            val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
+            numberOfSuccessfulTests += 1
+            refineResults(pageUrl, testResults, elementsList)
+          } catch {
+            case _: Throwable => {
+              println("Page failed for some reason")
+              numberOfFailedTests += 1
+              failedTestUnknown(pageUrl, testResults)
+            }
           }
+        } else {
+          println(DateTime.now + " Test results show 0 successful runs ")
+          numberOfFailedTests += 1
+          failedTestNoSuccessfulRuns(pageUrl, testResults)
         }
       } else {
-        println(DateTime.now + " Test results show 0 successful runs ")
-        numberOfFailedTests += 1
-        failedTestNoSuccessfulRuns(pageUrl, testResults)
+        if ((testResults \\ "statusCode").text.toInt == 404) {
+          println(DateTime.now + " Test returned 404 error. Test ID: " + resultUrl + " is not valid")
+          numberOfFailedTests += 1
+          numberOfTestTimeOuts += 1
+          failedTestUnknown(pageUrl, testResults)
+        } else {
+          println(DateTime.now + " Test failed for unknown reason. Test ID: " + resultUrl)
+          numberOfFailedTests += 1
+          numberOfTestTimeOuts += 1
+          failedTestTimeout(pageUrl, testResults)
+        }
       }
     } else {
-      if ((testResults \\ "statusCode").text.toInt == 404) {
-        println(DateTime.now + " Test returned 404 error. Test ID: " + resultUrl + " is not valid")
-        numberOfFailedTests += 1
-        numberOfTestTimeOuts += 1
-        failedTestUnknown(pageUrl, testResults)
-      } else {
-        println(DateTime.now + " Test timed out after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds")
-        numberOfFailedTests += 1
-        numberOfTestTimeOuts += 1
-        failedTestTimeout(pageUrl, testResults)
-      }
+      println(DateTime.now + " Test timed out after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds")
+      println("Test id is: "+ resultUrl)
+      numberOfFailedTests += 1
+      numberOfTestTimeOuts += 1
+      failedTestTimeout(pageUrl, testResults)
     }
   }
 
