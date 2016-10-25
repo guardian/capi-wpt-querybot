@@ -250,7 +250,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
           println(DateTime.now + " Test failed for unknown reason. Test ID: " + resultUrl)
           numberOfFailedTests += 1
           numberOfTestTimeOuts += 1
-          failedTestTimeout(pageUrl, testResults)
+          failedTestUnknown(pageUrl, testResults)
         }
       }
     } else {
@@ -258,7 +258,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       println("Test id is: "+ resultUrl)
       numberOfFailedTests += 1
       numberOfTestTimeOuts += 1
-      failedTestTimeout(pageUrl, testResults)
+      failedTestTimeout(pageUrl, resultUrl)
     }
   }
 
@@ -419,7 +419,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       println(DateTime.now + " Test timed out after " + roundAt(0)(((iterator + 1) * msTimeBetweenPings) / 1000).toInt + " seconds")
       numberOfFailedTestsForMultipleTests +=1
       numberOfTestTimeOutsForMultipleTests += 2
-      failedTestTimeout(pageUrl, testResults)
+      failedTestTimeout(pageUrl, resultUrl)
     }
   }
 
