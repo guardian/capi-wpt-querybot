@@ -203,6 +203,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       .url(resultUrl)
       .get()
       .build()
+    println("request is:" + request)
     var response: Response = httpClient.newCall(request).execute()
     println("Processing response and checking if results are ready")
     var testResults: Elem = scala.xml.XML.loadString(response.body.string)
@@ -515,12 +516,12 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     failElement
   }
 
-  def failedTestTimeout(url: String, rawResults: Elem): PerformanceResultsObject = {
+  def failedTestTimeout(url: String, resultUrl: String): PerformanceResultsObject = {
     val failIndicator: Int = -1
-    val testType: String = if((rawResults \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")){"Android/3G"}else{"Desktop"}
+    val testType: String = "Unknown"
     val failComment: String = "Test request timed out"
     // set warning status as result may have timed out due to very large page
-    val failElement: PerformanceResultsObject = new PerformanceResultsObject(url, testType, failComment, failIndicator, failIndicator,failIndicator,failIndicator,failIndicator,failIndicator,failIndicator, failComment, true, true, true)
+    val failElement: PerformanceResultsObject = new PerformanceResultsObject(url, testType, failComment, failIndicator, failIndicator,failIndicator,failIndicator,failIndicator,failIndicator,failIndicator, resultUrl, true, true, true)
     failElement
   }
 
