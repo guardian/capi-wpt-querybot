@@ -105,7 +105,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
   def dedupeList(inputList: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
       var workingList: List[PerformanceResultsObject] = List()
     for (result <- inputList) {
-      if(!workingList.map(page => (page.testUrl, page.typeOfTest, page.getPageLastUpdated)).contains((result.testUrl,result.typeOfTest,result.getPageLastUpdated))){
+      if(!workingList.map(page => (page.testUrl, page.typeOfTest)).contains((result.testUrl,result.typeOfTest))){
         workingList = workingList ::: List(result)
       }
     }
