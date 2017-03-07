@@ -115,7 +115,7 @@
     println("**** audioBoom counter: " + audioboomcounter.length)
 
 
-    val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testResultsHandler, alertsResultsHandler)
+    val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, 5, 3, 1, 0, emptyPerfResults, testResultsHandler, alertsResultsHandler)
     //write summaries to files
     val localFiles = new LocalFileOperations
 
@@ -358,9 +358,11 @@
         }
       }
 
-      val elementList = dataSummary.unknownElement
+      //val elementList = dataSummary.unknownElement
+      val pageList = dataSummary.pagesWithInstagramEmbed
 
-      s3Interface.writeFileToS3("unknownElement.txt", "List of Unknown element resource urls\n" + elementList.map(_.resource + "\n").mkString)
+      //s3Interface.writeFileToS3("unknownelements.txt", "List of unknown elements\n" + elementList.map(_.resource + "\n").mkString)
+      s3Interface.writeFileToS3("pageswithinstagramembed.txt", "List of pages with facebook embed\n" + getPage(pageList).mkString)
       assert(true)
     }
 

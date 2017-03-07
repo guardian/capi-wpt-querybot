@@ -168,8 +168,10 @@ object App {
     //obtain list of email addresses for alerting
     val emailAddresses: Array[List[String]] = s3Interface.getEmailAddresses
     val generalAlertsAddressList: List[String] = emailAddresses(0)
-    val interactiveAlertsAddressList: List[String] = emailAddresses(1)
-    val gLabsAlertsAddressList: List[String] = emailAddresses(2)
+    val ukInteractiveAlertsAddressList: List[String] = emailAddresses(1)
+    val usInteractiveAlertsAddressList: List[String] = emailAddresses(2)
+    val auInteractiveAlertsAddressList: List[String] = emailAddresses(3)
+    val gLabsAlertsAddressList: List[String] = emailAddresses(4)
 
     //Create Email Handler class
     val emailer: EmailOperations = new EmailOperations(emailUsername, emailPassword)
@@ -205,12 +207,12 @@ object App {
     //  Define new CAPI Query object
     val capiQuery = new ArticleUrls(contentApiKey)
     //get all content-type-lists
-    val articles: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Article")
-    val liveBlogs: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("LiveBlog")
-    val interactives: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Interactive")
-    val fronts: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Front")
-    val videoPages: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Video")
-    val audioPages: List[(Option[ContentFields], Seq[Tag], String)] = capiQuery.getUrlsForContentType("Audio")
+    val articles: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Article")
+    val liveBlogs: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("LiveBlog")
+    val interactives: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Interactive")
+    val fronts: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Front")
+    val videoPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Video")
+    val audioPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Audio")
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
 
@@ -261,13 +263,13 @@ object App {
     val previousInteractivesToRetest: List[PerformanceResultsObject] = for (result <- previousResultsToRetest if result.getPageType.contains("Interactive")) yield result
 
     // munge into proper format and merge these with the capi results
-    val previousArticlesReTestContentFieldsAndUrl = previousArticlesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl))
-    val previousLiveBlogReTestContentFieldsAndUrl = previousLiveBlogsToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl))
-    val previousInteractiveReTestContentFieldsAndUrl = previousInteractivesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl))
+    val previousArticlesReTestContentFieldsAndUrl = previousArticlesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl, result.createdBy))
+    val previousLiveBlogReTestContentFieldsAndUrl = previousLiveBlogsToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl, result.createdBy))
+    val previousInteractiveReTestContentFieldsAndUrl = previousInteractivesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl, result.createdBy))
 
-    val combinedArticleList: List[(Option[ContentFields], Seq[Tag], String)] = previousArticlesReTestContentFieldsAndUrl ::: newOrChangedArticles
-    val combinedLiveBlogList: List[(Option[ContentFields], Seq[Tag], String)] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
-    val combinedInteractiveList: List[(Option[ContentFields], Seq[Tag], String)] = previousInteractiveReTestContentFieldsAndUrl ::: newOrChangedInteractives
+    val combinedArticleList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = previousArticlesReTestContentFieldsAndUrl ::: newOrChangedArticles
+    val combinedLiveBlogList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
+    val combinedInteractiveList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = previousInteractiveReTestContentFieldsAndUrl ::: newOrChangedInteractives
 
     //create sorter object - contains functions for ordering lists of Performance Results Objects
     val sorter = new ListSorter
@@ -478,6 +480,8 @@ object App {
     val pageWeightAlertsFixedThisRun = for (alert <- previousTestResultsHandler.hasPreviouslyAlertedOnWeight if !(articlePageWeightAlertList ::: liveBlogPageWeightAlertList ::: interactivePageWeightAlertList).map(result => (result.testUrl, result.typeOfTest)).contains((alert.testUrl, alert.typeOfTest))) yield alert
     val pageWeightAlertsFixedCSVString = (pageWeightAlertsFixedThisRun ::: pageWeightAlertsPreviouslyFixed).map(_.toCSVString()).mkString
 
+    val interactiveAlertsFixedThisRun = previousTestResultsHandler.hasPreviouslyAlerted.filter(_.getPageType.toLowerCase.contains("interactive"))
+
     val listOfDupes = for (result <- sortedByWeightCombinedResults if sortedByWeightCombinedResults.map(page => (page.testUrl, page.typeOfTest)).count(_ == (result.testUrl,result.typeOfTest)) > 1) yield result
 
     val listOfPagesWithInsecureElements = (combinedResultsList ::: previousPagesWithInsecureElements).filter(_.fullElementList.exists(test => test.resource.take(5).contains("http:")))
@@ -576,10 +580,19 @@ object App {
     }
 
     if (newInteractiveAlertsList.nonEmpty) {
+      println("dividing interactive's by their production office")
+      val ukInteractives = newInteractiveAlertsList.filter(_.productionOffice.getOrElse("").contains("UK"))
+      val usInteractives = newInteractiveAlertsList.filter(_.productionOffice.getOrElse("").contains("US"))
+      val auInteractives = newInteractiveAlertsList.filter(_.productionOffice.getOrElse("").contains("AU"))
       println("There are new interactive email alerts to send - length of list is: " + newInteractiveAlertsList.length)
-      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractiveAlertsList, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
-      val interactiveEmailSuccess = emailer.sendInteractiveAlert(interactiveAlertsAddressList, interactiveEmailAlerts.toString())
-      if (interactiveEmailSuccess) {
+      val ukInteractiveEmailAlerts = new InteractiveEmailTemplate(ukInteractives, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
+      val usInteractiveEmailAlerts = new InteractiveEmailTemplate(usInteractives, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
+      val auInteractiveEmailAlerts = new InteractiveEmailTemplate(auInteractives, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
+
+      val ukInteractiveEmailSuccess = emailer.sendInteractiveAlert(ukInteractiveAlertsAddressList, ukInteractiveEmailAlerts.toString())
+      val usInteractiveEmailSuccess = emailer.sendInteractiveAlert(usInteractiveAlertsAddressList, usInteractiveEmailAlerts.toString())
+      val auInteractiveEmailSuccess = emailer.sendInteractiveAlert(auInteractiveAlertsAddressList, auInteractiveEmailAlerts.toString())
+      if (ukInteractiveEmailSuccess && usInteractiveEmailSuccess && auInteractiveEmailSuccess) {
         println("Interactive Alert email sent successfully.")
       } else {
         println("ERROR: Sending of Interactive Alert Emails failed")
@@ -641,10 +654,10 @@ object App {
 
 
     //generate summaries
-        val resultSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
-        val pageWeightAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newPageWeightAlerts, new ResultsFromPreviousTests(previousPageWeightAlerts), new ResultsFromPreviousTests(previousPageWeightAlerts))
-        val interactiveAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newInteractiveAlertsList, new ResultsFromPreviousTests(previousInteractiveAlerts), new ResultsFromPreviousTests(previousInteractiveAlerts))
-        val periodicReport = new PeriodicReport(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
+        val resultSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newArticlePageWeightAlertsList.length, pageWeightAlertsFixedThisRun.count(_.getPageType.toLowerCase.contains("article")), newInteractiveAlertsList.length, interactiveAlertsFixedThisRun.length, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
+        val pageWeightAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newArticlePageWeightAlertsList.length, pageWeightAlertsFixedThisRun.count(_.getPageType.toLowerCase.contains("article")), newInteractiveAlertsList.length, interactiveAlertsFixedThisRun.length, newPageWeightAlerts, new ResultsFromPreviousTests(previousPageWeightAlerts), new ResultsFromPreviousTests(previousPageWeightAlerts))
+        val interactiveAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newArticlePageWeightAlertsList.length, pageWeightAlertsFixedThisRun.count(_.getPageType.toLowerCase.contains("article")), newInteractiveAlertsList.length, interactiveAlertsFixedThisRun.length, newInteractiveAlertsList, new ResultsFromPreviousTests(previousInteractiveAlerts), new ResultsFromPreviousTests(previousInteractiveAlerts))
+        val periodicReport = new PeriodicReport(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newArticlePageWeightAlertsList.length, pageWeightAlertsFixedThisRun.count(_.getPageType.toLowerCase.contains("article")), newInteractiveAlertsList.length, interactiveAlertsFixedThisRun.length, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
 
     //generate summary pages
         val summaryHTMLPage = new SummaryPage(resultSummary)
@@ -742,21 +755,21 @@ object App {
     desktopResults ::: mobileResults
   }
 
-  def listenForResultPages(capiPages: List[(Option[ContentFields], Seq[Tag], String)], contentType: String, resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String]): List[PerformanceResultsObject] = {
+  def listenForResultPages(capiPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])], contentType: String, resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String]): List[PerformanceResultsObject] = {
     println("ListenForResultPages called with: \n\n" +
       " List of Urls: \n" + capiPages.map(page => page._3).mkString +
       "\n\nList of WebPage Test results: \n" + resultUrlList.mkString +
       "\n\nList of averages: \n" + averages.toHTMLString + "\n")
 
     val listenerList: List[WptResultPageListener] = capiPages.flatMap(page => {
-      for (element <- resultUrlList if element._1 == page._3) yield new WptResultPageListener(element._1, contentType, page._1, page._2, element._2)
+      for (element <- resultUrlList if element._1 == page._3) yield new WptResultPageListener(element._1, contentType, page._1, page._2, element._2, page._4)
     })
 
     println("Listener List created: \n" + listenerList.map(element => "list element: \n" + "url: " + element.pageUrl + "\n" + "resulturl" + element.wptResultUrl + "\n"))
 
     val resultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
-      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields, element.tagList, element.wptResultUrl)
+      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields, element.tagList, element.wptResultUrl, element.contentCreator)
       println("getting result for page element")
       newElement.testResults = wpt.getResults(newElement.pageUrl,newElement.wptResultUrl)
       println("result received\n setting headline")
@@ -771,6 +784,10 @@ object App {
       newElement.testResults.setLiveBloggingNow(newElement.liveBloggingNow.getOrElse(false))
       println("liveBloggingNow set\n setting gLabs flag")
       newElement.testResults.setGLabs(newElement.gLabs.toString)
+      println("gLabs set \n setting production office")
+      newElement.testResults.productionOffice = newElement.productionOffice
+      println("production office set \n setting content creator")
+      newElement.testResults.createdBy = newElement.contentCreator
       println("all variables set for element")
       newElement
     })

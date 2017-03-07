@@ -56,9 +56,9 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   val timeOfOldestTest = if(previousResults.nonEmpty){previousResults.last.timeOfTest}else{new DateTime(0).toString}
 
-  def returnPagesNotYetTested(list: List[(Option[ContentFields], Seq[Tag], String)]): List[(Option[ContentFields], Seq[Tag], String)] = {
-    val pagesNotYetTested: List[(Option[ContentFields], Seq[Tag], String)] = for (page <- list if !previousResults.map(_.testUrl).contains(page._3)) yield page
-    val pagesAlreadyTested:List[(Option[ContentFields], Seq[Tag], String)] = for (page <- list if previousResults.map(_.testUrl).contains(page._3)) yield page
+  def returnPagesNotYetTested(list: List[(Option[ContentFields], Seq[Tag], String, Option[String])]): List[(Option[ContentFields], Seq[Tag], String, Option[String])] = {
+    val pagesNotYetTested: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (page <- list if !previousResults.map(_.testUrl).contains(page._3)) yield page
+    val pagesAlreadyTested:List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (page <- list if previousResults.map(_.testUrl).contains(page._3)) yield page
     val testedPagesBothSourcesThatHaveChangedSinceLastTest = pagesAlreadyTested.flatMap(page => {
       for (result <- previousResults if result.testUrl.contains(page._3) && result.mostRecentUpdate < page._1.get.lastModified.getOrElse(new CapiDateTime {
         override def dateTime: Long = 0

@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 28/06/16.
  */
-class DataSummary(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesFromCapi: Int, numberOfPagesTested: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests, alertsResultsObject: ResultsFromPreviousTests) {
+class DataSummary(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesFromCapi: Int, numberOfPagesTested: Int, numberNewPageWeightAlerts: Int, numberPageWeightAlertsResolved: Int, numberNewInteractiveAlerts: Int, numberInteractiveAlertsResolved: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests, alertsResultsObject: ResultsFromPreviousTests) {
   /*
 Data summary
 Its time to take note of pages tested each run,
@@ -506,6 +506,10 @@ val timeNow = DateTime.now
       "<p style = \"margin-left: 40px\">Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun + "</p>" +  "\n" +
       "<p style = \"margin-left: 40px\">Number of pages tested: " + numberOfPagesSentToWPT + "</p>" +  "\n" +
       "<p style = \"margin-left: 40px\">Number of failed tests: " + numberOfFailedTests + "</p>" +  "\n" +
+      "<p style = \"margin-left: 40px\">Number of new Article alerts: " + numberNewPageWeightAlerts + "</p>" +  "\n" +
+      "<p style = \"margin-left: 40px\">Number of Article alerts resolved: " + numberPageWeightAlertsResolved + "</p>" +  "\n" +
+      "<p style = \"margin-left: 40px\">Number of new Interactive alerts: " + numberNewInteractiveAlerts + "</p>" +  "\n" +
+      "<p style = \"margin-left: 40px\">Number of Interactive Alerts resolved: " + numberInteractiveAlertsResolved + "</p>" +  "\n" +
       "</div>" + "\n"
     val elementString: String = sortedCombinedSummaryList.map(elementData => returnElementSummaryAsHTMLString(elementData)).mkString
     runString + elementString
