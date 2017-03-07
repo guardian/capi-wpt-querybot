@@ -185,12 +185,9 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
         val elementArray = data.drop(23)
         //val elementArray = data.drop(21)
         //            println("elementArray: " + elementArray.map(_.toString + "\n").mkString)
-        println("element array length: " + elementArray.length)
         if (elementArray.length > 9) {
           if ((elementArray(9).toInt > 0) && (data(10).toInt > -1)) {
-            println("call get getElementListFromArray")
             val elementList = getElementListFromArray(elementArray)
-            println("returned from getElementListFromArray")
             if (elementList.nonEmpty) {
               result.fullElementList = elementList
               result.populateEditorialElementList(elementList)
