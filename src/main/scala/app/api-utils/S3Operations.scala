@@ -181,37 +181,44 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           data(18).toBoolean,
           data(19).toBoolean,
           data(20).toBoolean)
-          val elementArray = data.drop(23)
-          //val elementArray = data.drop(21)
-          //            println("elementArray: " + elementArray.map(_.toString + "\n").mkString)
-          if (elementArray.length > 9) {
+        if (data.length > 21) {
+        val elementArray = data.drop(23)
+        //val elementArray = data.drop(21)
+        //            println("elementArray: " + elementArray.map(_.toString + "\n").mkString)
+        println("element array length: " + elementArray.length)
+        if (elementArray.length > 9) {
           if ((elementArray(9).toInt > 0) && (data(10).toInt > -1)) {
-              val elementList = getElementListFromArray(elementArray)
-              if (elementList.nonEmpty) {
-                result.fullElementList = elementList
-                result.populateEditorialElementList(elementList)
-             } else {
-                println("returned list from getElementListFromArray is empty")
-             }
+            println("call get getElementListFromArray")
+            val elementList = getElementListFromArray(elementArray)
+            println("returned from getElementListFromArray")
+            if (elementList.nonEmpty) {
+              result.fullElementList = elementList
+              result.populateEditorialElementList(elementList)
             } else {
-              println("Data in element array is not valid.\n")
-              println("elementArray(2).toInt gives: " + elementArray(2).toInt)
-              println("data(9).toInt gives: " + data(10).toInt)
-           }
+              println("returned list from getElementListFromArray is empty")
+            }
           } else {
-            println("no elements present for this result")
+            println("Data in element array is not valid.\n")
+            println("elementArray(2).toInt gives: " + elementArray(2).toInt)
+            println("data(9).toInt gives: " + data(10).toInt)
           }
-          result.setHeadline(Option(data(2)))
-          result.setPageType(data(3))
-          val firstPublishedTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
-          result.setFirstPublished(firstPublishedTime)
-          val lastUpdateTime: Option[CapiDateTime] = result.stringtoCAPITime(data(5))
-          result.setPageLastUpdated(lastUpdateTime)
-          result.setLiveBloggingNow(data(6))
-          result.setGLabs(data(7))
-          result.setProductionOffice(data(21))
-          result.setCreator(data(22))
+        } else {
+          println("no elements present for this result")
+        }
+        result.setHeadline(Option(data(2)))
+        result.setPageType(data(3))
+        val firstPublishedTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
+        result.setFirstPublished(firstPublishedTime)
+        val lastUpdateTime: Option[CapiDateTime] = result.stringtoCAPITime(data(5))
+        result.setPageLastUpdated(lastUpdateTime)
+        result.setLiveBloggingNow(data(6))
+        result.setGLabs(data(7))
+        result.setProductionOffice(data(21))
+        result.setCreator(data(22))
+        result
+      } else {
           result
+        }
       }
       resultsIterator.toList
     } else {
