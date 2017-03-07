@@ -45,7 +45,8 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   val pagesWithInsecureElements = ""
   val visualsPagesFileName = "visuals.conf"
 
- val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+  val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+//  val resultsFromPreviousTests = "interactives.csv"
 // val resultsFromPreviousTests = "resultsFromPreviousTestsShortened.csv"
 //val resultsFromPreviousTests = "shortenedresultstest.csv"
   val outputFile = "shortenedresultstest.csv"
@@ -92,7 +93,7 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
 
 
   val previousResults = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
-  val previousResultsHandler = new ResultsFromPreviousTests(previousResults)
+  //val previousResultsHandler = new ResultsFromPreviousTests(previousResults)
 
   val urlsToTest = List(
     "https://www.theguardian.com/education/live/2016/aug/25/gcse-results-day-2016-uk-students-get-their-grades-live",
@@ -508,7 +509,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
   }
   assert(allIsWell)
 }*/
-  "previous results to retest" should "display correct results" in {
+/*  "previous results to retest" should "display correct results" in {
     val resultsToRetest = previousResultsHandler.dedupedPreviousResultsToRestest
     println("dedupedPreviousResultsToRetest\n")
     println(resultsToRetest.map(_.testUrl + "\n"))
@@ -530,7 +531,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     println(nonLiveblogs.map(_.testUrl + "\n"))
     assert(nonLiveblogs.isEmpty)
   }
-
+*/
 /*
   "Getting data from results file" should " allow me to repopulate data from tests" in {
   //Create new S3 Client
@@ -775,6 +776,29 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     assert(true)
   }*/
 
+  "not a test" should "generate list of pages with creation office and creator obtained from CAPI" in {
+    val previousResults = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
+    val capiQuery = new ArticleUrls(contentApiKey)
+    val resultsWithcreationOfficeandCreator = previousResults.map(result => {
+      if(result.getPageType.contains("Interactive")){
+        println("\n\n\n\n\n\n\n\n requesting capi result for: " + result.testUrl + "\n")
+        val capiResult = capiQuery.getSinglePage(result.testUrl)
+        val prod = capiResult._1.flatMap(_.productionOffice).map(_.name).getOrElse("Nothing there")
+        val prodOffice = capiResult._1.flatMap(_.productionOffice.map(_.name)).getOrElse("Nothing there")
+        println("\n\n\n CAPI RESULT: \n"  + "Result: \n" + capiResult.toString + "\n\n\n" + "attempt 1: \n" + prod + "\n" + "attempt 2: \n" + prodOffice + "\n\n\n" )
+        result.productionOffice = capiResult._1.flatMap(_.productionOffice.map(_.name))
+        result.createdBy = capiResult._4
+        result
+      } else
+          result
+    })
+
+    //val resultsToWriteToFile = resultsWithcreationOfficeandCreator.map(_.toCSVString()).mkString
+    //s3Interface.writeFileToS3("previousResultsWithCreatorInfo.csv", resultsToWriteToFile)
+    //println("written out file with " + resultsWithcreationOfficeandCreator.length + " rows")
+    assert(resultsWithcreationOfficeandCreator.filter(_.getPageType.contains("Interactive")).head.productionOffice.isDefined)
+  }
+
   def getResult(resultUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String], articleUrls: ArticleUrls): PerformanceResultsObject = {
     //val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
     val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
@@ -790,6 +814,24 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     newResult
   }
 
+  def getInteractiveResult(resultUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String], articleUrls: ArticleUrls): Option[PerformanceResultsObject] = {
+    //val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
+    val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
+    val pageUrl = "unknown"
+    val cAPIPage = articleUrls.getInteractives(1).headOption
+    val populatedResult = cAPIPage.map { page =>
+      val requestedPage = wpt.sendPage(page._3)
+      val newResult = wpt.getResults(page._3, requestedPage)
+      newResult.headline = page._1.get.headline
+      newResult.pageType = Option("Interactive")
+      newResult.firstPublished = page._1.get.firstPublicationDate
+      newResult.pageLastUpdated = page._1.get.lastModified
+      newResult.liveBloggingNow = page._1.get.liveBloggingNow
+      setAlertStatus(newResult)
+      newResult
+    }
+    populatedResult
+  }
 
 
 

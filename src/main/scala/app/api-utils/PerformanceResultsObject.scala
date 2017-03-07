@@ -50,6 +50,8 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   var pageLastUpdated: Option[CapiDateTime] = None
   var liveBloggingNow: Option[Boolean] = None
   var gLabs = false
+  var productionOffice: Option[String] = None
+  var createdBy: Option[String] = None
   var anchorId: Option[String] = None
 
   var fullElementList: List[PageElementFromHTMLTableRow] = List()
@@ -70,6 +72,23 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   def setGLabs(isGLabs: String):Unit = {
     gLabs = isGLabs.contains("True") || isGLabs.contains("true")
   }
+
+  def setProductionOffice(office: String): Unit = {
+    if(office.nonEmpty){
+      productionOffice = Some(office)
+    } else {
+      productionOffice = None
+    }
+  }
+
+  def setCreator(emailAddress: String): Unit = {
+    if(emailAddress.nonEmpty){
+      createdBy = Some(emailAddress)
+    } else {
+      createdBy = None
+    }
+  }
+
 
   def getPageType:String = {
       pageType.getOrElse("Unknown")
@@ -166,7 +185,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + "," + gLabs + "," + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + editorialElementList.map(element => "," + element.toCSVString()).mkString + "\n"
+    printTimeLastLaunched() + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + "," + gLabs + "," + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + "," + productionOffice.getOrElse("") + "," + createdBy.getOrElse("") + editorialElementList.map(element => "," + element.toCSVString()).mkString + "\n"
   }
 
   def toCSVStringTestOutput(): String = {

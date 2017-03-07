@@ -130,16 +130,20 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
     println("session id: " + session.toString)
 
     try {
-      val message: Message = new MimeMessage(session)
-      message.setFrom(new InternetAddress(username))
-      message.setRecipients(Message.RecipientType.TO,
-        internetAddressList.toArray)
-      message.setSubject("Interactive Performance Alert - The following interactive pages have been measured as too slow or too heavy")
-      message.setContent(messageBody, "text/html")
-      println("message deets: \n" + message.toString + "\n from: " + message.getFrom.toString + "\n to: " + message.getAllRecipients.toString + "\n Session: " + message.getSession.toString)
-      Transport.send(message, message.getAllRecipients, username, password )
-      println("Success - Your Email has been sent")
-      true
+      if(emailAddressList.nonEmpty) {
+        true
+      } else {
+        val message: Message = new MimeMessage(session)
+        message.setFrom(new InternetAddress(username))
+        message.setRecipients(Message.RecipientType.TO,
+          internetAddressList.toArray)
+        message.setSubject("Interactive Performance Alert - The following interactive pages have been measured as too slow or too heavy")
+        message.setContent(messageBody, "text/html")
+        println("message deets: \n" + message.toString + "\n from: " + message.getFrom.toString + "\n to: " + message.getAllRecipients.toString + "\n Session: " + message.getSession.toString)
+        Transport.send(message, message.getAllRecipients, username, password)
+        println("Success - Your Email has been sent")
+        true
+      }
     }
     catch {
       case e: MessagingException => println("Message Failed: \n" + e)
