@@ -144,6 +144,12 @@ class EmailTests extends EmailUnitSpec with Matchers {
     assert(paidContentEmail.toString().contains(singleResultText) && paidContentEmail.toString().contains(twoResultsText) && paidContentEmail.toString().contains(threeResultsText))
   }
 
+  "An interactive Email" should "contain a list of the relevant people to send to" in {
+    testResult1.setCreator("testResult1Creator@test.com")
+    testResult1.setProductionOffice("US")
+
+  }
+
  /* "A Paid-Content Email list with 3 Results" should "send succesfully" in {
     val paidContentEmail = new GLabsEmailTemplate(testResultList3results, fakeDashboardUrl, fakeOtherDashboardUrl)
     //      println(pageWeightEmail.toString())

@@ -51,3 +51,40 @@ val dateTimeold = new DateTime(0)
 
 println(DateTime.now.plusDays(3).dayOfWeek().get)
 
+
+
+sealed abstract class Person(val name: String, val address: String, val ageBracket: String)
+
+case class GenX(override val name: String, override val address: String) extends Person(name: String, address: String, "35 - 50")
+case class GenY(override val name: String, override val address: String) extends Person(name: String, address: String, "20 - 35")
+case class GenZ(override val name: String, override val address: String) extends Person(name: String, address: String, "0 - 16")
+
+def categorisePerson(name: String, address: String, generation: String): Option[Person] = {
+  generation match {
+    case "genX" => Some(GenX(name, address))
+    case "genY" => Some(GenY(name, address))
+    case "genZ" => Some(GenZ(name, address))
+    case _ => None
+  }
+}
+
+def isAPerson(name: String, address: String, generation: String): String = {
+  val schrodinger = categorisePerson(name, address, generation)
+  schrodinger match {
+    case Some(Person) => "This is a person"
+    case None => "Not a person"
+  }
+}
+
+
+object Person {
+
+
+  val candidate = categorisePerson("bob", "martin", "genY")
+  val candidate2 = categorisePerson("james", "May", "genX")
+  val candidate3 = categorisePerson("Mary", "May", "genZ")
+
+  val candidateList = List(candidate, candidate2, candidate3)
+
+
+}

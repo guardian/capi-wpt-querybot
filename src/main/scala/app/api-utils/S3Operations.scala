@@ -81,14 +81,18 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
 
     println("returning config object")
     val generalAlerts = conf.getStringList("general.alerts").toList
-    val interactiveAlerts = conf.getStringList("interactive.alerts").toList
+    val ukInteractiveAlerts = conf.getStringList("uk.interactive.alerts").toList
+    val usInteractiveAlerts = conf.getStringList("us.interactive.alerts").toList
+    val auInteractiveAlerts = conf.getStringList("au.interactive.alerts").toList
     val gLabsAlerts = conf.getStringList("glabs.alerts").toList
-    if (generalAlerts.nonEmpty || interactiveAlerts.nonEmpty || gLabsAlerts.nonEmpty){
+    if (generalAlerts.nonEmpty || ukInteractiveAlerts.nonEmpty || usInteractiveAlerts.nonEmpty || auInteractiveAlerts.nonEmpty || gLabsAlerts.nonEmpty){
       println(DateTime.now + " Config retrieval successful. \n You have retrieved the following users\n" +
         generalAlerts + "\n" +
-        interactiveAlerts + "\n" +
+        ukInteractiveAlerts + "\n" +
+        usInteractiveAlerts + "\n" +
+        auInteractiveAlerts + "\n" +
         gLabsAlerts)
-      val returnArray = Array(generalAlerts, interactiveAlerts,gLabsAlerts)
+      val returnArray = Array(generalAlerts, ukInteractiveAlerts, usInteractiveAlerts, auInteractiveAlerts, gLabsAlerts)
       returnArray
     }
     else {
@@ -177,6 +181,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           data(18).toBoolean,
           data(19).toBoolean,
           data(20).toBoolean)
+          //val elementArray = data.drop(23)
           val elementArray = data.drop(21)
           //            println("elementArray: " + elementArray.map(_.toString + "\n").mkString)
           if (elementArray.length > 9) {
@@ -204,6 +209,10 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           result.setPageLastUpdated(lastUpdateTime)
           result.setLiveBloggingNow(data(6))
           result.setGLabs(data(7))
+          //result.setProductionOffice(data(21))
+          //result.setCreator(data(22))
+          result.setProductionOffice("")
+          result.setCreator("")
           result
       }
       resultsIterator.toList
