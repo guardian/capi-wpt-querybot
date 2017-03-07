@@ -181,8 +181,8 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           data(18).toBoolean,
           data(19).toBoolean,
           data(20).toBoolean)
-          //val elementArray = data.drop(23)
-          val elementArray = data.drop(21)
+          val elementArray = data.drop(23)
+          //val elementArray = data.drop(21)
           //            println("elementArray: " + elementArray.map(_.toString + "\n").mkString)
           if (elementArray.length > 9) {
           if ((elementArray(9).toInt > 0) && (data(10).toInt > -1)) {
@@ -209,10 +209,8 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           result.setPageLastUpdated(lastUpdateTime)
           result.setLiveBloggingNow(data(6))
           result.setGLabs(data(7))
-          //result.setProductionOffice(data(21))
-          //result.setCreator(data(22))
-          result.setProductionOffice("")
-          result.setCreator("")
+          result.setProductionOffice(data(21))
+          result.setCreator(data(22))
           result
       }
       resultsIterator.toList
