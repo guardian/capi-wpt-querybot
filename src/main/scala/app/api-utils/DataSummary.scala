@@ -484,6 +484,10 @@ val timeNow = DateTime.now
       "Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun + "\n" +
       "Number of pages tested: " + numberOfPagesSentToWPT + "\n" +
       "Number of failed tests: " + numberOfFailedTests + "\n" +
+      "Number of new Article alerts: " + numberNewPageWeightAlerts + "\n" +
+      "Number of Article alerts resolved: " + numberPageWeightAlertsResolved + "\n" +
+      "Number of new Interactive alerts: " + numberNewInteractiveAlerts + "\n" +
+      "Number of Interactive Alerts resolved: " + numberInteractiveAlertsResolved + "\n" +
       "**** \n\n" + "\n"
     val elementString: String = summaryList.map(elementData => returnElementSummaryAsString(elementData)).mkString
     runString + elementString

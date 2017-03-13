@@ -14,11 +14,9 @@ println("pageElementYouTube says:" + pageElementYoutube.identifyPageElementType(
 println("pageElementTwitter says:" + pageElementTwitter.identifyPageElementType())
 println("pageElementFacebook says:" + pageElementFacebook.identifyPageElementType())
 println("pageElementFormstack says:" + pageElementFormstack.identifyPageElementType())
-
 val capitime1 = new CapiDateTime {
   override def dateTime: Long = 1469455344000L
 }
-
 val capitime2 = new CapiDateTime {
   override def dateTime: Long = 1469368741000L
 }
@@ -29,7 +27,6 @@ val hours = timediff.toDouble /(1000 * 60 * 60)
 val capitime3 = new CapiDateTime {
   override def dateTime: Long = 1469342702000L
 }
-
 def capiTimeToString(time: CapiDateTime): String = {
   val capiDT:CapiDateTime = time
   val timeLong = capiDT.dateTime
@@ -42,23 +39,14 @@ println(capiTimeToString(capitime1))
 println(capiTimeToString(capitime2))
 
 println(capiTimeToString(capitime3))
-
-
 val now = DateTime.now()
 val hour = now.hourOfDay.get
-
 val dateTimeold = new DateTime(0)
-
 println(DateTime.now.plusDays(3).dayOfWeek().get)
-
-
-
 sealed abstract class Person(val name: String, val address: String, val ageBracket: String)
-
 case class GenX(override val name: String, override val address: String) extends Person(name: String, address: String, "35 - 50")
 case class GenY(override val name: String, override val address: String) extends Person(name: String, address: String, "20 - 35")
 case class GenZ(override val name: String, override val address: String) extends Person(name: String, address: String, "0 - 16")
-
 def categorisePerson(name: String, address: String, generation: String): Option[Person] = {
   generation match {
     case "genX" => Some(GenX(name, address))
@@ -67,8 +55,7 @@ def categorisePerson(name: String, address: String, generation: String): Option[
     case _ => None
   }
 }
-
-def isAPerson(name: String, address: String, generation: String): String = {
+/*def isAPerson(name: String, address: String, generation: String): String = {
   val schrodinger = categorisePerson(name, address, generation)
   schrodinger match {
     case Some(Person) => "This is a person"
@@ -87,4 +74,32 @@ object Person {
   val candidateList = List(candidate, candidate2, candidate3)
 
 
+}*/
+
+case class Thing(id: String, url: String, para: Int, message: String){
+   def toReadableString: String = {
+    "id: " + id + ", " +
+      "url: " + url + ", " +
+      "para: " + para.toString + ", " +
+      "message: " + message
+  }
 }
+
+val thingList = List(Thing("0", "https://blah.com/a", 5, "should be first"),
+  Thing("1", "https://blah.com/a", 5, "should be second"),
+  Thing("2", "https://blah.com/ab", 5, "should be first"),
+  Thing("3", "https://blah.com/d", 2, "should be first"),
+  Thing("4", "https://blah.com/a", 3, "should be fourth"),
+  Thing("5", "https://blah.com/d", 1, "should be second"),
+  Thing("6", "https://blah.com/a", 4, "should be third"),
+  Thing("7", "https://blah.com/ab", 5, "should be second")
+)
+val grouped= thingList.groupBy(_.url)
+
+val sortedGroup = grouped.map(group => (group._1,group._2.sortWith(_.para > _.para))).toSeq
+
+val countedGroup = sortedGroup.map(group => (group._1, group._2.length))
+
+sortedGroup.foreach(a => println("url: " + a._1 + "\n groups: \n" + a._2.map(_.toReadableString + "\n").mkString))
+
+countedGroup.foreach(a => println("url: " + a._1 + "\n number comments: " + a._2))
