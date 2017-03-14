@@ -8,7 +8,36 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 28/06/16.
  */
-class DataSummary(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesFromCapi: Int, numberOfPagesTested: Int, numberNewPageWeightAlerts: Int, numberPageWeightAlertsResolved: Int, numberNewInteractiveAlerts: Int, numberInteractiveAlertsResolved: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests, alertsResultsObject: ResultsFromPreviousTests) {
+class DataSummary(jobStarted: DateTime,
+                  jobFinished: DateTime,
+                  numberOfPagesFromCapi: Int,
+                  numberOfDesktopArticlePagesTested: Int,
+                  numberOfMobileArticlePagesTested: Int,
+                  numberOfDesktopLiveBlogPagesTested:Int,
+                  numberOfMobileLiveBlogPagesTested: Int,
+                  numberOfDesktopInteractivePagesTested: Int,
+                  numberOfMobileInteractivePagesTested: Int,
+                  numberOfDesktopGlabsContentPagesTested: Int,
+                  numberOfMobileGlabsContentPagesTested: Int,
+                  numberNewArticleDesktopPageWeightAlerts: Int,
+                  numberArticleDesktopPageWeightAlertsResolved: Int,
+                  numberNewArticleMobilePageWeightAlerts: Int,
+                  numberArticleMobilePageWeightAlertsResolved: Int,
+                  numberNewLiveblogDesktopPageWeightAlerts: Int,
+                  numberLiveblogDesktopPageWeightAlertsResolved: Int,
+                  numberNewLiveblogMobilePageWeightAlerts: Int,
+                  numberLiveblogMobilePageWeightAlertsResolved: Int,
+                  numberNewInteractiveDesktopAlerts: Int,
+                  numberInteractiveDesktopAlertsResolved: Int,
+                  numberNewInteractiveMobileAlerts: Int,
+                  numberInteractiveMobileAlertsResolved: Int,
+                  numberNewGLabsDesktopAlerts: Int,
+                  numberGLabsDesktopAlertsResolved: Int,
+                  numberNewGLabsMobileAlerts: Int,
+                  numberGLabsMobileAlertsResolved: Int,
+                  latestResults: List[PerformanceResultsObject],
+                  previousResultsObject: ResultsFromPreviousTests,
+                  alertsResultsObject: ResultsFromPreviousTests) {
   /*
 Data summary
 Its time to take note of pages tested each run,
@@ -70,7 +99,7 @@ val timeNow = DateTime.now
 
   //last run - number of pages pulled from capi
   val numberOfPagesFromCAPI: Int = numberOfPagesFromCapi
-  val numberOfPagesSentToWPT: Int = numberOfPagesTested
+  val numberOfPagesSentToWPT: Int = numberOfDesktopArticlePagesTested + numberOfMobileArticlePagesTested + numberOfDesktopInteractivePagesTested + numberOfMobileInteractivePagesTested
   val numberOfFailedTests = latestResults.count(_.timeToFirstByte < 0)
   /*  - number of pageWeight alerts raised on non-interactive content
     - number of pageSpeed alerts raised on non-interactive content
@@ -482,12 +511,32 @@ val timeNow = DateTime.now
       "Duration of Run: " + durationOfRunMin + " minutes." + "\n" +
       "Number of pages from CAPI queries: " + numberOfPagesFromCAPI + "\n" +
       "Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun + "\n" +
-      "Number of pages tested: " + numberOfPagesSentToWPT + "\n" +
+      "Total number of pages tested: " +  numberOfPagesSentToWPT + "\n" +
+      "Number of desktop article pages tested: " +  numberOfDesktopArticlePagesTested + "\n" +
+      "Number of mobile article pages tested: " +  numberOfMobileArticlePagesTested + "\n" +
+      "Number of desktop liveblog pages tested: " +  numberOfDesktopLiveBlogPagesTested + "\n" +
+      "Number of mobile liveblog pages tested: " +  numberOfMobileLiveBlogPagesTested + "\n" +
+      "Number of desktop interactive pages tested: " +  numberOfDesktopInteractivePagesTested + "\n" +
+      "Number of mobile interactive pages tested: " +  numberOfMobileInteractivePagesTested + "\n" +
+      "Number of desktop paid-content pages tested: " + numberOfDesktopGlabsContentPagesTested + "\n" +
+      "Number of mobile paid-content pages tested: " +  numberOfMobileGlabsContentPagesTested + "\n" +
       "Number of failed tests: " + numberOfFailedTests + "\n" +
-      "Number of new Article alerts: " + numberNewPageWeightAlerts + "\n" +
-      "Number of Article alerts resolved: " + numberPageWeightAlertsResolved + "\n" +
-      "Number of new Interactive alerts: " + numberNewInteractiveAlerts + "\n" +
-      "Number of Interactive Alerts resolved: " + numberInteractiveAlertsResolved + "\n" +
+      "Number of new article desktop alerts: " + numberNewArticleDesktopPageWeightAlerts + "\n" +
+      "Number of new article mobile alerts: " + numberNewArticleMobilePageWeightAlerts + "\n" +
+      "Number of article desktop alerts resolved: " + numberArticleDesktopPageWeightAlertsResolved + "\n" +
+      "Number of article mobile alerts resolved: " + numberArticleMobilePageWeightAlertsResolved + "\n" +
+      "Number of new liveblog desktop alerts: " + numberNewLiveblogDesktopPageWeightAlerts + "\n" +
+      "Number of new liveblog mobile alerts: " + numberNewLiveblogMobilePageWeightAlerts + "\n" +
+      "Number of liveblog desktop alerts resolved: " + numberLiveblogDesktopPageWeightAlertsResolved + "\n" +
+      "Number of liveblog mobile alerts resolved: " + numberLiveblogMobilePageWeightAlertsResolved + "\n" +
+      "Number of new interactive desktop alerts: " + numberNewInteractiveDesktopAlerts + "\n" +
+      "Number of new interactive desktop alerts: " + numberNewInteractiveMobileAlerts + "\n" +
+      "Number of interactive desktop alerts resolved: " + numberInteractiveDesktopAlertsResolved + "\n" +
+      "Number of interactive mobile alerts resolved: " + numberInteractiveMobileAlertsResolved + "\n" +
+      "Number of new paid-content desktop alerts: " + numberNewGLabsDesktopAlerts + "\n" +
+      "Number of new paid-content mobile alerts: " + numberNewGLabsMobileAlerts + "\n" +
+      "Number of paid-content desktop alerts resolved: " + numberGLabsDesktopAlertsResolved + "\n" +
+      "Number of paid-content mobile alerts resolved: " + numberGLabsMobileAlertsResolved + "\n" +
       "**** \n\n" + "\n"
     val elementString: String = summaryList.map(elementData => returnElementSummaryAsString(elementData)).mkString
     runString + elementString
@@ -503,17 +552,37 @@ val timeNow = DateTime.now
   def summaryDataToHTMLString(): String = {
     val runString: String = "<div>\n" +
       "<h3>Job Summary:" + "</h3>" + "\n" +
-      "<p style = \"margin-left: 40px\">jobStarted at:      " + jobStartedTime.toDateTime + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">jobFinished at:     " + jobFinishTime.toDateTime + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Duration of Run:    " + durationOfRunMin + " minutes." + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of pages from CAPI queries: " + numberOfPagesFromCAPI + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of pages tested: " + numberOfPagesSentToWPT + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of failed tests: " + numberOfFailedTests + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of new Article alerts: " + numberNewPageWeightAlerts + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of Article alerts resolved: " + numberPageWeightAlertsResolved + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of new Interactive alerts: " + numberNewInteractiveAlerts + "</p>" +  "\n" +
-      "<p style = \"margin-left: 40px\">Number of Interactive Alerts resolved: " + numberInteractiveAlertsResolved + "</p>" +  "\n" +
+      "<p style = \"margin-left: 40px\">jobStarted at:      " + jobStartedTime.toDateTime + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">jobFinished at:     " + jobFinishTime.toDateTime + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Duration of Run:    " + durationOfRunMin + " minutes." + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of pages from CAPI queries: " + numberOfPagesFromCAPI + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of pages retested from previous run: " + numberOfPagesRetestedFromLastRun + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Total number of pages tested: " +  numberOfPagesSentToWPT + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of desktop article pages tested: " +  numberOfDesktopArticlePagesTested + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of mobile article pages tested: " +  numberOfMobileArticlePagesTested + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of desktop liveblog pages tested: " +  numberOfDesktopLiveBlogPagesTested + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of mobile liveblog pages tested: " +  numberOfMobileLiveBlogPagesTested + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of desktop interactive pages tested: " +  numberOfDesktopInteractivePagesTested + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of mobile interactive pages tested: " +  numberOfMobileInteractivePagesTested + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of desktop paid-content pages tested: " + numberOfDesktopGlabsContentPagesTested + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of mobile paid-content pages tested: " +  numberOfMobileGlabsContentPagesTested + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of failed tests: " + numberOfFailedTests + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of new article desktop alerts: " + numberNewArticleDesktopPageWeightAlerts + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of new article mobile alerts: " + numberNewArticleMobilePageWeightAlerts + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of article desktop alerts resolved: " + numberArticleDesktopPageWeightAlertsResolved + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of article mobile alerts resolved: " + numberArticleMobilePageWeightAlertsResolved + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of new liveblog desktop alerts: " + numberNewLiveblogDesktopPageWeightAlerts + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of new liveblog mobile alerts: " + numberNewLiveblogMobilePageWeightAlerts + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of liveblog desktop alerts resolved: " + numberLiveblogDesktopPageWeightAlertsResolved + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of liveblog mobile alerts resolved: " + numberLiveblogMobilePageWeightAlertsResolved + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of new interactive desktop alerts: " + numberNewInteractiveDesktopAlerts + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of new interactive desktop alerts: " + numberNewInteractiveMobileAlerts + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of interactive desktop alerts resolved: " + numberInteractiveDesktopAlertsResolved + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of interactive mobile alerts resolved: " + numberInteractiveMobileAlertsResolved + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of new paid-content desktop alerts: " + numberNewGLabsDesktopAlerts + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of new paid-content mobile alerts: " + numberNewGLabsMobileAlerts + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of paid-content desktop alerts resolved: " + numberGLabsDesktopAlertsResolved + "</p>" + "\n" +
+      "<p style = \"margin-left: 40px\">Number of paid-content mobile alerts resolved: " + numberGLabsMobileAlertsResolved + "</p>" + "\n" +
       "</div>" + "\n"
     val elementString: String = sortedCombinedSummaryList.map(elementData => returnElementSummaryAsHTMLString(elementData)).mkString
     runString + elementString

@@ -115,7 +115,7 @@
     println("**** audioBoom counter: " + audioboomcounter.length)
 
 
-    val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, 5, 3, 1, 0, emptyPerfResults, testResultsHandler, alertsResultsHandler)
+    val dataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, 5, 3, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 3, 5, 6, 7, 8, 9, 0, 1, emptyPerfResults, testResultsHandler, alertsResultsHandler)
     //write summaries to files
     val localFiles = new LocalFileOperations
 

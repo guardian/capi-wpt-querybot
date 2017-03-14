@@ -654,10 +654,44 @@ object App {
 
 
     //generate summaries
-        val resultSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newArticlePageWeightAlertsList.length, pageWeightAlertsFixedThisRun.count(_.getPageType.toLowerCase.contains("article")), newInteractiveAlertsList.length, interactiveAlertsFixedThisRun.length, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
-        val pageWeightAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newArticlePageWeightAlertsList.length, pageWeightAlertsFixedThisRun.count(_.getPageType.toLowerCase.contains("article")), newInteractiveAlertsList.length, interactiveAlertsFixedThisRun.length, newPageWeightAlerts, new ResultsFromPreviousTests(previousPageWeightAlerts), new ResultsFromPreviousTests(previousPageWeightAlerts))
-        val interactiveAlertsSummary = new DataSummary(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newArticlePageWeightAlertsList.length, pageWeightAlertsFixedThisRun.count(_.getPageType.toLowerCase.contains("article")), newInteractiveAlertsList.length, interactiveAlertsFixedThisRun.length, newInteractiveAlertsList, new ResultsFromPreviousTests(previousInteractiveAlerts), new ResultsFromPreviousTests(previousInteractiveAlerts))
-        val periodicReport = new PeriodicReport(jobStart, jobFinish, articles.length + liveBlogs.length + interactives.length, numberOfPagesTested, newArticlePageWeightAlertsList.length, pageWeightAlertsFixedThisRun.count(_.getPageType.toLowerCase.contains("article")), newInteractiveAlertsList.length, interactiveAlertsFixedThisRun.length, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
+
+        val numberNewDesktopArticleTests = newOrChangedArticles.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewMobileArticleTests = newOrChangedArticles.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewDesktopLiveBlogTests = newOrChangedLiveBlogs.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewMobileLiveBlogTests = newOrChangedLiveBlogs.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewDesktopInteractiveTests = newOrChangedInteractives.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewMobileInteractiveTests = newOrChangedInteractives.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewDesktopGLabsTests = {
+          newOrChangedArticles.count(_._2.exists(_.id.contains("tone/advertisement-features"))) +
+            newOrChangedLiveBlogs.count(_._2.exists(_.id.contains("tone/advertisement-features"))) +
+            newOrChangedInteractives.count(_._2.exists(_.id.contains("tone/advertisement-features")))
+        }
+        val numberNewMobileGLabsTests = numberNewDesktopGLabsTests
+
+        val nbrNewDesktopArticleAlerts = newArticlePageWeightAlertsList.count(_.typeOfTestName.contains("Desktop"))
+        val nbrNewMobileArticleAlerts = newArticlePageWeightAlertsList.count(_.typeOfTestName.contains("Mobile"))
+        val nbrNewDesktopLiveBlogAlerts = newLiveBlogPageWeightAlertsList.count(_.typeOfTestName.contains("Desktop"))
+        val nbrNewMobileLiveBlogAlerts = newLiveBlogPageWeightAlertsList.count(_.typeOfTestName.contains("Mobile"))
+        val nbrNewDesktopInteractiveAlerts = newInteractiveAlertsList.count(_.typeOfTestName.contains("Desktop"))
+        val nbrNewMobileInteractiveAlerts = newInteractiveAlertsList.count(_.typeOfTestName.contains("Mobile"))
+        val nbrNewDesktopGLabsAlerts = newGLabsAlertsList.count(_.typeOfTestName.contains("Desktop"))
+        val nbrNewMobileGLabsAlerts = newGLabsAlertsList.count(_.typeOfTestName.contains("Mobile"))
+
+        val nbrDesktopArticleAlertsResolved = pageWeightAlertsFixedThisRun.count(result => {result.getPageType.contains("Article") && result.typeOfTestName.contains("Desktop")})
+        val nbrMobileArticleAlertsResolved = pageWeightAlertsFixedThisRun.count(result => {result.getPageType.contains("Article") && result.typeOfTestName.contains("Mobile")})
+        val nbrDesktopLiveBlogAlertsResolved = pageWeightAlertsFixedThisRun.count(result => {result.getPageType.contains("LiveBlog") && result.typeOfTestName.contains("Desktop")})
+        val nbrMobileLiveBlogAlertsResolved = pageWeightAlertsFixedThisRun.count(result => {result.getPageType.contains("LiveBlog") && result.typeOfTestName.contains("Mobile")})
+        val nbrDesktopInteractiveAlertsResolved = interactiveAlertsFixedThisRun.count(result => {(!result.gLabs) && result.typeOfTestName.contains("Desktop")})
+        val nbrMobileInteractiveAlertsResolved = interactiveAlertsFixedThisRun.count(result => {(!result.gLabs) && result.typeOfTestName.contains("Mobile")})
+        val nbrDesktopGLabsAlertsResolved = pageWeightAlertsFixedThisRun.count(result => {result.gLabs && result.typeOfTestName.contains("Desktop")}) + interactiveAlertsFixedThisRun.count(result => {result.gLabs && result.typeOfTestName.contains("Desktop")})
+        val nbrMobileGLabsAlertsResolved = pageWeightAlertsFixedThisRun.count(result => {result.gLabs && result.typeOfTestName.contains("Mobile")}) + interactiveAlertsFixedThisRun.count(result => {result.gLabs && result.typeOfTestName.contains("Mobile")})
+
+        val numberCAPIRequests = articles.length + liveBlogs.length + interactives.length
+        val resultSummary = new DataSummary(jobStart, jobFinish, numberCAPIRequests, numberNewDesktopArticleTests, numberNewMobileArticleTests, numberNewDesktopLiveBlogTests, numberNewMobileLiveBlogTests, numberNewDesktopInteractiveTests, numberNewMobileInteractiveTests, numberNewDesktopGLabsTests, numberNewMobileGLabsTests, nbrNewDesktopArticleAlerts, nbrDesktopArticleAlertsResolved, nbrNewMobileArticleAlerts, nbrMobileArticleAlertsResolved, nbrNewDesktopLiveBlogAlerts, nbrDesktopLiveBlogAlertsResolved, nbrNewMobileLiveBlogAlerts, nbrMobileLiveBlogAlertsResolved, nbrNewDesktopInteractiveAlerts, nbrDesktopInteractiveAlertsResolved, nbrNewMobileInteractiveAlerts, nbrMobileInteractiveAlertsResolved, nbrNewDesktopGLabsAlerts, nbrDesktopGLabsAlertsResolved, nbrNewMobileGLabsAlerts, nbrMobileGLabsAlertsResolved, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
+        val pageWeightAlertsSummary = new DataSummary(jobStart, jobFinish, numberCAPIRequests, numberNewDesktopArticleTests, numberNewMobileArticleTests, numberNewDesktopLiveBlogTests, numberNewMobileLiveBlogTests, numberNewDesktopInteractiveTests, numberNewMobileInteractiveTests, numberNewDesktopGLabsTests, numberNewMobileGLabsTests, nbrNewDesktopArticleAlerts, nbrDesktopArticleAlertsResolved, nbrNewMobileArticleAlerts, nbrMobileArticleAlertsResolved, nbrNewDesktopLiveBlogAlerts, nbrDesktopLiveBlogAlertsResolved, nbrNewMobileLiveBlogAlerts, nbrMobileLiveBlogAlertsResolved, nbrNewDesktopInteractiveAlerts, nbrDesktopInteractiveAlertsResolved, nbrNewMobileInteractiveAlerts, nbrMobileInteractiveAlertsResolved, nbrNewDesktopGLabsAlerts, nbrDesktopGLabsAlertsResolved, nbrNewMobileGLabsAlerts, nbrMobileGLabsAlertsResolved, newPageWeightAlerts, new ResultsFromPreviousTests(previousPageWeightAlerts), new ResultsFromPreviousTests(previousPageWeightAlerts))
+        val interactiveAlertsSummary = new DataSummary(jobStart, jobFinish, numberCAPIRequests, numberNewDesktopArticleTests, numberNewMobileArticleTests, numberNewDesktopLiveBlogTests, numberNewMobileLiveBlogTests, numberNewDesktopInteractiveTests, numberNewMobileInteractiveTests, numberNewDesktopGLabsTests, numberNewMobileGLabsTests, nbrNewDesktopArticleAlerts, nbrDesktopArticleAlertsResolved, nbrNewMobileArticleAlerts, nbrMobileArticleAlertsResolved, nbrNewDesktopLiveBlogAlerts, nbrDesktopLiveBlogAlertsResolved, nbrNewMobileLiveBlogAlerts, nbrMobileLiveBlogAlertsResolved, nbrNewDesktopInteractiveAlerts, nbrDesktopInteractiveAlertsResolved, nbrNewMobileInteractiveAlerts, nbrMobileInteractiveAlertsResolved, nbrNewDesktopGLabsAlerts, nbrDesktopGLabsAlertsResolved, nbrNewMobileGLabsAlerts, nbrMobileGLabsAlertsResolved, newInteractiveAlertsList, new ResultsFromPreviousTests(previousInteractiveAlerts), new ResultsFromPreviousTests(previousInteractiveAlerts))
+        val periodicReport = new PeriodicReport(jobStart, jobFinish, numberCAPIRequests, numberOfPagesTested, numberNewDesktopArticleTests, numberNewMobileArticleTests, numberNewDesktopLiveBlogTests, numberNewMobileLiveBlogTests, numberNewDesktopInteractiveTests, numberNewMobileInteractiveTests, numberNewDesktopGLabsTests, numberNewMobileGLabsTests, nbrNewDesktopArticleAlerts, nbrDesktopArticleAlertsResolved, nbrNewMobileArticleAlerts, nbrMobileArticleAlertsResolved, nbrNewDesktopLiveBlogAlerts, nbrDesktopLiveBlogAlertsResolved, nbrNewMobileLiveBlogAlerts, nbrMobileLiveBlogAlertsResolved, nbrNewDesktopInteractiveAlerts, nbrDesktopInteractiveAlertsResolved, nbrNewMobileInteractiveAlerts, nbrMobileInteractiveAlertsResolved, nbrNewDesktopGLabsAlerts, nbrDesktopGLabsAlertsResolved, nbrNewMobileGLabsAlerts, nbrMobileGLabsAlertsResolved, combinedResultsList, previousTestResultsHandler, new ResultsFromPreviousTests(previousPageWeightAlerts))
+
 
     //generate summary pages
         val summaryHTMLPage = new SummaryPage(resultSummary)

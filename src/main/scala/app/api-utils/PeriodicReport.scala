@@ -9,7 +9,37 @@ import org.joda.time.DateTime
  */
 
 
-class PeriodicReport(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesFromCapi: Int, numberOfPagesTested: Int, numberOfNewPageWeightAlerts: Int, numberOfPageWeightAlertsFixed: Int, numberOfInteractiveAlerts: Int, numberOfInteractiveAlertsFixed: Int, latestResults: List[PerformanceResultsObject], previousResultsObject: ResultsFromPreviousTests, alertsResultsObject: ResultsFromPreviousTests) {
+class PeriodicReport(jobStarted: DateTime,
+                     jobFinished: DateTime,
+                     numberOfPagesFromCapi: Int,
+                     numberOfPagesTested: Int,
+                     numberOfDesktopArticlePagesTested: Int,
+                     numberOfMobileArticlePagesTested: Int,
+                     numberOfDesktopLiveBlogPagesTested:Int,
+                     numberOfMobileLiveBlogPagesTested: Int,
+                     numberOfDesktopInteractivePagesTested: Int,
+                     numberOfMobileInteractivePagesTested: Int,
+                     numberOfDesktopGlabsContentPagesTested: Int,
+                     numberOfMobileGlabsContentPagesTested: Int,
+                     numberNewArticleDesktopPageWeightAlerts: Int,
+                     numberArticleDesktopPageWeightAlertsResolved: Int,
+                     numberNewArticleMobilePageWeightAlerts: Int,
+                     numberArticleMobilePageWeightAlertsResolved: Int,
+                     numberNewLiveblogDesktopPageWeightAlerts: Int,
+                     numberLiveblogDesktopPageWeightAlertsResolved: Int,
+                     numberNewLiveblogMobilePageWeightAlerts: Int,
+                     numberLiveblogMobilePageWeightAlertsResolved: Int,
+                     numberNewInteractiveDesktopAlerts: Int,
+                     numberInteractiveDesktopAlertsResolved: Int,
+                     numberNewInteractiveMobileAlerts: Int,
+                     numberInteractiveMobileAlertsResolved: Int,
+                     numberNewGLabsDesktopAlerts: Int,
+                     numberGLabsDesktopAlertsResolved: Int,
+                     numberNewGLabsMobileAlerts: Int,
+                     numberGLabsMobileAlertsResolved: Int,
+                     latestResults: List[PerformanceResultsObject],
+                     previousResultsObject: ResultsFromPreviousTests,
+                     alertsResultsObject: ResultsFromPreviousTests) {
 
   val startOfWeek: DateTime = jobFinished.minusDays(jobFinished.dayOfWeek.get())
   val startOfDay: DateTime = jobFinished.minusHours(jobFinished.hourOfDay.get())
@@ -30,10 +60,10 @@ class PeriodicReport(jobStarted: DateTime, jobFinished: DateTime, numberOfPagesF
   val currentRunPrevResults = new ResultsFromPreviousTests(emptyListPerfResults)
   val alertsForCurrentRunPreviousResults = new ResultsFromPreviousTests(alertsForCurrentRun)
 
-  val fullSummary = new DataSummary(jobStarted, jobFinished, numberOfPagesFromCapi, numberOfPagesTested, numberOfNewPageWeightAlerts, numberOfPageWeightAlertsFixed, numberOfInteractiveAlerts, numberOfInteractiveAlertsFixed, latestResults, previousResultsObject, alertsResultsObject)
-  val summaryWeekSoFar = new DataSummary(jobStarted, jobFinished, numberOfPagesFromCapi, numberOfPagesTested, numberOfNewPageWeightAlerts, numberOfPageWeightAlertsFixed, numberOfInteractiveAlerts, numberOfInteractiveAlertsFixed, latestResults, weekSoFarPrevResults, alertsResultsObject)
-  val summaryDaySoFar = new DataSummary(jobStarted, jobFinished, numberOfPagesFromCapi, numberOfPagesTested, numberOfNewPageWeightAlerts, numberOfPageWeightAlertsFixed, numberOfInteractiveAlerts, numberOfInteractiveAlertsFixed, latestResults, daySoFarPrevResults, alertsResultsObject)
-  val summaryCurrentRun = new DataSummary(jobStarted, jobFinished, numberOfPagesFromCapi, numberOfPagesTested, numberOfNewPageWeightAlerts, numberOfPageWeightAlertsFixed, numberOfInteractiveAlerts, numberOfInteractiveAlertsFixed, latestResults, currentRunPrevResults, alertsForCurrentRunPreviousResults)
+  val fullSummary = new DataSummary(jobStarted, jobFinished, numberOfPagesFromCapi, numberOfDesktopArticlePagesTested: Int, numberOfMobileArticlePagesTested: Int, numberOfDesktopLiveBlogPagesTested:Int, numberOfMobileLiveBlogPagesTested: Int, numberOfDesktopInteractivePagesTested: Int, numberOfMobileInteractivePagesTested: Int, numberOfDesktopGlabsContentPagesTested: Int, numberOfMobileGlabsContentPagesTested: Int, numberNewArticleDesktopPageWeightAlerts: Int, numberArticleDesktopPageWeightAlertsResolved: Int, numberNewArticleMobilePageWeightAlerts: Int, numberArticleMobilePageWeightAlertsResolved: Int, numberNewLiveblogDesktopPageWeightAlerts: Int, numberLiveblogDesktopPageWeightAlertsResolved: Int, numberNewLiveblogMobilePageWeightAlerts: Int, numberLiveblogMobilePageWeightAlertsResolved: Int, numberNewInteractiveDesktopAlerts: Int, numberInteractiveDesktopAlertsResolved: Int, numberNewInteractiveMobileAlerts: Int, numberInteractiveMobileAlertsResolved: Int, numberNewGLabsDesktopAlerts: Int, numberGLabsDesktopAlertsResolved: Int, numberNewGLabsMobileAlerts: Int, numberGLabsMobileAlertsResolved: Int, latestResults, previousResultsObject, alertsResultsObject)
+  val summaryWeekSoFar = new DataSummary(jobStarted, jobFinished, numberOfPagesFromCapi, numberOfDesktopArticlePagesTested: Int, numberOfMobileArticlePagesTested: Int, numberOfDesktopLiveBlogPagesTested:Int, numberOfMobileLiveBlogPagesTested: Int, numberOfDesktopInteractivePagesTested: Int, numberOfMobileInteractivePagesTested: Int, numberOfDesktopGlabsContentPagesTested: Int, numberOfMobileGlabsContentPagesTested: Int, numberNewArticleDesktopPageWeightAlerts: Int, numberArticleDesktopPageWeightAlertsResolved: Int, numberNewArticleMobilePageWeightAlerts: Int, numberArticleMobilePageWeightAlertsResolved: Int, numberNewLiveblogDesktopPageWeightAlerts: Int, numberLiveblogDesktopPageWeightAlertsResolved: Int, numberNewLiveblogMobilePageWeightAlerts: Int, numberLiveblogMobilePageWeightAlertsResolved: Int, numberNewInteractiveDesktopAlerts: Int, numberInteractiveDesktopAlertsResolved: Int, numberNewInteractiveMobileAlerts: Int, numberInteractiveMobileAlertsResolved: Int, numberNewGLabsDesktopAlerts: Int, numberGLabsDesktopAlertsResolved: Int, numberNewGLabsMobileAlerts: Int, numberGLabsMobileAlertsResolved: Int, latestResults, weekSoFarPrevResults, alertsResultsObject)
+  val summaryDaySoFar = new DataSummary(jobStarted, jobFinished, numberOfPagesFromCapi, numberOfDesktopArticlePagesTested: Int, numberOfMobileArticlePagesTested: Int, numberOfDesktopLiveBlogPagesTested:Int, numberOfMobileLiveBlogPagesTested: Int, numberOfDesktopInteractivePagesTested: Int, numberOfMobileInteractivePagesTested: Int, numberOfDesktopGlabsContentPagesTested: Int, numberOfMobileGlabsContentPagesTested: Int, numberNewArticleDesktopPageWeightAlerts: Int, numberArticleDesktopPageWeightAlertsResolved: Int, numberNewArticleMobilePageWeightAlerts: Int, numberArticleMobilePageWeightAlertsResolved: Int, numberNewLiveblogDesktopPageWeightAlerts: Int, numberLiveblogDesktopPageWeightAlertsResolved: Int, numberNewLiveblogMobilePageWeightAlerts: Int, numberLiveblogMobilePageWeightAlertsResolved: Int, numberNewInteractiveDesktopAlerts: Int, numberInteractiveDesktopAlertsResolved: Int, numberNewInteractiveMobileAlerts: Int, numberInteractiveMobileAlertsResolved: Int, numberNewGLabsDesktopAlerts: Int, numberGLabsDesktopAlertsResolved: Int, numberNewGLabsMobileAlerts: Int, numberGLabsMobileAlertsResolved: Int, latestResults, daySoFarPrevResults, alertsResultsObject)
+  val summaryCurrentRun = new DataSummary(jobStarted, jobFinished, numberOfPagesFromCapi, numberOfDesktopArticlePagesTested: Int, numberOfMobileArticlePagesTested: Int, numberOfDesktopLiveBlogPagesTested:Int, numberOfMobileLiveBlogPagesTested: Int, numberOfDesktopInteractivePagesTested: Int, numberOfMobileInteractivePagesTested: Int, numberOfDesktopGlabsContentPagesTested: Int, numberOfMobileGlabsContentPagesTested: Int, numberNewArticleDesktopPageWeightAlerts: Int, numberArticleDesktopPageWeightAlertsResolved: Int, numberNewArticleMobilePageWeightAlerts: Int, numberArticleMobilePageWeightAlertsResolved: Int, numberNewLiveblogDesktopPageWeightAlerts: Int, numberLiveblogDesktopPageWeightAlertsResolved: Int, numberNewLiveblogMobilePageWeightAlerts: Int, numberLiveblogMobilePageWeightAlertsResolved: Int, numberNewInteractiveDesktopAlerts: Int, numberInteractiveDesktopAlertsResolved: Int, numberNewInteractiveMobileAlerts: Int, numberInteractiveMobileAlertsResolved: Int, numberNewGLabsDesktopAlerts: Int, numberGLabsDesktopAlertsResolved: Int, numberNewGLabsMobileAlerts: Int, numberGLabsMobileAlertsResolved: Int, latestResults, currentRunPrevResults, alertsForCurrentRunPreviousResults)
 
   val fullSummaryPage = new SummaryPage(fullSummary)
   val weekSummaryPage = new SummaryPage(summaryWeekSoFar)
