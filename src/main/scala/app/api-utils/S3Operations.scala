@@ -19,8 +19,8 @@ import scala.io.Source
 class S3Operations(s3BucketName: String, configFile: String, emailFile: String) {
   val s3Client: AmazonS3Client = new AmazonS3Client()
   val bucket: String = s3BucketName
-  val configFileName = configFile
-  val emailFileName = emailFile
+  val configFileName: String = configFile
+  val emailFileName: String = emailFile
 
 
   def doesFileExist(fileKeyName: String): Boolean = {
@@ -84,15 +84,21 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     val ukInteractiveAlerts = conf.getStringList("uk.interactive.alerts").toList
     val usInteractiveAlerts = conf.getStringList("us.interactive.alerts").toList
     val auInteractiveAlerts = conf.getStringList("au.interactive.alerts").toList
-    val gLabsAlerts = conf.getStringList("glabs.alerts").toList
-    if (generalAlerts.nonEmpty || ukInteractiveAlerts.nonEmpty || usInteractiveAlerts.nonEmpty || auInteractiveAlerts.nonEmpty || gLabsAlerts.nonEmpty){
+    val globalGLabsAlerts = conf.getStringList("global.glabs.alerts").toList
+    val ukGLabsAlerts = conf.getStringList("uk.glabs.alerts").toList
+    val usGLabsAlerts = conf.getStringList("us.glabs.alerts").toList
+    val auGLabsAlerts = conf.getStringList("au.glabs.alerts").toList
+    if (generalAlerts.nonEmpty || ukInteractiveAlerts.nonEmpty || usInteractiveAlerts.nonEmpty || auInteractiveAlerts.nonEmpty || globalGLabsAlerts.nonEmpty || ukGLabsAlerts.nonEmpty || usGLabsAlerts.nonEmpty || auGLabsAlerts.nonEmpty){
       println(DateTime.now + " Config retrieval successful. \n You have retrieved the following users\n" +
         generalAlerts + "\n" +
         ukInteractiveAlerts + "\n" +
         usInteractiveAlerts + "\n" +
         auInteractiveAlerts + "\n" +
-        gLabsAlerts)
-      val returnArray = Array(generalAlerts, ukInteractiveAlerts, usInteractiveAlerts, auInteractiveAlerts, gLabsAlerts)
+        globalGLabsAlerts + "\n" +
+        ukGLabsAlerts + "\n" +
+        usGLabsAlerts + "\n" +
+        auGLabsAlerts)
+      val returnArray = Array(generalAlerts, ukInteractiveAlerts, usInteractiveAlerts, auInteractiveAlerts, globalGLabsAlerts, ukGLabsAlerts, usGLabsAlerts, auGLabsAlerts)
       returnArray
     }
     else {

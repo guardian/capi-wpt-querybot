@@ -171,7 +171,10 @@ object App {
     val ukInteractiveAlertsAddressList: List[String] = emailAddresses(1)
     val usInteractiveAlertsAddressList: List[String] = emailAddresses(2)
     val auInteractiveAlertsAddressList: List[String] = emailAddresses(3)
-    val gLabsAlertsAddressList: List[String] = emailAddresses(4)
+    val globalGLabsAlertsAddressList: List[String] = emailAddresses(4)
+    val ukGLabsAlertsAddressList: List[String] = emailAddresses(5)
+    val usGLabsAlertsAddressList: List[String] = emailAddresses(6)
+    val auGLabsAlertsAddressList: List[String] = emailAddresses(7)
 
     //Create Email Handler class
     val emailer: EmailOperations = new EmailOperations(emailUsername, emailPassword)
@@ -585,13 +588,15 @@ object App {
       val usInteractives = newInteractiveAlertsList.filter(_.productionOffice.getOrElse("").contains("US"))
       val auInteractives = newInteractiveAlertsList.filter(_.productionOffice.getOrElse("").contains("AU"))
       println("There are new interactive email alerts to send - length of list is: " + newInteractiveAlertsList.length)
+      println("There are " + ukInteractives.length + " alerts for the UK interactive office")
+      println("There are " + usInteractives.length + " alerts for the US interactive office")
+      println("There are " + auInteractives.length + " alerts for the AU interactive office")
       val ukInteractiveEmailAlerts = new InteractiveEmailTemplate(ukInteractives, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
       val usInteractiveEmailAlerts = new InteractiveEmailTemplate(usInteractives, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
       val auInteractiveEmailAlerts = new InteractiveEmailTemplate(auInteractives, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
-
-      val ukInteractiveEmailSuccess = emailer.sendInteractiveAlert(ukInteractiveAlertsAddressList, ukInteractiveEmailAlerts.toString())
-      val usInteractiveEmailSuccess = emailer.sendInteractiveAlert(usInteractiveAlertsAddressList, usInteractiveEmailAlerts.toString())
-      val auInteractiveEmailSuccess = emailer.sendInteractiveAlert(auInteractiveAlertsAddressList, auInteractiveEmailAlerts.toString())
+      val ukInteractiveEmailSuccess = emailer.sendInteractiveAlert(ukInteractiveAlertsAddressList ::: ukInteractives.flatMap(page => page.createdBy), ukInteractiveEmailAlerts.toString())
+      val usInteractiveEmailSuccess = emailer.sendInteractiveAlert(usInteractiveAlertsAddressList ::: usInteractives.flatMap(page => page.createdBy), usInteractiveEmailAlerts.toString())
+      val auInteractiveEmailSuccess = emailer.sendInteractiveAlert(auInteractiveAlertsAddressList ::: auInteractives.flatMap(page => page.createdBy), auInteractiveEmailAlerts.toString())
       if (ukInteractiveEmailSuccess && usInteractiveEmailSuccess && auInteractiveEmailSuccess) {
         println("Interactive Alert email sent successfully.")
       } else {
@@ -603,15 +608,29 @@ object App {
 
     if (newGLabsAlertsList.nonEmpty) {
       println("There are new interactive email alerts to send - length of list is: " + newGLabsAlertsList.length)
-      val gLabsEmailAlerts = new GLabsEmailTemplate(newGLabsAlertsList, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardDesktopFilename)
-      val gLabsEmailSuccess = emailer.sendPaidContentAlert(gLabsAlertsAddressList, gLabsEmailAlerts.toString())
-      if (gLabsEmailSuccess) {
-        println("Interactive Alert email sent successfully.")
+      val ukGLabsAlerts = newGLabsAlertsList.filter(_.productionOffice.getOrElse("").contains("UK"))
+      val usGLabsAlerts = newGLabsAlertsList.filter(_.productionOffice.getOrElse("").contains("US"))
+      val auGLabsAlerts = newGLabsAlertsList.filter(_.productionOffice.getOrElse("").contains("AU"))
+      println("There are new  GLabs email alerts to send - length of list is: " + newGLabsAlertsList.length)
+      println("There are " + ukGLabsAlerts.length + " alerts for the UK GLabs office")
+      println("There are " + usGLabsAlerts.length + " alerts for the US GLabs office")
+      println("There are " + auGLabsAlerts.length + " alerts for the AU GLabs office")
+      val ukFullGlabsEmailAddresses = ukGLabsAlertsAddressList ::: globalGLabsAlertsAddressList ::: ukGLabsAlerts.flatMap(page => page.createdBy)
+      val usFullGlabsEmailAddresses = usGLabsAlertsAddressList ::: globalGLabsAlertsAddressList ::: usGLabsAlerts.flatMap(page => page.createdBy)
+      val auFullGlabsEmailAddresses = auGLabsAlertsAddressList ::: globalGLabsAlertsAddressList ::: auGLabsAlerts.flatMap(page => page.createdBy)
+      val ukGLabsEmailAlerts = new GLabsEmailTemplate(ukGLabsAlerts, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardDesktopFilename)
+      val usGLabsEmailAlerts = new GLabsEmailTemplate(usGLabsAlerts, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardDesktopFilename)
+      val auGLabsEmailAlerts = new GLabsEmailTemplate(auGLabsAlerts, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardDesktopFilename)
+      val ukGLabsEmailSuccess = emailer.sendPaidContentAlert(ukFullGlabsEmailAddresses, ukGLabsEmailAlerts.toString())
+      val usGLabsEmailSuccess = emailer.sendPaidContentAlert(usFullGlabsEmailAddresses, usGLabsEmailAlerts.toString())
+      val auGLabsEmailSuccess = emailer.sendPaidContentAlert(auFullGlabsEmailAddresses, auGLabsEmailAlerts.toString())
+      if (ukGLabsEmailSuccess && usGLabsEmailSuccess && auGLabsEmailSuccess) {
+        println("Paid Content Alert email sent successfully.")
       } else {
-        println("ERROR: Sending of Interactive Alert Emails failed")
+        println("ERROR: Sending of Paid Content Alert Emails failed")
       }
     } else {
-      println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
+      println("no Paid Content alerts to send, therefore Paid Content Alert Email not sent.")
     }
 
 
