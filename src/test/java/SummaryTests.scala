@@ -185,11 +185,24 @@
 
 
     /*  "Not a test PageElementSamples page " should "be populated and display correctly when I run this" in {
-        val listAudioBoomElement = previousResults.filter(_.testUrl.contains("/world/2015/mar/16/london-teenagers-stopped-syria-parents-islamic-state"))
-        val pageAndElements = listAudioBoomElement.map(page => (page.testUrl, page.editorialElementList.map(_.resource).mkString, page.editorialElementList.map(_.determinedResourceType)))
-        val samplePage = new PageElementSamples(dataSummary)
+        println("writing run summary data to new file")
+        val lastDateOfPreviousResults = previousResults.last.timeOfTest
+        val endOfRun = previousResultsBig.filter(_.timeOfTest.matches(lastDateOfPreviousResults)).take(1)
+        val resultsToReport = {if(endOfRun.nonEmpty) {
+          val indexEndOfRun = previousResultsBig.indexOf(endOfRun.head)
+          previousResults ::: previousResultsBig.drop(indexEndOfRun)
+        } else {
+          previousResults ::: previousResultsBig
+        }
+        }
+        val testReportResultHandler = new ResultsFromPreviousTests(resultsToReport)
+        val reportDataSummary = new DataSummary(time1HourAgo, currentTime, 10, 20, emptyPerfResults, testReportResultHandler, alertsResultsHandler)
+        //val summaryPage = new SummaryPage(reportDataSummary)
+        //val listAudioBoomElement = previousResults.filter(_.testUrl.contains("/world/2015/mar/16/london-teenagers-stopped-syria-parents-islamic-state"))
+        //val pageAndElements = listAudioBoomElement.map(page => (page.testUrl, page.editorialElementList.map(_.resource).mkString, page.editorialElementList.map(_.determinedResourceType)))
+        val samplePage = new PageElementSamples(reportDataSummary)
   //      localFiles.writeLocalResultFile("pageElementSamplePages.html", samplePage.toString())
-        s3Interface.writeFileToS3("pageElementSamplePages.html", samplePage.toString())
+        s3Interface.writeFileToS3("pageElementSamplePagesLargeSample.html", samplePage.toString())
         assert(true)
       }*/
 
@@ -316,7 +329,7 @@
     }*/
 
 
-/*        "Not a test but I " should "be able to get a list of pages with a given embed" in {
+       "Not a test but I " should "be able to get a list of pages with a given embed" in {
 
       def getPage(pageList: List[PerformanceResultsObject]): List[String] = {
         if (pageList.nonEmpty) {
@@ -343,11 +356,13 @@
       val pageList: List[String] = getPage(elementList)
       val output: String = pageList.map(url => url + "\n").mkString
 
-      s3Interface.writeFileToS3("pageswithUnknownElements.txt", output)
+      val embeds = resultsToReport.filter(_.fullElementList.exists(_.resource.contains("embed.theguardian.com"))).map(_.testUrl + "\n").distinct.mkString
+
+      s3Interface.writeFileToS3("pageswithembeddottheguardiandotcom.txt", "Pages with embed from \"embed.theguardian.com\"" + embeds)
       assert(true)
     }
-*/
 
+/*
     "Not a test but I " should "be able to get a list of embeds of a given type" in {
 
       def getPage(pageList: List[PerformanceResultsObject]): List[String] = {
@@ -364,7 +379,7 @@
       //s3Interface.writeFileToS3("unknownelements.txt", "List of unknown elements\n" + elementList.map(_.resource + "\n").mkString)
       s3Interface.writeFileToS3("pageswithinstagramembed.txt", "List of pages with facebook embed\n" + getPage(pageList).mkString)
       assert(true)
-    }
+    }*/
 
 
   }
