@@ -17,9 +17,10 @@ class ArticleUrls(key: String) {
   val until = DateTime.now
   val from = until.minusHours(3)
   val pageSize: Int = 30
-// todo get top 20 for each section
-// You can do this per section, for example for the uk section:
-// http://example.url/uk?show-most-viewed=true&page-size=0
+/* todo get top 20 for each section
+   You can do this per section, for example for the uk section:
+   http://some.example.url/uk?show-most-viewed=true&page-size=0
+*/
 
   def getUrlsForContentType(contentType: String): List[(Option[ContentFields], Seq[Tag], String, Option[String])] = {
      contentType match {
