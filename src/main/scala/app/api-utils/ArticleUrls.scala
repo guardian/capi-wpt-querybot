@@ -19,7 +19,7 @@ class ArticleUrls(key: String) {
   val pageSize: Int = 30
 // todo get top 20 for each section
 // You can do this per section, for example for the uk section:
-// http://***REMOVED***/uk?show-most-viewed=true&page-size=0
+// http://example.url/uk?show-most-viewed=true&page-size=0
 
   def getUrlsForContentType(contentType: String): List[(Option[ContentFields], Seq[Tag], String, Option[String])] = {
      contentType match {
@@ -151,9 +151,9 @@ class ArticleUrls(key: String) {
   }
 
   def getFronts(pageNumber: Int): List[(Option[ContentFields], Seq[Tag], String, Option[String])] = {
-    val listofFronts: List[String] = List("http://www.theguardian.com/uk"/*,
+    val listofFronts: List[String] = List("http://www.theguardian.com/uk",
       "http://www.theguardian.com/us",
-      "http://www.theguardian.com/au",
+      "http://www.theguardian.com/au"/*,
       "http://www.theguardian.com/uk-news",
       "http://www.theguardian.com/world",
       "http://www.theguardian.com/politics",
