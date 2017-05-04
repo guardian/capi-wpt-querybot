@@ -246,6 +246,14 @@ class ArticleUrls(key: String) {
     }
   }
 
+  def getSingleItem(path: String): (Option[ContentFields],String) = {
+//todo - ask how to get info for capi query on known item
+    /*    try{
+      val singleItemQuery = new SearchQuery()
+
+    }*/
+  }
+
 
   /*def getContentTypeFronts: List[String] = {
     println("Creating CAPI query")

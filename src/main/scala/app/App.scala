@@ -62,6 +62,19 @@ object App {
     val interactiveResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + interactiveOutputFilename
     val frontsResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + frontsOutputFilename
 
+    val articleCanaryTrackerFile = "articlecanarydata.csv"
+    val longReadCanaryTrackerFile = "longreadcanarydata.csv"
+    val liveBlogCanaryTrackerFile = "liveblogcanarydata.csv"
+    val interactiveCanaryTrackerFile = "interactivecanarydata.csv"
+    val audioCanaryTrackerFile = "audiocanarydata.csv"
+    val videoCanaryTrackerFile = "videocanarydata.csv"
+
+    val articleCanaryUrl = "https://www.theguardian.com/world/2016/jun/03/five-women-objectified-wendy-davis-jessica-valenti"
+    val longreadCanaryUrl = "https://www.theguardian.com/news/2016/jun/02/generation-revolution-egypt-military-state-youth"
+    val liveBlogCanaryUrl = "https://www.theguardian.com/us-news/live/2016/jun/03/us-election-2016-donald-trump-violence-hillary-clinton"
+    val interactiveCanaryUrl = "https://www.theguardian.com/politics/ng-interactive/2016/jun/02/eu-referendum-find-out-how-much-you-really-know"
+    val audioCanaryUrl = "https://www.theguardian.com/news/audio/2016/jun/03/how-the-pentagon-punished-nsa-whistleblowers"
+
     val articleCSVName = "accumulatedArticlePerformanceData.csv"
     val liveBlogCSVName = "accumulatedLiveblogPerformanceData.csv"
     val interactiveCSVName = "accumulatedInteractivePerformanceData.csv"
