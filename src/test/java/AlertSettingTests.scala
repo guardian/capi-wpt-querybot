@@ -30,7 +30,7 @@ class AlertSettingTests extends AlertUnitSpec with Matchers {
   var configArray: Array[String] = Array("", "", "", "", "", "")
   var urlFragments: List[String] = List()
 
-  val articlePerformanceAverages = new ArticleDefaultAverages("color string")  
+  val articlePerformanceAverages = new ArticleDefaultAverages()
   
   val mobileArticlespeedIndexHigh = new PerformanceResultsObject("mobileArticlespeedIndexHigh", "Android/3G", "mobileArticlespeedIndexHigh", 1, 1, 1, 1, 1, 1, articlePerformanceAverages.mobileSpeedIndex + 1, "mobileArticlespeedIndexHigh", false, false, false)
   val mobileArticletFpHigh = new PerformanceResultsObject("mobileArticletFpHigh", "Android/3G", "mobileArticletFpHigh", 2, articlePerformanceAverages.mobileTimeFirstPaintInMs + 1, 2, 2, 2, 2, 2, "mobileArticletFpHigh", false, false, false)
@@ -49,7 +49,7 @@ class AlertSettingTests extends AlertUnitSpec with Matchers {
   }
 
   "A Mobile Performance Result with a timeToFirstPaint above threshold" should "contain a proper alert message" in {
-    val performanceAverages = new ArticleDefaultAverages("color string")
+    val performanceAverages = new ArticleDefaultAverages()
     val testResult = app.App.setAlertStatus(mobileArticletFpHigh, articlePerformanceAverages)
     println(testResult.pageWeightAlertDescription)
     //      println(pageWeightEmail.toString())
@@ -57,7 +57,7 @@ class AlertSettingTests extends AlertUnitSpec with Matchers {
   }
 
   "A Mobile Performance Result with Both tFP and SpeedIndex above threshold" should "contain a proper alert message" in {
-    val performanceAverages = new ArticleDefaultAverages("color string")
+    val performanceAverages = new ArticleDefaultAverages()
     val testResult = app.App.setAlertStatus(mobileArticletFpHigh, articlePerformanceAverages)
     println(testResult.pageWeightAlertDescription)
     //      println(pageWeightEmail.toString())
@@ -72,9 +72,9 @@ class AlertSettingTests extends AlertUnitSpec with Matchers {
     val previousLiveBlogResults = previousResults.filter(_.getPageType.contains("LiveBlog"))
 
     def setAlerts(result: PerformanceResultsObject): PerformanceResultsObject = {
-      val articleAverages = new ArticleDefaultAverages("test")
-      val interactiveAverages = new InteractiveDefaultAverages("test")
-      val liveBlogAverages = new LiveBlogDefaultAverages("test")
+      val articleAverages = new ArticleDefaultAverages()
+      val interactiveAverages = new InteractiveDefaultAverages()
+      val liveBlogAverages = new LiveBlogDefaultAverages()
       result.getPageType match {
         case "Article" => app.App.setAlertStatus(result, articleAverages)
         case "Interactive" => app.App.setAlertStatus(result, interactiveAverages)

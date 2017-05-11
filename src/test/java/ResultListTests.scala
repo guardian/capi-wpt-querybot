@@ -943,12 +943,12 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     //  Add results to string which will eventually become the content of our results file
     val averages = {
       if (resultObject.pageType.contains("Article")) {
-        new ArticleDefaultAverages("Color does not apply")
+        new ArticleDefaultAverages()
       } else {
         if (resultObject.pageType.contains("LiveBlog")) {
-          new LiveBlogDefaultAverages("Color does not apply")
+          new LiveBlogDefaultAverages()
         } else {
-          new InteractiveDefaultAverages("Color does not apply")
+          new InteractiveDefaultAverages()
         }
       }
     }
