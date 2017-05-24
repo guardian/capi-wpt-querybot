@@ -42,6 +42,9 @@ object App {
     val editorialPageweightFilename = "editorialpageweightdashboard.html"
     val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
     val editorialMobilePageweightFilename = "editorialpageweightdashboardmobile.html"
+    val frontsPageweightFilename = "frontspageweightdashboard.html"
+    val frontsDesktopPageweightFilename = "frontspageweightdashboarddesktop.html"
+    val frontsMobilePageweightFilename = "frontspageweightdashboardmobile.html"
     val currentDataSummaryPage = "summarypage.html"
     val currentPageWeightAlertSummaryPage = "pageweightalertsummarypage.html"
     val currentInteractiveSummaryPage = "interactivesummarypage.html"
@@ -70,8 +73,11 @@ object App {
     val frontsCSVName = "accumulatedFrontsPerformanceData.csv"
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
+    val resultsForNetworkFronts = "resultsForNetworkFronts.csv"
+    val currentFrontsResults = "currentFrontsResults.csv"
     val pageWeightAlertsFromPreviousTests = "alerts/pageWeightAlertsFromPreviousTests.csv"
     val interactiveAlertsFromPreviousTests = "alerts/interactiveAlertsFromPreviousTests.csv"
+
 
     val alertsThatHaveBeenFixed = "alertsthathavebeenfixed.csv"
     val pagesWithInsecureElements = "pagesWithInsecureElements.csv"
@@ -97,6 +103,7 @@ object App {
     //initialize combinedResultsLists - these will be used to sort and accumulate test results
     // for the combined page and for long term storage file
     var combinedResultsList: List[PerformanceResultsObject] = List()
+    var frontsResultsList: List[PerformanceResultsObject] = List()
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
@@ -104,7 +111,6 @@ object App {
     var articleResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var liveBlogResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var interactiveResults: String = htmlString.initialisePageForInteractive + htmlString.interactiveTable
-    var frontsResults: String = htmlString.initialisePageForFronts + htmlString.initialiseTable
     var audioResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var videoResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
 
@@ -417,6 +423,39 @@ object App {
       println("CAPI query found no interactives")
     }
 
+    if (fronts.nonEmpty) {
+      println("Generating average values for fronts")
+      val frontsAverages: PageAverageObject = new FrontsDefaultAverages(averageColor)
+      val frontsResults = listenForResultPages(fronts, "Front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(frontsResultsList, pageWeightAnchorId)
+      val frontsResultsWithAnchor = getAnchorId._1
+      pageWeightAnchorId = getAnchorId._2
+
+      frontsResultsList = frontsResultsWithAnchor
+      println("\n \n \n fronts tests complete. \n tested " + frontsResultsWithAnchor.length + "pages")
+      println("Total number of results gathered so far " + (combinedResultsList.length + frontsResults.length) + "pages")
+      val sortedFrontsResultsList = sorter.orderListByWeight(frontsResultsWithAnchor)
+      if (sortedFrontsResultsList.isEmpty) {
+        println("Sorting algorithm has returned empty list. Aborting")
+        System exit 1
+      }
+      //generate fronts alert list
+      val currentlyAlertingFronts = s3Interface.getResultsFileFromS3(currentFrontsResults).filter(_.alertStatusPageWeight)
+      val frontsAlerts = sortedFrontsResultsList.filter(_.alertStatusPageWeight)
+      frontsPageWeightAlertList = for (alert <- frontsAlerts if !(currentlyAlertingFronts.map(_.testUrl).contains(alert.testUrl))) yield alert
+      val previousFrontsResultsList = s3Interface.getResultsFileFromS3(resultsForNetworkFronts)
+      val combinedFrontsResults = (frontsResults ::: previousFrontsResultsList).take(5000)
+      //write fronts results to file
+      if (!iamTestingLocally) {
+        println(DateTime.now + " Writing interactive results to S3")
+        s3Interface.writeFileToS3(resultsForNetworkFronts, combinedFrontsResults.map(_.toCSVString()).mkString)
+        s3Interface.writeFileToS3(currentFrontsResults, sortedFrontsResultsList.map(_.toCSVString()).mkString)
+        }
+      println("Fronts Performance Test Complete")
+    } else {
+      println("CAPI query found no fronts")
+    }
+
     println("length of recent but no retest required list: " + previousTestResultsHandler.recentButNoRetestRequired.length)
     val sortedByWeightCombinedResults: List[PerformanceResultsObject] = sorter.orderListByWeight(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Desktop")) yield result
@@ -479,6 +518,11 @@ object App {
     val gLabsDashboardDesktop = new InteractiveDashboardDesktop(sortedGLabsCombinedResults, sortedGLabsDesktopResults, sortedGLabsMobileResults)
     val gLabsDashboardMobile = new InteractiveDashboardMobile(sortedGLabsCombinedResults, sortedGLabsDesktopResults, sortedGLabsMobileResults)
 
+    val frontsPageWeightDashboardDesktop = new PageWeightDashboardDesktop(frontsResultsList, frontsResultsList.filter(_.typeOfTestName.contains("Desktop")), frontsResultsList.filter(_.typeOfTestName.contains("Mobile")))
+    val frontsPageWeightDashboardMobile = new PageWeightDashboardMobile(frontsResultsList, frontsResultsList.filter(_.typeOfTestName.contains("Desktop")), frontsResultsList.filter(_.typeOfTestName.contains("Mobile")))
+    val frontsPageWeightDashboard = new PageWeightDashboardTabbed(frontsResultsList, frontsResultsList.filter(_.typeOfTestName.contains("Desktop")), frontsResultsList.filter(_.typeOfTestName.contains("Mobile")))
+
+
     val pageWeightAlertsPreviouslyFixed = s3Interface.getResultsFileFromS3(alertsThatHaveBeenFixed)
     val pageWeightAlertsFixedThisRun = for (alert <- previousTestResultsHandler.hasPreviouslyAlertedOnWeight if !(articlePageWeightAlertList ::: liveBlogPageWeightAlertList ::: interactivePageWeightAlertList).map(result => (result.testUrl, result.typeOfTest)).contains((alert.testUrl, alert.typeOfTest))) yield alert
     val pageWeightAlertsFixedCSVString = (pageWeightAlertsFixedThisRun ::: pageWeightAlertsPreviouslyFixed).map(_.toCSVString()).mkString
@@ -507,6 +551,9 @@ object App {
       s3Interface.writeFileToS3(gLabsDashboardFilename, gLabsDashboard.toString())
       s3Interface.writeFileToS3(gLabsDashboardDesktopFilename, gLabsDashboardDesktop.toString())
       s3Interface.writeFileToS3(gLabsDashboardMobileFilename, gLabsDashboardMobile.toString())
+      s3Interface.writeFileToS3(frontsDesktopPageweightFilename, frontsPageWeightDashboardDesktop.toString())
+      s3Interface.writeFileToS3(frontsMobilePageweightFilename, frontsPageWeightDashboardMobile.toString())
+      s3Interface.writeFileToS3(frontsPageweightFilename, frontsPageWeightDashboard.toString())
       s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
       s3Interface.writeFileToS3(alertsThatHaveBeenFixed, pageWeightAlertsFixedCSVString)
       s3Interface.writeFileToS3(pagesWithInsecureElements, listOfPagesWithInsecureElements.map(_.toCSVString()).mkString)
@@ -633,20 +680,19 @@ object App {
       println("no Paid Content alerts to send, therefore Paid Content Alert Email not sent.")
     }
 
-
-    //todo - this needs to have both pageweight and page-speed alerts
-    /*val paidContentAlertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(_.gLabs)
-    if (paidContentAlertsToSend.nonEmpty) {
-      println("There are new paid Content alerts to send! There are " + alertsToSend.length + " new alerts")
-      val paidContentEmailAlerts = new PageWeightEmailTemplate(paidContentAlertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
-      val paidContentEmailSuccess = emailer.sendPageWeightAlert(generalAlertsAddressList, paidContentEmailAlerts.toString())
-      if (paidContentEmailSuccess)
-        println(DateTime.now + " Paid-content Alert Emails sent successfully. ")
+    if (frontsPageWeightAlertList.nonEmpty) {
+      println("There are new pageWeight alerts to send! There are " + alertsToSend.length + " new alerts")
+      val frontsEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + frontsMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + frontsDesktopPageweightFilename)
+      val pageWeightEmailSuccess = emailer.sendPageWeightAlert(generalAlertsAddressList, frontsEmailAlerts.toString())
+      if (pageWeightEmailSuccess)
+        println(DateTime.now + " Fronts page-weight Alert Emails sent successfully. ")
       else
-        println(DateTime.now + "ERROR: Sending of Paid-content Alert Emails failed")
+        println(DateTime.now + "ERROR: Sending of Fronts page-weight Alert Emails failed")
     } else {
-      println("No pages to alert on Paid-content. Email not sent.")
-    }*/
+      println("No pages to alert on Fronts Page-Weight. Email not sent.")
+    }
+    //todo - this needs to have both pageweight and page-speed alerts
+
 
     val newPageWeightAlerts = newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList
     // write pageWeight alerts results file
