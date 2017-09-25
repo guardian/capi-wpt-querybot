@@ -621,9 +621,27 @@ object App {
       val ukGLabsEmailAlerts = new GLabsEmailTemplate(ukGLabsAlerts, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardDesktopFilename)
       val usGLabsEmailAlerts = new GLabsEmailTemplate(usGLabsAlerts, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardDesktopFilename)
       val auGLabsEmailAlerts = new GLabsEmailTemplate(auGLabsAlerts, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + gLabsDashboardDesktopFilename)
-      val ukGLabsEmailSuccess = emailer.sendPaidContentAlert(ukFullGlabsEmailAddresses, ukGLabsEmailAlerts.toString())
-      val usGLabsEmailSuccess = emailer.sendPaidContentAlert(usFullGlabsEmailAddresses, usGLabsEmailAlerts.toString())
-      val auGLabsEmailSuccess = emailer.sendPaidContentAlert(auFullGlabsEmailAddresses, auGLabsEmailAlerts.toString())
+      val ukGLabsEmailSuccess = {
+        if(ukGLabsAlerts.nonEmpty){
+        emailer.sendPaidContentAlert(ukFullGlabsEmailAddresses, ukGLabsEmailAlerts.toString())
+      } else {
+        true
+      }
+      }
+      val usGLabsEmailSuccess = {
+        if(usGLabsAlerts.nonEmpty){
+        emailer.sendPaidContentAlert(usFullGlabsEmailAddresses, usGLabsEmailAlerts.toString())
+      } else {
+        true
+        }
+      }
+      val auGLabsEmailSuccess = {
+        if (auGLabsAlerts.nonEmpty) {
+          emailer.sendPaidContentAlert(auFullGlabsEmailAddresses, auGLabsEmailAlerts.toString())
+        } else {
+          true
+        }
+      }
       if (ukGLabsEmailSuccess && usGLabsEmailSuccess && auGLabsEmailSuccess) {
         println("Paid Content Alert email sent successfully.")
       } else {
