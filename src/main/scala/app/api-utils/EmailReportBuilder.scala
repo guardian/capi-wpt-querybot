@@ -4,9 +4,6 @@ import app.apiutils.{PageAverageObject, PerformanceResultsObject}
 import org.joda.time.DateTime
 
 
-/**
-  * Created by Gwyn Lockett on 12/04/16.
-  */
 class EmailReportBuilder(average: String, warning: String, alert: String, articleResultsUrl: String, liveBlogResultsUrl: String, interactiveResultsUrl: String, frontsResultsUrl: String) {
 
   val averageColor = average
@@ -145,8 +142,7 @@ class EmailReportBuilder(average: String, warning: String, alert: String, articl
 
 
   def generateAlertEmailBodyElement(alertList: List[PerformanceResultsObject], averages: PageAverageObject): String = {
-    //    println("*\n \n \n **** \n \n \n averages.desktopHTMLResultString: \n" + averages.desktopHTMLResultString)
-    //    println("*\n \n \n **** \n \n \n averages.mobileHTMLResultString: \n" + averages.mobileHTMLResultString)
+  
     if(alertList.nonEmpty) {
       val desktopMessageString: String =
         if (alertList.exists(test => test.typeOfTest == "Desktop")) {
@@ -179,8 +175,6 @@ class EmailReportBuilder(average: String, warning: String, alert: String, articl
 
 
   def generateInteractiveAlertBodyElement(alertList: List[PerformanceResultsObject], averages: PageAverageObject): String = {
-    //    println("*\n \n \n **** \n \n \n averages.desktopHTMLResultString: \n" + averages.desktopHTMLResultString)
-    //    println("*\n \n \n **** \n \n \n averages.mobileHTMLResultString: \n" + averages.mobileHTMLResultString)
     if(alertList.nonEmpty) {
       val desktopMessageString: String =
         if (alertList.exists(test => test.typeOfTest == "Desktop")) {
