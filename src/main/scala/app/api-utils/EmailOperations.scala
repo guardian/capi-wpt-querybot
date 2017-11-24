@@ -26,48 +26,7 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
   val username: String = passedUserName
   val password: String = passedPassword
 
-  /*def sendEmail(): Boolean = {
-    val sMTPemailAddress: String = "pageperformancetesterbot@gmail.com"
-    val sMTPemailPassword: String = "AirServicesAustralia"
-    val sMTPportId: Int = 587
-    //or 587
-    val sMTPtLSSSLRequired: String = "yes"
-
-    val mailer = Mailer(sMTPemailAddress, sMTPportId)
-        .auth(true)
-        .as(sMTPemailAddress,sMTPemailPassword)
-        .sslSocketFactory
-        .startTtls(true)()
-
-    println(mailer.toString)
-
-
-
-    var emailSuccess: Boolean = false
-    val internetAddress = new InternetAddress(sMTPemailAddress, true)
-    val toaddress = new InternetAddress("michael.mcnamara@guardian.co.uk")
-    val ccaddress = new InternetAddress("m_w_mcnamara@hotmail.com")
-    println(internetAddress.getAddress)
-    println(internetAddress.toString)
-    mailer(Envelope.from(new InternetAddress(sMTPemailAddress, true))
-      .to(new InternetAddress("michael.mcnamara@guardian.co.uk", true))
-      .subject("test email from PagePerformanceTesterBot")
-      .content(Text("Yay!")))
-      .onSuccess{
-        case _ => println ("Email sent successfully")
-                   emailSuccess = true
-                  }
-    val myEnvelope = new Envelope(internetAddress,Option("testing"), Seq(toaddress), Seq(ccaddress), Seq.empty[InternetAddress],None, None, Seq.empty[(String,String)],Text("This is a test second attempt"))
-    mailer.apply(myEnvelope)
-
-
-    emailSuccess
-    }*/
-
   def sendPageWeightAlert(emailAddressList: List[String], messageBody: String):Boolean = {
-//    val username: String = "Michael.McNamara@guardian.co.uk"
-//    val altfrom: String = "pageperformancetesterbot@gmail.com"
-//    val password: String = "keprlztdbnyvgqsc"
     val internetAddressList: List[InternetAddress] = emailAddressList.map(emailAddress => new InternetAddress(emailAddress))
 
     val props: Properties = new Properties
@@ -107,9 +66,7 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
   }
 
   def sendInteractiveAlert(emailAddressList: List[String], messageBody: String):Boolean = {
-    //    val username: String = "Michael.McNamara@guardian.co.uk"
-    //    val altfrom: String = "pageperformancetesterbot@gmail.com"
-    //    val password: String = "keprlztdbnyvgqsc"
+
     val internetAddressList: List[InternetAddress] = emailAddressList.map(emailAddress => new InternetAddress(emailAddress))
 
     val props: Properties = new Properties
@@ -154,9 +111,7 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
 
 
   def sendPaidContentAlert(emailAddressList: List[String], messageBody: String):Boolean = {
-    //    val username: String = "Michael.McNamara@guardian.co.uk"
-    //    val altfrom: String = "pageperformancetesterbot@gmail.com"
-    //    val password: String = "keprlztdbnyvgqsc"
+
     val internetAddressList: List[InternetAddress] = emailAddressList.map(emailAddress => new InternetAddress(emailAddress))
 
     val props: Properties = new Properties
