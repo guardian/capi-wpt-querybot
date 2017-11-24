@@ -247,34 +247,6 @@ class ArticleUrls(key: String) {
   }
 
 
-  /*def getContentTypeFronts: List[String] = {
-    println("Creating CAPI query")
-    val until = DateTime.now
-    val from = until.minusHours(24)
-
-    val FrontsSearchQuery = new SearchQuery()
-      .fromDate(from)
-      .toDate(until)
-      .showBlocks("all")
-      .showElements("all")
-      .showFields("all")
-      .showTags("all")
-      .page(1)
-      .pageSize(20)
-      .orderBy("newest")
-      .contentType("front")
-    println("Sending query to CAPI: \n" + FrontsSearchQuery.toString)
-
-    val apiResponse = contentApiClient.getResponse(FrontsSearchQuery)
-    val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    println("CAPI has returned response")
-    val liveBlogUrlString: List[String] = for (result <- returnedResponse.results) yield {
-      println("liveBlog result: " + result.webUrl)
-      result.webUrl }
-    liveBlogUrlString
-  }
-*/
-
   def getSinglePage(urlString: String): (Option[ContentFields], Seq[Tag], String, Option[String]) = {
     val domainName= "www.theguardian.com"
     val urlId = urlString.substring(urlString.indexOf(domainName)+domainName.length+1,urlString.length)
