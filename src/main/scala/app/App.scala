@@ -217,7 +217,6 @@ object App {
     val videoPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Video")
     val audioPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Audio")
     println(DateTime.now + " Closing Content API query connection")
-    capiQuery.shutDown
 
     println("CAPI call summary: \n")
     println("Retrieved: " + articles.length + " article pages")
@@ -227,6 +226,8 @@ object App {
     println("Retrieved: " + videoPages.length + " video pages")
     println("Retrieved: " + audioPages.length + " audio pages")
     println((articles.length + liveBlogs.length + interactives.length + fronts.length + videoPages.length + audioPages.length) + " pages returned in total")
+
+    capiQuery.shutDown
 
     val newOrChangedArticles = previousTestResultsHandler.returnPagesNotYetTested(articles)
     val newOrChangedLiveBlogs = previousTestResultsHandler.returnPagesNotYetTested(liveBlogs)
