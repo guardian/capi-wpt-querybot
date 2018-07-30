@@ -16,26 +16,25 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   //val fullResultsList = resultsList
 
-  val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
-  val cutoffTime96Hours: Long = DateTime.now.minusHours(96).getMillis
+  val cutoffTime: Long = DateTime.now.minusHours(96).getMillis
   val previousResults: List[PerformanceResultsObject] = dedupeList(resultsList)
   //val previousResults: List[PerformanceResultsObject] = resultsList
 
-  val resultsFromLast24Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime) yield result
+  val resultsFromLast96Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime) yield result
 
-  val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if result.needsRetest()) yield result
+  val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast96Hours if result.needsRetest()) yield result
   val desktopPreviousResultsToReTest = previousResultsToRetest.filter(_.typeOfTest.contains("Desktop"))
   val mobilePreviousResultsToReTest = previousResultsToRetest.filter(_.typeOfTest.contains("Android/3G"))
   val dedupedMobilePreviousResultsToRetest = for (result <- mobilePreviousResultsToReTest if!desktopPreviousResultsToReTest.map(_.testUrl).contains(result.testUrl)) yield result
   val dedupedStandardResultsToRestest: List[PerformanceResultsObject] = (dedupedMobilePreviousResultsToRetest ::: desktopPreviousResultsToReTest).filter(_.isNotInteractiveOrGLabs)
 
-  val interactivesFromLast96Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime96Hours && result.getPageType.contains("Interactive") && result.hasAlert) yield result
+  val interactivesFromLast96Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime && result.getPageType.contains("Interactive") && result.hasAlert) yield result
   val interactiveDesktopPagesToRetest = interactivesFromLast96Hours.filter(_.typeOfTest.contains("Desktop"))
   val interactiveMobilePagesToRetest = interactivesFromLast96Hours.filter(_.typeOfTest.contains("Android/3G"))
   val dedupedMobileInteractivePreviousResultsToRetest = for (result <- interactiveMobilePagesToRetest if!interactiveDesktopPagesToRetest.map(_.testUrl).contains(result.testUrl)) yield result
   val dedupedInteractivePreviousResultsToRetest: List[PerformanceResultsObject] = dedupedMobileInteractivePreviousResultsToRetest ::: interactiveDesktopPagesToRetest
 
-  val gLabsFromLast96Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime96Hours && result.gLabs && result.hasAlert) yield result
+  val gLabsFromLast96Hours = for (result <- previousResults if result.mostRecentUpdate >= cutoffTime && result.gLabs && result.hasAlert) yield result
   val gLabsDesktopPagesToRetest = gLabsFromLast96Hours.filter(_.typeOfTest.contains("Desktop"))
   val gLabsMobilePagesToRetest = gLabsFromLast96Hours.filter(_.typeOfTest.contains("Android/3G"))
   val dedupedMobileGLabsPreviousResultsToRetest = for (result <- gLabsMobilePagesToRetest if!gLabsDesktopPagesToRetest.map(_.testUrl).contains(result.testUrl)) yield result
@@ -46,9 +45,9 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   val oldResults = for (result <- previousResults if result.mostRecentUpdate < cutoffTime) yield result
 
-  val recentButNoRetestRequired: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if !result.needsRetest()) yield result
+  val recentButNoRetestRequired: List[PerformanceResultsObject] = for (result <- resultsFromLast96Hours if !result.needsRetest()) yield result
 
-  val pagesThatMightHAveAlertedRecently = resultsFromLast24Hours ::: interactivesFromLast96Hours ::: gLabsFromLast96Hours
+  val pagesThatMightHAveAlertedRecently = resultsFromLast96Hours ::: interactivesFromLast96Hours ::: gLabsFromLast96Hours
   val hasPreviouslyAlerted: List[PerformanceResultsObject] = pagesThatMightHAveAlertedRecently.filter(_.hasAlert)
   val hasPreviouslyAlertedOnWeight: List[PerformanceResultsObject] = pagesThatMightHAveAlertedRecently.filter(_.alertStatusPageWeight)
 
@@ -140,24 +139,24 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
 
   def checkConsistency(): Boolean = {
-        if (!(((previousResultsToRetest.length + recentButNoRetestRequired.length) == resultsFromLast24Hours.length) && ((resultsFromLast24Hours.length + oldResults.length) == previousResults.length))) {
+        if (!(((previousResultsToRetest.length + recentButNoRetestRequired.length) == resultsFromLast96Hours.length) && ((resultsFromLast96Hours.length + oldResults.length) == previousResults.length))) {
           println("ERROR: previous results list handling is borked!")
           println("Previous Results to retest length == " + previousResultsToRetest.length + "\n")
           println("Unchanged previous results length == " + recentButNoRetestRequired.length + "\n")
-          println("Results from last 24 hours length == " + resultsFromLast24Hours.length + "\n")
+          println("Results from last 24 hours length == " + resultsFromLast96Hours.length + "\n")
           println("Old results length == " + oldResults.length + "\n")
           println("Original list of previous results length == " + previousResults.length + "\n")
-          if (!((previousResultsToRetest.length + recentButNoRetestRequired.length) == resultsFromLast24Hours.length)) {
+          if (!((previousResultsToRetest.length + recentButNoRetestRequired.length) == resultsFromLast96Hours.length)) {
             println("Results to test and unchanged results from last 24 hours dont add up correctly \n")
           }
-          if (!((resultsFromLast24Hours.length + oldResults.length) == previousResults.length)) {
+          if (!((resultsFromLast96Hours.length + oldResults.length) == previousResults.length)) {
             println("Results from last 24 hours and old results dont add up \n")
           }
           false
         } else {
           println("Retrieved results from file\n")
           println(previousResults.length + " results retrieved in total")
-          println(resultsFromLast24Hours.length + " results for last 24 hours")
+          println(resultsFromLast96Hours.length + " results for last 24 hours")
           println(previousResultsToRetest.length + " results will be elegible for retest")
           println(dedupedPreviousResultsToRestest.length + " results are not duplicates and will actually be retested")
           println(recentButNoRetestRequired.length + " results will be listed but not tested")
