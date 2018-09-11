@@ -570,7 +570,8 @@ object App {
     val newInteractiveAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(interactiveAlertList)
     val newGLabsAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(gLabsAlertList)
 
-    val alertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
+    val alertsToSendWithDupes = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
+    val alertsToSend = latestResultOnly(alertsToSendWithDupes)
     if (alertsToSend.nonEmpty) {
       println("There are new pageWeight alerts to send! There are " + alertsToSend.length + " new alerts")
       val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
@@ -1002,6 +1003,22 @@ object App {
       result
     }
     (resultList,iterator)
+  }
+
+  def latestResultOnly(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+
+    def findLatest(x: PerformanceResultsObject, y: PerformanceResultsObject): PerformanceResultsObject = {
+      val timeX: Long = DateTime.parse(x.timeOfTest).getMillis
+      val timeY: Long = DateTime.parse(y.timeOfTest).getMillis
+      if (timeX > timeY)
+        x
+      else
+        y
+    }
+
+    val urls = for(urls <- results.map(_.testUrl)) yield urls
+    val latestResults: List[PerformanceResultsObject] = for (url <- urls) yield results.filter(_.testUrl.contains(url)).reduceLeft(findLatest)
+    latestResults
   }
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
