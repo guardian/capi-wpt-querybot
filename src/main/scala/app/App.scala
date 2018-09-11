@@ -1005,20 +1005,30 @@ object App {
     (resultList,iterator)
   }
 
+  def findLatest(x: PerformanceResultsObject, y: PerformanceResultsObject): PerformanceResultsObject = {
+    val timeX: Long = DateTime.parse(x.timeOfTest).getMillis
+    val timeY: Long = DateTime.parse(y.timeOfTest).getMillis
+    if (timeX > timeY)
+      x
+    else
+      y
+  }
+
+  def getLatestResults(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    val urls = for (urls <- results.map(_.testUrl)) yield urls
+    val latestResults = for (url <- urls) yield results.filter(r => r.testUrl.contains(url)).reduceLeft(findLatest)
+    latestResults
+  }
+
   def latestResultOnly(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
 
-    def findLatest(x: PerformanceResultsObject, y: PerformanceResultsObject): PerformanceResultsObject = {
-      val timeX: Long = DateTime.parse(x.timeOfTest).getMillis
-      val timeY: Long = DateTime.parse(y.timeOfTest).getMillis
-      if (timeX > timeY)
-        x
-      else
-        y
-    }
+    val resultsMobile: List[PerformanceResultsObject] = results.filter(_.typeOfTestName.contains("Mobile"))
+    val resultsDesktop: List[PerformanceResultsObject] = results.filter(_.typeOfTest.contains("Desktop"))
 
-    val urls = for(urls <- results.map(_.testUrl)) yield urls
-    val latestResults: List[PerformanceResultsObject] = for (url <- urls) yield results.filter(_.testUrl.contains(url)).reduceLeft(findLatest)
-    latestResults
+    val latestResultsMobile = getLatestResults(resultsMobile)
+    val latestResultsDesktop = getLatestResults(resultsDesktop)
+
+    latestResultsMobile ::: latestResultsDesktop
   }
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
