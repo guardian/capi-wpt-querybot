@@ -570,7 +570,8 @@ object App {
     val newInteractiveAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(interactiveAlertList)
     val newGLabsAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(gLabsAlertList)
 
-    val alertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
+    val alertsToSendWithDupes = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
+    val alertsToSend = latestResultOnly(alertsToSendWithDupes)
     if (alertsToSend.nonEmpty) {
       println("There are new pageWeight alerts to send! There are " + alertsToSend.length + " new alerts")
       val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
@@ -1002,6 +1003,32 @@ object App {
       result
     }
     (resultList,iterator)
+  }
+
+  def findLatest(x: PerformanceResultsObject, y: PerformanceResultsObject): PerformanceResultsObject = {
+    val timeX: Long = DateTime.parse(x.timeOfTest).getMillis
+    val timeY: Long = DateTime.parse(y.timeOfTest).getMillis
+    if (timeX > timeY)
+      x
+    else
+      y
+  }
+
+  def getLatestResults(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    val urls = for (urls <- results.map(_.testUrl)) yield urls
+    val latestResults = for (url <- urls) yield results.filter(r => r.testUrl.contains(url)).reduceLeft(findLatest)
+    latestResults
+  }
+
+  def latestResultOnly(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+
+    val resultsMobile: List[PerformanceResultsObject] = results.filter(_.typeOfTestName.contains("Mobile"))
+    val resultsDesktop: List[PerformanceResultsObject] = results.filter(_.typeOfTest.contains("Desktop"))
+
+    val latestResultsMobile = getLatestResults(resultsMobile)
+    val latestResultsDesktop = getLatestResults(resultsDesktop)
+
+    latestResultsMobile ::: latestResultsDesktop
   }
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
