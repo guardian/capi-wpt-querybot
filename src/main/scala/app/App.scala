@@ -254,7 +254,6 @@ object App {
 
     //get all pages from the visuals team api
 
-
     // sendPageWeightAlert all urls to webpagetest at once to enable parallel testing by test agents
     val urlsToSend: List[String] = (pagesToRetest ::: articleUrls ::: liveBlogUrls ::: interactiveUrls).distinct
     println("Combined list of urls: \n" + urlsToSend)
@@ -1003,6 +1002,40 @@ object App {
     }
     (resultList,iterator)
   }
+
+
+  def findLatest(x: PerformanceResultsObject, y: PerformanceResultsObject): PerformanceResultsObject = {
+    val timeX: Long = DateTime.parse(x.timeOfTest).getMillis
+    val timeY: Long = DateTime.parse(y.timeOfTest).getMillis
+    if (timeX > timeY)
+      x
+    else
+      y
+  }
+
+  def getLatestResults(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    val urls = for (urls <- results.map(_.testUrl)) yield urls
+    val latestResults = for (url <- urls) yield {
+      val resultsByUrl = results.filter(r => r.testUrl.contains(url))
+      if(resultsByUrl.size > 1)
+        resultsByUrl.reduceLeft(findLatest)
+      else
+        resultsByUrl.head
+    }
+    latestResults
+  }
+
+  def latestResultOnly(results: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+
+    val resultsMobile: List[PerformanceResultsObject] = results.filter(_.typeOfTestName.contains("Mobile"))
+    val resultsDesktop: List[PerformanceResultsObject] = results.filter(_.typeOfTest.contains("Desktop"))
+
+    val latestResultsMobile = getLatestResults(resultsMobile)
+    val latestResultsDesktop = getLatestResults(resultsDesktop)
+
+    latestResultsMobile ::: latestResultsDesktop
+  }
+
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
     val contentStub = new ContentFields {override def newspaperEditionDate: Option[CapiDateTime] = None
