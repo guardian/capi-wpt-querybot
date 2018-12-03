@@ -569,8 +569,7 @@ object App {
     val newInteractiveAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(interactiveAlertList)
     val newGLabsAlertsList: List[PerformanceResultsObject] = previousTestResultsHandler.returnPagesNotYetAlertedOn(gLabsAlertList)
 
-    val alertsToSendWithDupes = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
-    val alertsToSend = latestResultOnly(alertsToSendWithDupes)
+    val alertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
     if (alertsToSend.nonEmpty) {
       println("There are new pageWeight alerts to send! There are " + alertsToSend.length + " new alerts")
       val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
@@ -1004,6 +1003,7 @@ object App {
     (resultList,iterator)
   }
 
+
   def findLatest(x: PerformanceResultsObject, y: PerformanceResultsObject): PerformanceResultsObject = {
     val timeX: Long = DateTime.parse(x.timeOfTest).getMillis
     val timeY: Long = DateTime.parse(y.timeOfTest).getMillis
@@ -1035,6 +1035,7 @@ object App {
 
     latestResultsMobile ::: latestResultsDesktop
   }
+
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
     val contentStub = new ContentFields {override def newspaperEditionDate: Option[CapiDateTime] = None
