@@ -1,6 +1,6 @@
 package app.apiutils
 
-import com.squareup.okhttp.{OkHttpClient, Response, Request}
+import okhttp3.{OkHttpClient, Request, Response}
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 

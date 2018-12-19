@@ -2,48 +2,36 @@ name := "capi-wpi-querybot"
 
 version := "1.0"
 
-scalaVersion := "2.11.7"
-
-//javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
-
-
+scalaVersion := "2.12.4"
 
 libraryDependencies ++= Seq(
 // Dependencies needed to build as an AWS Lambda file
-  "com.amazonaws" % "aws-lambda-java-core" % "1.0.0",
-  "com.amazonaws" % "aws-lambda-java-events" % "1.0.0",
-  "com.gu" %% "content-api-client" % "7.3",
+//  "com.amazonaws" % "aws-lambda-java-core" % "1.0.0",
+//  "com.amazonaws" % "aws-lambda-java-events" % "1.0.0",
+  "com.gu" %% "content-api-client-default" % "12.10",
   // Test dependencies
-  "org.specs2" %% "specs2" % "2.3.12" % "test",
+  "org.specs2" %% "specs2-core" % "4.3.5" % "test",
   //ok http dependencies
-  "com.squareup.okhttp" % "okhttp" % "2.5.0",
+  "com.squareup.okhttp3" % "okhttp" % "3.12.0",
   //play json dependencies
-  "com.typesafe.play" % "play-json_2.11" % "2.4.0-M2",
+  "com.typesafe.play" %% "play-json" % "2.6.10",
+  //"com.typesafe.play" %% "play-functional" % "2.6.7",
   //play ws dependencies
-  "com.typesafe.play" % "play-ws_2.11" % "2.4.5",
-  //Taig communicator - wraps OkHttp fro Scala
-  "io.taig" %% "communicator" % "2.2.2",
+  "com.typesafe.play" % "play-ws_2.12" % "2.6.0-M1",
+//Taig communicator - wraps OkHttp fro Scala
+  "io.taig" %% "communicator" % "3.5.1",
   //scalax.io
   "org.scalaforge" % "scalax" % "0.1",
   //aws S3 stuff
-  "com.amazonaws" % "aws-java-sdk-s3" % "1.10.44",
-  // typesafe config
-  "com.typesafe" % "config" % "1.3.0",
-  // sbt  command tool dependency
-  "org.scala-sbt" % "command" % "0.13.5",
-  //scalactic dependencies
-  "org.scalactic" %% "scalactic" % "2.2.6",
-  "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.11.461",
+  "com.typesafe" % "config" % "1.3.3",
+  "org.scala-sbt" % "command_2.12" % "1.2.7",
+  "org.scalactic" %% "scalactic" % "3.0.5",
+  "org.scalatest" %% "scalatest" % "3.0.5" % "test",
   // gmail api dependencies
-  "com.google.apis" % "google-api-services-gmail" % "v1-rev37-1.21.0",
-  // javax
+  "com.google.apis" % "google-api-services-gmail" % "v1-rev98-1.25.0",
   "javax.mail" % "mail" % "1.5.0-b01",
-  "io.argonaut" %% "argonaut" % "6.1")
-  // courier (email library) dependencies
-  //"me.lessis" %% "courier" % "0.1.3",
-  //mock java mail - for testing emails
-  //"org.jvnet.mock-javamail" % "mock-javamail" % "1.9" % "test"
-
+  "io.argonaut" %% "argonaut" % "6.2.2")
 
 assemblyMergeStrategy in assembly := {
     case PathList("META-INF", xs @ _*) => MergeStrategy.discard

@@ -1,7 +1,6 @@
 package app.apiutils
 
-//import app.api.PerformanceResultsObject
-import com.squareup.okhttp._
+import okhttp3.{HttpUrl, OkHttpClient, Request, Response}
 import org.joda.time.DateTime
 
 import scala.xml.Elem
@@ -18,7 +17,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
   val fragments: String = urlFragments.map(x => "#" + x).mkString
 
   val wptResponseFormat:String = "xml"
-  implicit val httpClient = new OkHttpClient()
+  implicit val httpClient: OkHttpClient = new OkHttpClient()
 
   val msmaxTime: Int = 6000000
   val msTimeBetweenPings: Int = 30000

@@ -99,21 +99,15 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def getFirstPublished: Long = {
-    firstPublished.getOrElse(new CapiDateTime {
-      override def dateTime: Long = 0
-    }).dateTime
+    firstPublished.getOrElse(newCapiDateTime(0L)).dateTime
   }
 
   def getPageLastUpdated: Long = {
-    pageLastUpdated.getOrElse(new CapiDateTime {
-      override def dateTime: Long = 0
-    }).dateTime
+    pageLastUpdated.getOrElse(newCapiDateTime(0L)).dateTime
   }
 
   def mostRecentUpdate: Long = {
-    pageLastUpdated.getOrElse(firstPublished.getOrElse(new CapiDateTime {
-      override def dateTime: Long = 0
-    })).dateTime
+    pageLastUpdated.getOrElse(firstPublished.getOrElse(newCapiDateTime(0L))).dateTime
   }
 
   def addtoElementList(element: PageElementFromHTMLTableRow): Boolean = {
@@ -319,9 +313,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   def stringtoCAPITime(time: String): Option[CapiDateTime] = {
     if(time.nonEmpty && !time.equals("0")) {
       val longTime = time.toLong
-      val capiTime = new CapiDateTime {
-        override def dateTime: Long = longTime
-      }
+      val capiTime = newCapiDateTime(longTime)
       Option(capiTime)
     } else
     {
@@ -367,9 +359,8 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
    }
 
   def newCapiDateTime(time: Long): CapiDateTime = {
-    new CapiDateTime {
-      override def dateTime: Long = time
-    }
+    val iso8601 = new DateTime(time).toLocalDateTime.toString()
+    CapiDateTime.apply(time, iso8601)
   }
  
 
