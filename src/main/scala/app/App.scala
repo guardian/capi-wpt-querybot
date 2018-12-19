@@ -1,19 +1,11 @@
 package app
 
-// note an _ instead of {} would get everything
-
-import java.io._
-import java.util
 
 import app.api._
 import app.apiutils._
 import com.gu.contentapi.client.model.v1._
-import com.typesafe.config.{Config, ConfigFactory}
 import org.joda.time.DateTime
-import sbt.complete.Completion
-
 import scala.collection.parallel.immutable.ParSeq
-import scala.io.Source
 
 
 object App {
@@ -26,14 +18,11 @@ object App {
     println("Local Testing Flag is set to: " + iamTestingLocally.toString)
 
     val jobStart = DateTime.now
-    val startOfWeek = jobStart.minusDays(jobStart.getDayOfWeek).minusMillis(jobStart.getMillisOfDay)
     //  Define names of s3bucket, configuration and output Files
     val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
     val s3BucketName = "capi-wpt-querybot"
     val configFileName = "config.conf"
     val emailFileName = "addresses.conf"
-    val interactiveSampleFileName = "interactivesamples.conf"
-    val visualsPagesFileName = "visuals.conf"
 
     val articleOutputFilename = "articleperformancedata.html"
     val liveBlogOutputFilename = "liveblogperformancedata.html"
@@ -61,13 +50,6 @@ object App {
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
     val interactiveResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + interactiveOutputFilename
     val frontsResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + frontsOutputFilename
-
-    val articleCSVName = "accumulatedArticlePerformanceData.csv"
-    val liveBlogCSVName = "accumulatedLiveblogPerformanceData.csv"
-    val interactiveCSVName = "accumulatedInteractivePerformanceData.csv"
-    val videoCSVName = "accumulatedVideoPerformanceData.csv"
-    val audioCSVName = "accumulatedAudioPerformanceData.csv"
-    val frontsCSVName = "accumulatedFrontsPerformanceData.csv"
 
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
     val pageWeightAlertsFromPreviousTests = "alerts/pageWeightAlertsFromPreviousTests.csv"
@@ -98,26 +80,20 @@ object App {
     // for the combined page and for long term storage file
     var combinedResultsList: List[PerformanceResultsObject] = List()
 
+
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
-    val newhtmlString = new HtmlReportBuilder(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
     var articleResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var liveBlogResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var interactiveResults: String = htmlString.initialisePageForInteractive + htmlString.interactiveTable
-    var frontsResults: String = htmlString.initialisePageForFronts + htmlString.initialiseTable
-    var audioResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
-    var videoResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
+
 
     //Initialize Page-Weight email alerts lists - these will be used to generate emails
-
     var articlePageWeightAlertList: List[PerformanceResultsObject] = List()
     var liveBlogPageWeightAlertList: List[PerformanceResultsObject] = List()
     var interactivePageWeightAlertList: List[PerformanceResultsObject] = List()
-    var frontsPageWeightAlertList: List[PerformanceResultsObject] = List()
-    var audioPageWeightAlertList: List[PerformanceResultsObject] = List()
-    var videoPageWeightAlertList: List[PerformanceResultsObject] = List()
-
     var pageWeightAnchorId: Int = 0
+
 
     //Initialize Interactive email alerts lists - these will be used to generate emails
     var interactiveAlertList: List[PerformanceResultsObject] = List()
@@ -163,7 +139,6 @@ object App {
     val wptLocation: String = configArray(3)
     val emailUsername: String = configArray(4)
     val emailPassword: String = configArray(5)
-    val visualsApiUrl: String = configArray(6)
 
     //obtain list of email addresses for alerting
     val emailAddresses: Array[List[String]] = s3Interface.getEmailAddresses
@@ -183,7 +158,7 @@ object App {
     //val listofLargeInteractives: List[String] = s3Interface.getUrls(interactiveSampleFileName)
 
     //obtain list of items previously alerted on
-    val previousResults: List[PerformanceResultsObject] = (s3Interface.getResultsFileFromS3(resultsFromPreviousTests)).take(5000)
+    val previousResults: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(resultsFromPreviousTests).take(5000)
     /*    val localInput = new LocalFileOperations
     val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
     val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
@@ -193,18 +168,6 @@ object App {
     val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
     val previousInteractiveAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(interactiveAlertsFromPreviousTests)
     val previousPagesWithInsecureElements: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pagesWithInsecureElements)
-
-
-    //validate list handling
-    val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
-    val visualPagesString: String = s3Interface.getVisualsFileFromS3(visualsPagesFileName)
-    val jsonHandler: JSONOperations = new JSONOperations
-    //   val visualPagesSeq: Seq[Visuals] = jsonHandler.stringToVisualsPages(visualPagesString)
-    val visualPagesSeq: Seq[Visuals] = Seq()
-
-    val untestedVisualsTeamPages: List[Visuals] = (for (visual <- visualPagesSeq if !previousResults.map(_.testUrl).contains(visual.pageUrl)) yield visual).toList
-    val untestedVisualsTeamPagesFromToday: List[Visuals] = for (visual <- untestedVisualsTeamPages if visual.pageWebPublicationDate.dateTime >= cutoffTime) yield visual
-
 
 
     //  Define new CAPI Query object
@@ -227,32 +190,16 @@ object App {
     println("Retrieved: " + audioPages.length + " audio pages")
     println((articles.length + liveBlogs.length + interactives.length + fronts.length + videoPages.length + audioPages.length) + " pages returned in total")
 
-    capiQuery.shutDown
+    capiQuery.shutDown()
 
     val newOrChangedArticles = previousTestResultsHandler.returnPagesNotYetTested(articles)
     val newOrChangedLiveBlogs = previousTestResultsHandler.returnPagesNotYetTested(liveBlogs)
     val newOrChangedInteractives = previousTestResultsHandler.returnPagesNotYetTested(interactives)
-    val newOrChangedVideoPages = previousTestResultsHandler.returnPagesNotYetTested(videoPages)
-    val newOrChangedAudioPages = previousTestResultsHandler.returnPagesNotYetTested(audioPages)
 
-    //val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
-
-    //todo - work in visuals list
-    //   val visualsCapiResults = for(result <- combinedCapiResults if untestedVisualsTeamPagesFromToday.map(_.pageUrl).contains(result._2)) yield result
-    //   val nonVisualsCapiResults = for(result <- combinedCapiResults if !untestedVisualsTeamPagesFromToday.map(_.pageUrl).contains(result._2)) yield result
-
-    //   val nonCAPIResultsToRetest = for (result <- previousResultsToRetest if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
-
-    //    val dedupedResultsToRetestUrls: List[String] = for (result <- nonCAPIResultsToRetest) yield result.testUrl
     val pagesToRetest: List[String] = previousResultsToRetest.map(_.testUrl)
     val articleUrls: List[String] = for (page <- newOrChangedArticles) yield page._3
     val liveBlogUrls: List[String] = for (page <- newOrChangedLiveBlogs) yield page._3
     val interactiveUrls: List[String] = for (page <- newOrChangedInteractives) yield page._3
-    val frontsUrls: List[String] = for (page <- fronts) yield page._3
-    val videoUrls: List[String] = for (page <- newOrChangedVideoPages) yield page._3
-    val audioUrls: List[String] = for (page <- newOrChangedAudioPages) yield page._3
-
-    //get all pages from the visuals team api
 
     // sendPageWeightAlert all urls to webpagetest at once to enable parallel testing by test agents
     val urlsToSend: List[String] = (pagesToRetest ::: articleUrls ::: liveBlogUrls ::: interactiveUrls).distinct
@@ -458,9 +405,9 @@ object App {
     val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsBySpeed(combinedMobileResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
 
     //Generate Lists for interactive pages
-    val combinedInteractiveResultsList = for (result <- combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
-    val interactiveDesktopResults = for (result <- combinedDesktopResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
-    val interactiveMobileResults = for (result <- combinedMobileResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
+    val combinedInteractiveResultsList = for (result <- combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if result.getPageType.contains("Interactive") || result.getPageType.contains("interactive")) yield result
+    val interactiveDesktopResults = for (result <- combinedDesktopResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if result.getPageType.contains("Interactive") || result.getPageType.contains("interactive")) yield result
+    val interactiveMobileResults = for (result <- combinedMobileResultsList ::: previousTestResultsHandler.recentButNoRetestRequired if result.getPageType.contains("Interactive") || result.getPageType.contains("interactive")) yield result
 
     val sortedInteractiveCombinedResults: List[PerformanceResultsObject] = sorter.orderInteractivesBySpeed(combinedInteractiveResultsList)
     val sortedInteractiveDesktopResults: List[PerformanceResultsObject] = sorter.sortHomogenousInteractiveResultsBySpeed(interactiveDesktopResults)
@@ -546,19 +493,6 @@ object App {
       }
 
     }
-
-    //todo - remove this after data obtained
-    val currentHour = DateTime.now().hourOfDay.get
-    if(currentHour == 22 || currentHour == 23) {
-      s3Interface.writeFileToS3("resultsFromPreviousTestsBeforeMidnight.csv", resultsToRecordCSVString)
-    }
-    if(currentHour == 0) {
-      s3Interface.writeFileToS3("resultsFromPreviousTestsAfterMidnight.csv", resultsToRecordCSVString)
-    }
-    if(currentHour == 1) {
-      s3Interface.writeFileToS3("resultsFromPreviousTestsAt1AM.csv", resultsToRecordCSVString)
-    }
-
 
 
     //check if alert items have already been sent in earlier run
@@ -1042,6 +976,36 @@ object App {
 
       override def internalStoryPackageCode: Option[Int] = None
 
+      override def internalCommissionedWordcount: Option[Int] = None
+
+      override def internalRevision: Option[Int] = None
+
+      override def allowUgc: Option[Boolean] = None
+
+      override def shortSocialShareText: Option[String] = None
+
+      override def sensitive: Option[Boolean] = None
+
+      override def shouldHideReaderRevenue: Option[Boolean] = None
+
+      override def showAffiliateLinks: Option[Boolean] = None
+
+      override def bodyText: Option[String] = None
+
+      override def isLive: Option[Boolean] = passedLiveBloggingNow
+
+      override def socialShareText: Option[String] = None
+
+      override def internalShortId: Option[String] = None
+
+      override def internalVideoCode: Option[String] = None
+
+      override def charCount: Option[Int] = None
+
+      override def internalContentCode: Option[Int] = None
+
+      override def lang: Option[String] = None
+
       override def displayHint: Option[String] = None
 
       override def legallySensitive: Option[Boolean] = None
@@ -1113,40 +1077,58 @@ object App {
 
   def getTagList(glabs: Boolean): List[Tag] = {
     if(glabs){
-      val tag = new Tag {override def lastName: Option[String] = None
 
-        override def bylineImageUrl: Option[String] = None
-
-        override def `type`: TagType = TagType.Type
-
-        override def sectionId: Option[String] = None
+      val tag = new Tag {override def references: Seq[Reference] = Seq()
 
         override def bio: Option[String] = None
 
-        override def references: Seq[Reference] = Seq()
+        override def paidContentCampaignColour: Option[String] = None
+
+        override def `type`: TagType = TagType.Type
+
+        override def entityIds: Option[collection.Set[String]] = None
+
+        override def apiUrl: String = ""
+
+        override def id: String = "uk-labs"
+
+        override def r2ContributorId: Option[String] = None
+
+        override def campaignInformationType: Option[String] = None
+
+        override def bylineImageUrl: Option[String] = None
+
+        override def lastName: Option[String] = None
+
+        override def sectionName: Option[String] = None
+
+        override def rcsId: Option[String] = None
+
+        override def sectionId: Option[String] = None
+
+        override def paidContentType: Option[String] = None
 
         override def emailAddress: Option[String] = None
 
-        override def podcast: Option[Podcast] = None
+        override def tagCategories: Option[collection.Set[String]] = None
 
-        override def apiUrl: String = ""
+        override def firstName: Option[String] = None
+
+        override def twitterHandle: Option[String] = None
+
+        override def webUrl: String = ""
 
         override def description: Option[String] = None
 
         override def bylineLargeImageUrl: Option[String] = None
 
-        override def twitterHandle: Option[String] = None
-
-        override def sectionName: Option[String] = None
+        override def podcast: Option[Podcast] = None
 
         override def webTitle: String = ""
 
-        override def webUrl: String = ""
-
-        override def firstName: Option[String] = None
-
-        override def id: String = "uk-labs"
+        override def activeSponsorships: Option[Seq[Sponsorship]] = None
       }
+
       List(tag)
     }
     else{
@@ -1157,9 +1139,8 @@ object App {
 
 
   def jodaDateTimetoCapiDateTime(time: DateTime): CapiDateTime = {
-    new CapiDateTime {
-      override def dateTime: Long = time.getMillis
-    }
+    val iso8061String = time.toLocalDateTime.toString
+    CapiDateTime.apply(time.getMillis, iso8061String)
   }
 
 }

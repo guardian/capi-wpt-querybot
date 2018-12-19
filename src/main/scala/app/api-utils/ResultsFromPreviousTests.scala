@@ -59,9 +59,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     val pagesNotYetTested: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (page <- list if !previousResults.map(_.testUrl).contains(page._3)) yield page
     val pagesAlreadyTested:List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (page <- list if previousResults.map(_.testUrl).contains(page._3)) yield page
     val testedPagesBothSourcesThatHaveChangedSinceLastTest = pagesAlreadyTested.flatMap(page => {
-      for (result <- previousResults if result.testUrl.contains(page._3) && result.mostRecentUpdate < page._1.get.lastModified.getOrElse(new CapiDateTime {
-        override def dateTime: Long = 0
-      }).dateTime) yield page}).distinct
+      for (result <- previousResults if result.testUrl.contains(page._3) && result.mostRecentUpdate < page._1.get.lastModified.getOrElse(emptyCapiDateTime).dateTime) yield page}).distinct
    // println("pages that have been updated since last test: \n" + testedPagesBothSourcesThatHaveChangedSinceLastTest.map(_._2 + "\n").mkString)
     pagesNotYetTested ::: testedPagesBothSourcesThatHaveChangedSinceLastTest
     }
@@ -362,6 +360,16 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     val result: PerformanceResultsObject = wpt.getResults(pageUrl, xmlResultUrl)
     result
   }
+
+  def jodaDateTimetoCapiDateTime(time: DateTime): CapiDateTime = {
+    val iso8061String = time.toLocalDateTime.toString
+    CapiDateTime.apply(time.getMillis, iso8061String)
+  }
+
+  def emptyCapiDateTime: CapiDateTime = {
+    jodaDateTimetoCapiDateTime(new DateTime(0))
+  }
+
 
 }
 

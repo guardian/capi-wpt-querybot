@@ -3,7 +3,8 @@ package app.apiutils
 import com.gu.contentapi.client.GuardianContentClient
 import com.gu.contentapi.client.model.{ItemQuery, SearchQuery}
 import com.gu.contentapi.client.model.v1._
-import org.joda.time.DateTime
+import java.time.temporal.ChronoUnit
+import java.time.Instant
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -14,8 +15,8 @@ class ArticleUrls(key: String) {
   println("testApi = " + testApi)
   val contentApiClient = new GuardianContentClient(key)
 
-  val until = DateTime.now
-  val from = until.minusHours(3)
+  val until: Instant = Instant.now()
+  val from: Instant = until.minus(3, ChronoUnit.HOURS)
   val pageSize: Int = 30
 /* todo get top 20 for each section
    You can do this per section, for example for the uk section:
@@ -37,7 +38,7 @@ class ArticleUrls(key: String) {
     }
   }
 
-  def shutDown = {
+  def shutDown(): Unit = {
     println("Closing connection to Content API")
     contentApiClient.shutdown()
   }
@@ -45,7 +46,7 @@ class ArticleUrls(key: String) {
   def getArticles(pageNumber: Int): List[(Option[ContentFields], Seq[Tag],String, Option[String])] = {
 
     try {
-      val searchQuery = new SearchQuery()
+      val searchQuery = SearchQuery()
         .fromDate(from)
         .toDate(until)
         .showElements("all")
@@ -59,7 +60,7 @@ class ArticleUrls(key: String) {
 
       val apiResponse = contentApiClient.getResponse(searchQuery)
       val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-      val articleContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results) yield {
+      val articleContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results.toList) yield {
         (result.fields, result.tags, result.webUrl, None)
       }
       println("received " + articleContentAndUrl.length + " pages from this query")
@@ -81,7 +82,7 @@ class ArticleUrls(key: String) {
 
   def getMinByMins(pageNumber: Int): List[(Option[ContentFields], Seq[Tag],String, Option[String])] = {
   try {
-    val searchQuery = new SearchQuery()
+    val searchQuery = SearchQuery()
       .fromDate(from)
       .toDate(until)
       .showElements("all")
@@ -95,7 +96,7 @@ class ArticleUrls(key: String) {
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val liveBlogContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results) yield {
+    val liveBlogContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results.toList) yield {
         (result.fields, result.tags, result.webUrl, None)
       }
     println("received " + liveBlogContentAndUrl.length + " pages from this query")
@@ -117,7 +118,7 @@ class ArticleUrls(key: String) {
 
   def getInteractives(pageNumber: Int): List[(Option[ContentFields],Seq[Tag], String, Option[String])] = {
   try {
-    val searchQuery = new SearchQuery()
+    val searchQuery = SearchQuery()
       .fromDate(from)
       .toDate(until)
       .showElements("all")
@@ -131,7 +132,7 @@ class ArticleUrls(key: String) {
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val interactiveContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results) yield {
+    val interactiveContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results.toList) yield {
         val creatorEmail = result.blocks.flatMap(_.body).map(_.map(_.createdBy.map(_.email).getOrElse("")).head)
         (result.fields, result.tags, result.webUrl, creatorEmail)
     }
@@ -178,7 +179,7 @@ class ArticleUrls(key: String) {
 
   def getVideoPages(pageNumber: Int): List[(Option[ContentFields], Seq[Tag],String, Option[String])] = {
   try {
-    val searchQuery = new SearchQuery()
+    val searchQuery = SearchQuery()
       .fromDate(from)
       .toDate(until)
       .showElements("all")
@@ -192,7 +193,7 @@ class ArticleUrls(key: String) {
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val videoContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results) yield {
+    val videoContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results.toList) yield {
         (result.fields, result.tags, result.webUrl, None)
       }
     println("received " + videoContentAndUrl.length + " pages from this query")
@@ -213,7 +214,7 @@ class ArticleUrls(key: String) {
 
   def getAudioPages(pageNumber: Int): List[(Option[ContentFields], Seq[Tag], String, Option[String])] = {
     try {
-      val liveBlogSearchQuery = new SearchQuery()
+      val liveBlogSearchQuery = SearchQuery()
         .fromDate(from)
         .toDate(until)
         .showElements("all")
@@ -227,7 +228,7 @@ class ArticleUrls(key: String) {
 
       val apiResponse = contentApiClient.getResponse(liveBlogSearchQuery)
       val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-      val audioContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results) yield {
+      val audioContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results.toList) yield {
           (result.fields, result.tags, result.webUrl, None)
         }
       println("received " + audioContentAndUrl.length + " pages from this query")
@@ -251,7 +252,7 @@ class ArticleUrls(key: String) {
     val domainName= "www.theguardian.com"
     val urlId = urlString.substring(urlString.indexOf(domainName)+domainName.length+1,urlString.length)
     try {
-      val searchQuery = new ItemQuery(urlId)
+      val searchQuery = ItemQuery(urlId)
         .showFields("all")
         .showElements("all")
         .showBlocks("all")
@@ -269,7 +270,7 @@ class ArticleUrls(key: String) {
         val returnTuple = for (content <- returnedResponse.content) yield {
           val blocks = content.blocks
           val body = blocks.flatMap(_.body)
-          val creatorEmail = body.map(_.flatMap(_.createdBy.map(_.email)).headOption).getOrElse(None)
+          val creatorEmail = body.flatMap(_.flatMap(_.createdBy.map(_.email)).headOption)
           val contentFields = content.fields
           val returnFields = (contentFields, content.tags, content.webUrl, creatorEmail)
           returnFields
@@ -294,9 +295,40 @@ class ArticleUrls(key: String) {
   }
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
+
     val contentStub = new ContentFields {override def newspaperEditionDate: Option[CapiDateTime] = None
 
       override def internalStoryPackageCode: Option[Int] = None
+
+      override def internalCommissionedWordcount: Option[Int] = None
+
+      override def internalRevision: Option[Int] = None
+
+      override def allowUgc: Option[Boolean] = None
+
+      override def shortSocialShareText: Option[String] = None
+
+      override def sensitive: Option[Boolean] = None
+
+      override def shouldHideReaderRevenue: Option[Boolean] = None
+
+      override def showAffiliateLinks: Option[Boolean] = None
+
+      override def bodyText: Option[String] = None
+
+      override def isLive: Option[Boolean] = passedLiveBloggingNow
+
+      override def socialShareText: Option[String] = None
+
+      override def internalShortId: Option[String] = None
+
+      override def internalVideoCode: Option[String] = None
+
+      override def charCount: Option[Int] = None
+
+      override def internalContentCode: Option[Int] = None
+
+      override def lang: Option[String] = None
 
       override def displayHint: Option[String] = None
 
@@ -364,7 +396,8 @@ class ArticleUrls(key: String) {
 
       override def standfirst: Option[String] = None
     }
-    contentStub
+
+   contentStub
   }
 
 }

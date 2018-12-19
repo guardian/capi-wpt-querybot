@@ -18,20 +18,19 @@ case class Visuals(pageType: String, id: String, webPublicationDate: String, fin
   val seqOfTypes: Seq[VisualsElementType] = types
 
 
-  def convertStringToCapiDateTime(time: String) = {
+  def convertStringToCapiDateTime(time: String): CapiDateTime = {
     val timeAsDateTime = new DateTime(time)
     val timeAsLong = timeAsDateTime.getMillis
-    val timeAsCAPI = new CapiDateTime {
-      override def dateTime: Long = timeAsLong
-    }
-    timeAsCAPI
+    val iso8061String = timeAsDateTime.toLocalDateTime.toString
+    CapiDateTime.apply(timeAsLong, iso8061String)
   }
 
-  def setPageType(givenType: String) = {
+  def setPageType(givenType: String): String = {
     if(!givenType.contains("nteractive")){
       givenType + " with Interactive Elements"
     } else {
       givenType
     }
   }
+
 }
