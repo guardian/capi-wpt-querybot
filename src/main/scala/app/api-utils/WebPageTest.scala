@@ -12,7 +12,7 @@ import scala.xml.Elem
 class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]) {
 
   val apiBaseUrl:String = baseUrl
-  val apihost: String = baseUrl.split("https://")(1)
+  val apihost: String = baseUrl.split("http://")(1)
   val apiKey:String = passedKey
   val fragments: String = urlFragments.map(x => "#" + x).mkString
 
@@ -464,10 +464,12 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
   }
 
   def obtainPageRequestDetails(webpageTestResultUrl: String): List[PageElementFromHTMLTableRow] = {
+    println("getting pageRequest Details")
     val sliceStart: Int = apiBaseUrl.length + "/xmlResult/".length
     val sliceEnd: Int = webpageTestResultUrl.length - 1
     val testId: String = webpageTestResultUrl.slice(sliceStart,sliceEnd)
     val resultDetailsPage: String =  apiBaseUrl + "/result/" + testId + "/1/details/"
+    println(s"fetching resultDetailsPage $resultDetailsPage")
     val request:Request  = new Request.Builder()
       .url(resultDetailsPage)
       .get()

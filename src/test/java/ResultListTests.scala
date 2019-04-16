@@ -15,19 +15,28 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
   val currentTime = DateTime.now
   val time1HourAgo = DateTime.now().minusHours(1)
   val time24HoursAgo = DateTime.now().minusHours(24)
+  val timeOld = DateTime.now().minusHours(24).minusSeconds(1)
 
-  val capiTimeNow = new CapiDateTime {
-    override def dateTime: Long = currentTime.getMillis
+  val capiTimeNow = {
+    val iso8061String = currentTime.toLocalDateTime.toString
+    CapiDateTime.apply(currentTime.getMillis, iso8061String)
   }
-  val capiTime1HourAgo = new CapiDateTime {
-    override def dateTime: Long = time1HourAgo.getMillis
+
+  val capiTime1HourAgo = {
+    val iso8061String = time1HourAgo.toLocalDateTime.toString
+    CapiDateTime.apply(time1HourAgo.getMillis, iso8061String)
   }
-  val capiTime24HoursAgo = new CapiDateTime {
-    override def dateTime: Long = time24HoursAgo.getMillis
+
+  val capiTime24HoursAgo = {
+    val iso8061String = time24HoursAgo.toLocalDateTime.toString
+    CapiDateTime.apply(time24HoursAgo.getMillis, iso8061String)
   }
-  val capiTimeOld = new CapiDateTime {
-    override def dateTime: Long = time24HoursAgo.getMillis - 1000
+
+  val capiTimeOld = {
+    val iso8061String = timeOld.toLocalDateTime.toString
+    CapiDateTime.apply(timeOld.getMillis, iso8061String)
   }
+
 
   val emptyPerfResults: List[PerformanceResultsObject] = List()
   val iamTestingLocally = false
@@ -839,6 +848,36 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     val contentStub = new ContentFields {override def newspaperEditionDate: Option[CapiDateTime] = None
 
       override def internalStoryPackageCode: Option[Int] = None
+
+      override def internalCommissionedWordcount: Option[Int] = None
+
+      override def internalRevision: Option[Int] = None
+
+      override def allowUgc: Option[Boolean] = None
+
+      override def shortSocialShareText: Option[String] = None
+
+      override def sensitive: Option[Boolean] = None
+
+      override def shouldHideReaderRevenue: Option[Boolean] = None
+
+      override def showAffiliateLinks: Option[Boolean] = None
+
+      override def bodyText: Option[String] = None
+
+      override def isLive: Option[Boolean] = passedLiveBloggingNow
+
+      override def socialShareText: Option[String] = None
+
+      override def internalShortId: Option[String] = None
+
+      override def internalVideoCode: Option[String] = None
+
+      override def charCount: Option[Int] = None
+
+      override def internalContentCode: Option[Int] = None
+
+      override def lang: Option[String] = None
 
       override def displayHint: Option[String] = None
 

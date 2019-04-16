@@ -3,10 +3,14 @@ package app.api
 import java.io._
 
 import app.apiutils._
-import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.auth.profile.ProfileCredentialsProvider
+import com.amazonaws.auth.{DefaultAWSCredentialsProviderChain, EnvironmentVariableCredentialsProvider}
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client, AmazonS3ClientBuilder}
 import com.amazonaws.services.s3.model._
 import com.gu.contentapi.client.model.v1.CapiDateTime
-import com.typesafe.config.{ConfigFactory, Config}
+import com.typesafe.config.{Config, ConfigFactory}
+
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime
 
@@ -17,7 +21,10 @@ import scala.io.Source
  * Created by mmcnamara on 09/02/16.
  */
 class S3Operations(s3BucketName: String, configFile: String, emailFile: String) {
-  val s3Client: AmazonS3Client = new AmazonS3Client()
+  val credentialsProvider = new ProfileCredentialsProvider("frontend")
+  val s3Client: AmazonS3 = AmazonS3ClientBuilder.standard().withRegion(Regions.EU_WEST_1).withCredentials(credentialsProvider).build()
+
+
   val bucket: String = s3BucketName
   val configFileName: String = configFile
   val emailFileName: String = emailFile

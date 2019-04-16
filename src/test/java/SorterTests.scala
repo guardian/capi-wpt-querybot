@@ -15,18 +15,25 @@ import org.scalatest._
     val currentTime = DateTime.now
     val time1HourAgo = DateTime.now().minusHours(1)
     val time24HoursAgo = DateTime.now().minusHours(24)
+    val timeOld = DateTime.now().minusHours(24).minusSeconds(1)
 
-    val capiTimeNow = new CapiDateTime {
-      override def dateTime: Long = currentTime.getMillis
+    val capiTimeNow = {
+      val iso8061String = currentTime.toLocalDateTime.toString
+      CapiDateTime.apply(currentTime.getMillis, iso8061String)
     }
-    val capiTime1HourAgo = new CapiDateTime {
-      override def dateTime: Long = time1HourAgo.getMillis
+    {
+      val iso8061String = time1HourAgo.toLocalDateTime.toString
+      CapiDateTime.apply(time1HourAgo.getMillis, iso8061String)
     }
-    val capiTime24HoursAgo = new CapiDateTime {
-      override def dateTime: Long = time24HoursAgo.getMillis
+
+    val capiTime24HoursAgo = {
+      val iso8061String = time24HoursAgo.toLocalDateTime.toString
+      CapiDateTime.apply(time24HoursAgo.getMillis, iso8061String)
     }
-    val capiTimeOld = new CapiDateTime {
-      override def dateTime: Long = time24HoursAgo.getMillis - 1000
+
+    val capiTimeOld = {
+      val iso8061String = timeOld.toLocalDateTime.toString
+      CapiDateTime.apply(timeOld.getMillis, iso8061String)
     }
 
     val emptyPerfResults: List[PerformanceResultsObject] = List()
