@@ -1,5 +1,6 @@
 import app.api.{GLabsEmailTemplate, InteractiveEmailTemplate, PageWeightEmailTemplate}
-import app.apiutils.{EmailOperations, PerformanceResultsObject}
+import app.api_utils.emails.EmailOperations
+import app.api_utils.model.PerformanceResultsObject
 import org.scalatest._
 
 /**

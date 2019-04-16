@@ -1,5 +1,7 @@
-import app.api.{ListSorter, S3Operations}
-import app.apiutils.{ResultsFromPreviousTests, LocalFileOperations, PerformanceResultsObject}
+import app.api_utils.file_handling.{LocalFileOperations, S3Operations}
+import app.api_utils.model.PerformanceResultsObject
+import app.api_utils.previous_results.ResultsFromPreviousTests
+import app.api_utils.util.ListSorter
 import com.gu.contentapi.client.model.v1.CapiDateTime
 import org.joda.time.DateTime
 import org.scalatest._

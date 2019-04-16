@@ -1,8 +1,12 @@
 
-  import app.HtmlReportBuilder
   import app.api._
+  import app.api_utils.file_handling.{LocalFileOperations, S3Operations}
+  import app.api_utils.model.PerformanceResultsObject
+  import app.api_utils.previous_results.ResultsFromPreviousTests
+  import app.api_utils.reports.HtmlReportBuilder
+  import app.api_utils.summary.DataSummary
   import app.apiutils._
-  import com.gu.contentapi.client.model.v1.{MembershipTier, Office, ContentFields, CapiDateTime}
+  import com.gu.contentapi.client.model.v1.{CapiDateTime, ContentFields, MembershipTier, Office}
   import org.joda.time.DateTime
   import org.scalatest._
 

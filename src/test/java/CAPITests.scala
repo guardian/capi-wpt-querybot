@@ -1,6 +1,6 @@
-import app.api.S3Operations
-import app.apiutils.{ArticleUrls, LocalFileOperations, ResultsFromPreviousTests, PerformanceResultsObject}
-import com.gu.contentapi.client.model.v1.{MembershipTier, Office, ContentFields, CapiDateTime}
+import app.api_utils.file_handling.{LocalFileOperations, S3Operations}
+import app.api_utils.capi_queries.CapiRequests
+import com.gu.contentapi.client.model.v1.{CapiDateTime, ContentFields, MembershipTier, Office}
 import org.joda.time.DateTime
 import org.scalatest._
 
@@ -70,7 +70,7 @@ class CAPITests extends CAPITestUnitSpec with Matchers {
   val configArray: Array[String] = getCAPISettings()
   val contentApiKey: String = configArray(0)
 
-  val capiHandler = new ArticleUrls(contentApiKey)
+  val capiHandler = new CapiRequests(contentApiKey)
 
   "A request to CAPI for Articles" should "return 1 or more results" in {
     val resultsList = capiHandler.getUrlsForContentType("Article")

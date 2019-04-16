@@ -1,10 +1,19 @@
 package app
 
-
 import app.api._
-import app.apiutils._
+import app.api_utils.file_handling.{LocalFileOperations, S3Operations}
+import app.api_utils.capi_queries.{CapiRequests, ContentPage}
+import app.api_utils.emails.EmailOperations
+import app.api_utils.model._
+import app.api_utils.previous_results.ResultsFromPreviousTests
+import app.api_utils.reports.{HtmlStringOperations, PeriodicReport}
+import app.api_utils.reports.html_files.pages._
+import app.api_utils.summary.DataSummary
+import app.api_utils.util.ListSorter
+import app.api_utils.web_page_test.{WebPageTest, WptTestResult}
 import com.gu.contentapi.client.model.v1._
 import org.joda.time.DateTime
+
 import scala.collection.parallel.immutable.ParSeq
 
 
@@ -14,7 +23,7 @@ object App {
     #####################    this should be set to false before merging!!!!################*/
     val iamTestingLocally = false
     /*#####################################################################################*/
-    println("Job started at: " + DateTime.now)
+
     println("Local Testing Flag is set to: " + iamTestingLocally.toString)
 
     val jobStart = DateTime.now
@@ -171,14 +180,14 @@ object App {
 
 
     //  Define new CAPI Query object
-    val capiQuery = new ArticleUrls(contentApiKey)
+    val capiQuery = new CapiRequests(contentApiKey)
     //get all content-type-lists
-    val articles: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Article")
-    val liveBlogs: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("LiveBlog")
-    val interactives: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Interactive")
-    val fronts: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Front")
-    val videoPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Video")
-    val audioPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Audio")
+    val articles: List[ContentPage] = capiQuery.getUrlsForContentType("Article")
+    val liveBlogs: List[ContentPage] = capiQuery.getUrlsForContentType("LiveBlog")
+    val interactives: List[ContentPage] = capiQuery.getUrlsForContentType("Interactive")
+    val fronts: List[ContentPage] = capiQuery.getUrlsForContentType("Front")
+    val videoPages: List[ContentPage] = capiQuery.getUrlsForContentType("Video")
+    val audioPages: List[ContentPage] = capiQuery.getUrlsForContentType("Audio")
     println(DateTime.now + " Closing Content API query connection")
 
     println("CAPI call summary: \n")
@@ -197,9 +206,9 @@ object App {
     val newOrChangedInteractives = previousTestResultsHandler.returnPagesNotYetTested(interactives)
 
     val pagesToRetest: List[String] = previousResultsToRetest.map(_.testUrl)
-    val articleUrls: List[String] = for (page <- newOrChangedArticles) yield page._3
-    val liveBlogUrls: List[String] = for (page <- newOrChangedLiveBlogs) yield page._3
-    val interactiveUrls: List[String] = for (page <- newOrChangedInteractives) yield page._3
+    val articleUrls: List[String] = for (page <- newOrChangedArticles) yield page.webUrl
+    val liveBlogUrls: List[String] = for (page <- newOrChangedLiveBlogs) yield page.webUrl
+    val interactiveUrls: List[String] = for (page <- newOrChangedInteractives) yield page.webUrl
 
     // sendPageWeightAlert all urls to webpagetest at once to enable parallel testing by test agents
     val urlsToSend: List[String] = (pagesToRetest ::: articleUrls ::: liveBlogUrls ::: interactiveUrls).distinct
@@ -213,13 +222,13 @@ object App {
     val previousInteractivesToRetest: List[PerformanceResultsObject] = for (result <- previousResultsToRetest if result.getPageType.contains("Interactive")) yield result
 
     // munge into proper format and merge these with the capi results
-    val previousArticlesReTestContentFieldsAndUrl = previousArticlesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl, result.createdBy))
-    val previousLiveBlogReTestContentFieldsAndUrl = previousLiveBlogsToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl, result.createdBy))
-    val previousInteractiveReTestContentFieldsAndUrl = previousInteractivesToRetest.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl, result.createdBy))
+    val previousArticlesReTestContentFieldsAndUrl = previousArticlesToRetest.map(result => ContentPage(Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl, result.createdBy))
+    val previousLiveBlogReTestContentFieldsAndUrl = previousLiveBlogsToRetest.map(result => ContentPage(Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl, result.createdBy))
+    val previousInteractiveReTestContentFieldsAndUrl = previousInteractivesToRetest.map(result => ContentPage(Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), getTagList(result.gLabs), result.testUrl, result.createdBy))
 
-    val combinedArticleList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = previousArticlesReTestContentFieldsAndUrl ::: newOrChangedArticles
-    val combinedLiveBlogList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
-    val combinedInteractiveList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = previousInteractiveReTestContentFieldsAndUrl ::: newOrChangedInteractives
+    val combinedArticleList: List[ContentPage] = previousArticlesReTestContentFieldsAndUrl ::: newOrChangedArticles
+    val combinedLiveBlogList: List[ContentPage] = previousLiveBlogReTestContentFieldsAndUrl ::: newOrChangedLiveBlogs
+    val combinedInteractiveList: List[ContentPage] = previousInteractiveReTestContentFieldsAndUrl ::: newOrChangedInteractives
 
     //create sorter object - contains functions for ordering lists of Performance Results Objects
     val sorter = new ListSorter
@@ -230,23 +239,21 @@ object App {
       val articleAverages: PageAverageObject = new ArticleDefaultAverages(averageColor)
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
-      val articleResultsList = listenForResultPages(combinedArticleList, "Article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(articleResultsList, pageWeightAnchorId)
-      val articleResultsWithAnchor = getAnchorId._1
-      pageWeightAnchorId = getAnchorId._2
+      val articleResultsList = WptTestResult.listenForResultPages(combinedArticleList, "Article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
 
+      val (articleResultsWithAnchor: List[PerformanceResultsObject], articlePageWeightAnchorId: Int) = applyAnchorId(articleResultsList, pageWeightAnchorId)
+      pageWeightAnchorId = pageWeightAnchorId + articlePageWeightAnchorId
       combinedResultsList = articleResultsWithAnchor
       println("\n \n \n article tests complete. \n tested " + articleResultsWithAnchor.length + "pages")
       println("Total number of results gathered so far " + combinedResultsList.length + "pages")
 
-      println("About to sort article results list. Length of list is: " + articleResultsList.length)
       val sortedByWeightArticleResultsList = sorter.orderListByWeight(articleResultsWithAnchor)
       val sortedBySpeedArticleResultsList = sorter.orderListBySpeed(articleResultsWithAnchor)
       if (sortedByWeightArticleResultsList.isEmpty || sortedBySpeedArticleResultsList.isEmpty) {
-        println("Sorting algorithm for articles has returned empty list. Aborting")
-        System exit 1
+        throw new Exception("Sorting algorithm for articles has returned empty list. Aborting")
       }
       val articleHTMLResults: List[String] = sortedByWeightArticleResultsList.map(x => htmlString.generateHTMLRow(x))
+
       // write article results to string
       //Create a list of alerting pages and write to string
       articlePageWeightAlertList = for (result <- sortedByWeightArticleResultsList if result.alertStatusPageWeight) yield result
@@ -278,7 +285,7 @@ object App {
       val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
       liveBlogResults = liveBlogResults.concat(liveBlogAverages.toHTMLString)
 
-      val liveBlogResultsList = listenForResultPages(combinedLiveBlogList, "LiveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      val liveBlogResultsList = WptTestResult.listenForResultPages(combinedLiveBlogList, "LiveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(liveBlogResultsList, pageWeightAnchorId)
       val liveBlogResultsWithAnchor = getAnchorId._1
       pageWeightAnchorId = getAnchorId._2
@@ -324,7 +331,7 @@ object App {
       val interactiveAverages: PageAverageObject = new InteractiveDefaultAverages(averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
-      val interactiveResultsList = listenForResultPages(combinedInteractiveList, "Interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      val interactiveResultsList = WptTestResult.listenForResultPages(combinedInteractiveList, "Interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(interactiveResultsList, pageWeightAnchorId)
       val interactiveResultsWithAnchor = getAnchorId._1
       pageWeightAnchorId = getAnchorId._2
@@ -626,16 +633,16 @@ object App {
 
     //generate summaries
 
-        val numberNewDesktopArticleTests = newOrChangedArticles.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
-        val numberNewMobileArticleTests = newOrChangedArticles.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
-        val numberNewDesktopLiveBlogTests = newOrChangedLiveBlogs.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
-        val numberNewMobileLiveBlogTests = newOrChangedLiveBlogs.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
-        val numberNewDesktopInteractiveTests = newOrChangedInteractives.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
-        val numberNewMobileInteractiveTests = newOrChangedInteractives.count(!_._2.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewDesktopArticleTests = newOrChangedArticles.count(!_.tags.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewMobileArticleTests = newOrChangedArticles.count(!_.tags.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewDesktopLiveBlogTests = newOrChangedLiveBlogs.count(!_.tags.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewMobileLiveBlogTests = newOrChangedLiveBlogs.count(!_.tags.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewDesktopInteractiveTests = newOrChangedInteractives.count(!_.tags.exists(_.id.contains("tone/advertisement-features")))
+        val numberNewMobileInteractiveTests = newOrChangedInteractives.count(!_.tags.exists(_.id.contains("tone/advertisement-features")))
         val numberNewDesktopGLabsTests = {
-          newOrChangedArticles.count(_._2.exists(_.id.contains("tone/advertisement-features"))) +
-            newOrChangedLiveBlogs.count(_._2.exists(_.id.contains("tone/advertisement-features"))) +
-            newOrChangedInteractives.count(_._2.exists(_.id.contains("tone/advertisement-features")))
+          newOrChangedArticles.count(_.tags.exists(_.id.contains("tone/advertisement-features"))) +
+            newOrChangedLiveBlogs.count(_.tags.exists(_.id.contains("tone/advertisement-features"))) +
+            newOrChangedInteractives.count(_.tags.exists(_.id.contains("tone/advertisement-features")))
         }
         val numberNewMobileGLabsTests = numberNewDesktopGLabsTests
 
@@ -760,144 +767,7 @@ object App {
     desktopResults ::: mobileResults
   }
 
-  def listenForResultPages(capiPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])], contentType: String, resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String]): List[PerformanceResultsObject] = {
-    println("ListenForResultPages called with: \n\n" +
-      " List of Urls: \n" + capiPages.map(page => page._3).mkString +
-      "\n\nList of WebPage Test results: \n" + resultUrlList.mkString +
-      "\n\nList of averages: \n" + averages.toHTMLString + "\n")
 
-    val listenerList: List[WptResultPageListener] = capiPages.flatMap(page => {
-      for (element <- resultUrlList if element._1 == page._3) yield new WptResultPageListener(element._1, contentType, page._1, page._2, element._2, page._4)
-    })
-
-    println("Listener List created: \n" + listenerList.map(element => "list element: \n" + "url: " + element.pageUrl + "\n" + "resulturl" + element.wptResultUrl + "\n"))
-
-    val resultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
-      val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
-      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields, element.tagList, element.wptResultUrl, element.contentCreator)
-      println("getting result for page element")
-      newElement.testResults = wpt.getResults(newElement.pageUrl,newElement.wptResultUrl)
-      println("result received\n setting headline")
-      newElement.testResults.setHeadline(newElement.headline)
-      println("headline set\n setting pagetype")
-      newElement.testResults.setPageType(newElement.pageType)
-      println("pagetype set\n setting FirstPublished")
-      newElement.testResults.setFirstPublished(newElement.firstPublished)
-      println("FirstPublished set\n setting LastUpdated")
-      newElement.testResults.setPageLastUpdated(newElement.pageLastModified)
-      println("Lastupdated set\n setting LiveBloggingNow")
-      newElement.testResults.setLiveBloggingNow(newElement.liveBloggingNow.getOrElse(false))
-      println("liveBloggingNow set\n setting gLabs flag")
-      newElement.testResults.setGLabs(newElement.gLabs.toString)
-      println("gLabs set \n setting production office")
-      newElement.testResults.productionOffice = newElement.productionOffice
-      println("production office set \n setting content creator")
-      newElement.testResults.createdBy = newElement.contentCreator
-      println("all variables set for element")
-      newElement
-    })
-    println("Generating list of results objects from list of listener objects")
-    val testResults = resultsList.map(element => element.testResults).toList
-    println("setting alert status of results in list")
-    val resultsWithAlerts: List[PerformanceResultsObject] = testResults.map(element => setAlertStatus(element, averages))
-    println("about to return list of results")
-    resultsWithAlerts
-  }
-    //Confirm alert status by retesting alerting urls - this has been removed as an attempt to reduce excessive load on the revised
-    // - much cheaper and less powerful testing agents
-    /*println("Confirming any items that have an alert")
-    val confirmedTestResults = resultsWithAlerts.map(x => {
-      if (x.alertStatusPageWeight || (x.timeFirstPaintInMs == -1)) {
-        val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, urlFragments, wptBaseUrl, wptApiKey ,wptLocation)
-        confirmedResult.headline = x.headline
-        confirmedResult.pageType = x.pageType
-        confirmedResult.firstPublished = x.firstPublished
-        confirmedResult.pageLastUpdated = x.pageLastUpdated
-        confirmedResult.liveBloggingNow = x.liveBloggingNow
-        confirmedResult
-      }
-      else
-        x
-    })
-    confirmedTestResults
-
-  }*/
-
-  def confirmAlert(initialResult: PerformanceResultsObject, averages: PageAverageObject, urlFragments: List[String],wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject = {
-    val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
-    val testCount: Int = if (initialResult.timeToFirstByte > 1000) {
-      5
-    } else {
-      3
-    }
-    println("TTFB for " + initialResult.testUrl + "\n therefore setting test count of: " + testCount)
-    val AlertConfirmationTestResult: PerformanceResultsObject = setAlertStatus(webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount), averages)
-    AlertConfirmationTestResult
-  }
-
-  def setAlertStatus(resultObject: PerformanceResultsObject, averages: PageAverageObject): PerformanceResultsObject = {
-    //  Add results to string which will eventually become the content of our results file
-    if (resultObject.typeOfTest == "Desktop") {
-      if (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded) {
-        println("PageWeight Alert Set")
-        resultObject.pageWeightAlertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
-        resultObject.alertStatusPageWeight = true
-      }
-      else {
-        println("PageWeight Alert not set")
-        resultObject.alertStatusPageWeight = false
-      }
-      if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) ||
-          (resultObject.speedIndex >= averages.desktopSpeedIndex)) {
-        println("PageSpeed alert set")
-        resultObject.alertStatusPageSpeed = true
-        if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) && (resultObject.speedIndex >= averages.desktopSpeedIndex)) {
-          resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) and time till page looks loaded (SpeedIndex) are unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-        } else {
-          if (resultObject.speedIndex >= averages.desktopSpeedIndex) {
-            resultObject.pageSpeedAlertDescription = "Time till page looks loaded (SpeedIndex) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-          }
-          else {
-            resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-          }
-        }
-      } else {
-        println("PageSpeed alert not set")
-        resultObject.alertStatusPageSpeed = false
-      }
-    } else {
-      //checking if status of mobile test needs an alert
-      if (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {
-        println("PageWeight Alert Set")
-        resultObject.pageWeightAlertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
-        resultObject.alertStatusPageWeight = true
-      }
-      else {
-        println("PageWeight Alert not set")
-        resultObject.alertStatusPageWeight = false
-      }
-      if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) ||
-        (resultObject.speedIndex >= averages.mobileSpeedIndex)) {
-        println("PageSpeed alert set")
-        resultObject.alertStatusPageSpeed = true
-        if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) && (resultObject.speedIndex >= averages.mobileSpeedIndex)) {
-          resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) and time till page looks loaded (SpeedIndex) are unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-        } else {
-          if (resultObject.speedIndex >= averages.mobileSpeedIndex) {
-            resultObject.pageSpeedAlertDescription = "Time till page looks loaded (SpeedIndex) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-          }
-          else {
-            resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-          }
-        }
-      } else {
-        println("PageSpeed alert not set")
-        resultObject.alertStatusPageSpeed = false
-      }
-    }
-    println("Returning test result with alert flags set to relevant values")
-    resultObject
-  }
 
   def generateInteractiveAverages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String], itemtype: String, averageColor: String): PageAverageObject = {
     val setHighPriority: Boolean = true

@@ -1,4 +1,6 @@
-import app.api.{S3Operations, PageWeightEmailTemplate}
+import app.api.PageWeightEmailTemplate
+import app.api_utils.file_handling.S3Operations
+import app.api_utils.model.{ArticleDefaultAverages, InteractiveDefaultAverages, LiveBlogDefaultAverages, PerformanceResultsObject}
 import app.apiutils._
 import org.scalatest._
 

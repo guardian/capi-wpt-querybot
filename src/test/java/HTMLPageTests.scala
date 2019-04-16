@@ -1,6 +1,7 @@
-import app.api.{PageWeightDashboardMobile, InteractiveEmailTemplate, PageWeightEmailTemplate}
-import app.apiutils.{ResultsFromPreviousTests, PerformanceResultsObject}
-import com.gu.contentapi.client.model.v1.{MembershipTier, Office, CapiDateTime, ContentFields}
+import app.api.{InteractiveEmailTemplate, PageWeightDashboardMobile, PageWeightEmailTemplate}
+import app.api_utils.model.PerformanceResultsObject
+import app.api_utils.previous_results.ResultsFromPreviousTests
+import com.gu.contentapi.client.model.v1.{CapiDateTime, ContentFields, MembershipTier, Office}
 import org.joda.time.DateTime
 import org.scalatest._
 

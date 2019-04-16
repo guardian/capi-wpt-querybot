@@ -1,7 +1,11 @@
-import app.HtmlReportBuilder
-import app.api.{DataSummary, JSONOperations, S3Operations}
+import app.api.JSONOperations
+import app.api_utils.file_handling.{LocalFileOperations, S3Operations}
+import app.api_utils.capi_queries.CapiRequests
+import app.api_utils.model.{ArticleDefaultAverages, InteractiveDefaultAverages, LiveBlogDefaultAverages, PerformanceResultsObject}
+import app.api_utils.reports.HtmlReportBuilder
 import app.apiutils._
-import com.gu.contentapi.client.model.v1.{MembershipTier, Office, ContentFields, CapiDateTime}
+import app.api_utils.web_page_test.WebPageTest
+import com.gu.contentapi.client.model.v1.{CapiDateTime, ContentFields, MembershipTier, Office}
 import org.joda.time.DateTime
 import org.scalatest._
 
@@ -778,7 +782,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
 
   "not a test" should "generate list of pages with creation office and creator obtained from CAPI" in {
     val previousResults = s3Interface.getResultsFileFromS3(resultsFromPreviousTests)
-    val capiQuery = new ArticleUrls(contentApiKey)
+    val capiQuery = new CapiRequests(contentApiKey)
     val resultsWithcreationOfficeandCreator = previousResults.map(result => {
       if(result.getPageType.contains("Interactive")){
         println("\n\n\n\n\n\n\n\n requesting capi result for: " + result.testUrl + "\n")
@@ -799,7 +803,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     assert(resultsWithcreationOfficeandCreator.filter(_.getPageType.contains("Interactive")).head.productionOffice.isDefined)
   }
 
-  def getResult(resultUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String], articleUrls: ArticleUrls): PerformanceResultsObject = {
+  def getResult(resultUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String], articleUrls: CapiRequests): PerformanceResultsObject = {
     //val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
     val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
     val pageUrl = "unknown"
@@ -814,7 +818,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
     newResult
   }
 
-  def getInteractiveResult(resultUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String], articleUrls: ArticleUrls): Option[PerformanceResultsObject] = {
+  def getInteractiveResult(resultUrl: String, wptBaseUrl: String, wptApiKey: String, urlFragments: List[String], articleUrls: CapiRequests): Option[PerformanceResultsObject] = {
     //val xmlResultUrl = friendlyUrl.replaceAll("result","xmlResult")
     val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
     val pageUrl = "unknown"
@@ -911,7 +915,7 @@ val capiResultList1New1Update: List[(Option[ContentFields],String)] = List(capiR
 
   def getResultPages(results: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[PerformanceResultsObject] = {
     val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
-    val cAPIQuery = new ArticleUrls(contentApiKey)
+    val cAPIQuery = new CapiRequests(contentApiKey)
     val desktopResultList: List[PerformanceResultsObject] = results.map(page => {
       val cAPIPage = cAPIQuery.getSinglePage(page)
       val testresultpage =  wpt.sendPage(page)

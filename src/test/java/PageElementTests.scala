@@ -1,5 +1,5 @@
-import app.api.S3Operations
-import app.apiutils.{PageElementFromHTMLTableRow, WebPageTest, PageElement, LocalFileOperations}
+import app.api_utils.file_handling.S3Operations
+import app.apiutils.{PageElement, PageElementFromHTMLTableRow}
 import org.joda.time.DateTime
 import org.scalatest._
 
