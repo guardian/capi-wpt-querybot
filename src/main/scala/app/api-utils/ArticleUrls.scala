@@ -16,7 +16,7 @@ class ArticleUrls(key: String) {
   val contentApiClient = new GuardianContentClient(key)
 
   val until: Instant = Instant.now()
-  val from: Instant = until.minus(3, ChronoUnit.HOURS)
+  val from: Instant = until.minus(30, ChronoUnit.MINUTES)
   val pageSize: Int = 30
 /* todo get top 20 for each section
    You can do this per section, for example for the uk section:
