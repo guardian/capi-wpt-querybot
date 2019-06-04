@@ -2,12 +2,9 @@ name := "capi-wpi-querybot"
 
 version := "1.0"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.8"
 
 libraryDependencies ++= Seq(
-// Dependencies needed to build as an AWS Lambda file
-//  "com.amazonaws" % "aws-lambda-java-core" % "1.0.0",
-//  "com.amazonaws" % "aws-lambda-java-events" % "1.0.0",
   "com.gu" %% "content-api-client-default" % "12.10",
   // Test dependencies
   "org.specs2" %% "specs2-core" % "4.3.5" % "test",
@@ -33,7 +30,29 @@ libraryDependencies ++= Seq(
   "javax.mail" % "mail" % "1.5.0-b01",
   "io.argonaut" %% "argonaut" % "6.2.2")
 
-assemblyMergeStrategy in assembly := {
-    case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-    case x => MergeStrategy.first
-}
+lazy val root = (project in file(".")).enablePlugins(RiffRaffArtifact, JDebPackaging, SystemdPlugin)
+  .settings(Defaults.coreDefaultSettings: _*)
+  .settings(
+    name in Universal := normalizedName.value,
+    topLevelDirectory := Some(normalizedName.value),
+    riffRaffPackageName := name.value,
+    riffRaffManifestProjectName := s"editorial-tools:${name.value}",
+    //    riffRaffBuildIdentifier :=  Option(System.getenv("BUILD_NUMBER")).getOrElse("DEV"),
+    riffRaffUploadArtifactBucket := Option("riffraff-artifact"),
+    riffRaffUploadManifestBucket := Option("riffraff-builds"),
+    //    riffRaffManifestBranch := Option(System.getenv("BRANCH_NAME")).getOrElse("unknown_branch"),
+
+    riffRaffPackageType := (packageBin in Debian).value,
+
+    debianPackageDependencies := Seq("openjdk-8-jre-headless"),
+    maintainer := "Editorial Tools <digitalcms.dev@guardian.co.uk>",
+    packageSummary := "Transcribe",
+    packageDescription := """A single place for atoms of all types""",
+
+//    riffRaffArtifactResources ++= Seq(
+//      baseDirectory.value / "cloudformation" / "Transcribe.yml" -> s"packages/cloudformation/Transcribe.yml"
+//    ),
+    javaOptions in Universal ++= Seq(
+      "-Dpidfile.path=/dev/null"
+    )
+  )

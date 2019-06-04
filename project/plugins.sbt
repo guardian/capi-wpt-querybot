@@ -1,6 +1,6 @@
 logLevel := Level.Error
 
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.12.0")
+resolvers += "Typesafe repository" at "https://dl.bintray.com/typesafe/maven-releases/"
 
 addSbtPlugin("com.gu" % "sbt-riffraff-artifact" % "1.1.9")
 
