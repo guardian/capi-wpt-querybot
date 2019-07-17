@@ -102,20 +102,20 @@ import scala.io.Source
       assert(isordered)
     }*/
 
-    "File loaded from S3" should "have elements in its Full Element List populated" in {
-      val resultList = s3Interface.getResultsFileFromS3(resultsFromPreviousTestsInput)
-      val errorFreeResultList = resultList.filter(_.fullElementList.nonEmpty)
-      s3Interface.writeFileToS3(resultsFromPreviousTestsOutput,errorFreeResultList.map(_.toCSVString()).mkString)
-      val resultList2 = s3Interface.getResultsFileFromS3(resultsFromPreviousTestsOutput)
-      val resultListLength = resultList.length
-      val errorFreeResultListLength = errorFreeResultList.length
-      var resultList2Length = resultList2.length
-      var resultListHead = resultList.head
-      var resultList2Head = resultList2.head
-      println(resultList.head.toCSVString())
-      println(resultList.head.resultStatus)
-      assert(resultListLength == errorFreeResultListLength && resultListLength == resultList2Length && resultListHead.testUrl == resultList2Head.testUrl && resultListHead.resultStatus == resultList2Head.resultStatus)
-    }
+//    "File loaded from S3" should "have elements in its Full Element List populated" in {
+//      val resultList = s3Interface.getResultsFileFromS3(resultsFromPreviousTestsInput)
+//      val errorFreeResultList = resultList.filter(_.fullElementList.nonEmpty)
+//      s3Interface.writeFileToS3(resultsFromPreviousTestsOutput,errorFreeResultList.map(_.toCSVString()).mkString)
+//      val resultList2 = s3Interface.getResultsFileFromS3(resultsFromPreviousTestsOutput)
+//      val resultListLength = resultList.length
+//      val errorFreeResultListLength = errorFreeResultList.length
+//      var resultList2Length = resultList2.length
+//      var resultListHead = resultList.head
+//      var resultList2Head = resultList2.head
+//      println(resultList.head.toCSVString())
+//      println(resultList.head.resultStatus)
+//      assert(resultListLength == errorFreeResultListLength && resultListLength == resultList2Length && resultListHead.testUrl == resultList2Head.testUrl && resultListHead.resultStatus == resultList2Head.resultStatus)
+//    }
 
   /*  "A list of elements from results" should "not contain any commas" in {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
