@@ -1,4 +1,4 @@
-name := "capi-wpi-querybot"
+name := "capi-wpt-querybot"
 
 version := "1.0"
 
