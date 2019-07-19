@@ -5,7 +5,7 @@ deployments:
   capi-wpt-querybot:
     type: autoscaling
     parameters:
-      bucket: frontend-dist
+      bucket: aws-frontend-artifacts
     dependencies:
       - capi-wpt-querybot-ami-update
   capi-wpt-querybot-ami-update:
