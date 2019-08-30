@@ -165,7 +165,6 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   def repairPreviousResultsList(): List[PerformanceResultsObject] = {
     //Create new S3 Client
-    val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
     val s3BucketName = "capi-wpt-querybot"
     val configFileName = "config.conf"
     val emailFileName = "addresses.conf"
