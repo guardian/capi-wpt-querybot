@@ -4,7 +4,7 @@ import java.io._
 
 import app.apiutils._
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
-import com.amazonaws.auth.{DefaultAWSCredentialsProviderChain, EnvironmentVariableCredentialsProvider}
+import com.amazonaws.auth.{AWSCredentialsProviderChain, InstanceProfileCredentialsProvider}
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client, AmazonS3ClientBuilder}
 import com.amazonaws.services.s3.model._
@@ -21,7 +21,9 @@ import scala.io.Source
  * Created by mmcnamara on 09/02/16.
  */
 class S3Operations(s3BucketName: String, configFile: String, emailFile: String) {
-  val credentialsProvider = new ProfileCredentialsProvider("frontend")
+  val credentialsProvider = new AWSCredentialsProviderChain(
+    new ProfileCredentialsProvider("frontend"),
+    InstanceProfileCredentialsProvider.getInstance())
   val s3Client: AmazonS3 = AmazonS3ClientBuilder.standard().withRegion(Regions.EU_WEST_1).withCredentials(credentialsProvider).build()
 
 

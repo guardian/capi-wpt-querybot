@@ -29,16 +29,10 @@ Parameters:
   PrivateSubnets:
     Type: List<AWS::EC2::Subnet::Id>
     Description: The list of SubnetIds in your Virtual Private Cloud (VPC)
-  PublicSubnets:
-    Type: List<AWS::EC2::Subnet::Id>
-    Description: Subnets to use in VPC for public internet-facing ELB
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Name of an existing key pair, which will be given root access to
       the instances
-  ELBSSLCertificate:
-    Type: String
-    Description: ELB SSL Certificate ARN
   ELKKinesisStream:
     Type: String
     Description: Name of the kinesis stream for logging to ELK (logs.gutools)
@@ -61,32 +55,15 @@ Resources:
       ImageId: !Ref ImageId
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
+      AssociatePublicIpAddress: true
       SecurityGroups:
         - Ref: SSHSecurityGroup
-        - Ref: InstanceSecurityGroup
       UserData:
         Fn::Base64:
           !Sub |
               #!/bin/bash -ev
-              mkdir -p /etc/gu
-              aws s3 cp s3://guconf-flexible/transcribe/transcribe.conf.code /etc/gu/transcribe.conf
-              aws s3 cp s3://composer-dist/flexible/${Stage}/${App}/${App}_1.0_all.deb /tmp
+              aws s3 cp s3://aws-frontend-artifacts/frontend/${Stage}/${App}/${App}_1.0_all.deb /tmp
               dpkg -i /tmp/${App}_1.0_all.deb
-  LoadBalancerSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Permit HTTPS access on port 443, egress to port 9000
-      VpcId: !Ref VpcId
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: '443'
-        ToPort: '443'
-        CidrIp: !FindInMap [ Config, IpRange, !Ref Stage ]
-      SecurityGroupEgress:
-      - IpProtocol: tcp
-        FromPort: '9000'
-        ToPort: '9000'
-        CidrIp: '0.0.0.0/0'
 
   SSMRunCommandPolicy:
     Type: AWS::IAM::Policy
@@ -121,20 +98,10 @@ Resources:
         FromPort: '22'
         ToPort: '22'
         CidrIp: '10.0.0.0/8'
-  InstanceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow instance access from the office
-      VpcId: !Ref VpcId
-      SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: '9000'
-        ToPort: '9000'
+        FromPort: '22'
+        ToPort: '22'
         CidrIp: !Ref GuardianIpRange
-      - IpProtocol: tcp
-        FromPort: '9000'
-        ToPort: '9000'
-        SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
   AutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -142,8 +109,6 @@ Resources:
       Cooldown: '300'
       MaxSize: !FindInMap [ Config, MaxSize, !Ref Stage ]
       MinSize: !FindInMap [ Config, MinSize, !Ref Stage ]
-      LoadBalancerNames:
-      - Ref: LoadBalancer
       HealthCheckGracePeriod: 300
       HealthCheckType: ELB
       LaunchConfigurationName:
@@ -158,34 +123,6 @@ Resources:
       - Key: Stage
         Value: !Ref Stage
         PropagateAtLaunch: true
-  LoadBalancer:
-    Type: AWS::ElasticLoadBalancing::LoadBalancer
-    Properties:
-      Scheme: internet-facing
-      SecurityGroups:
-      - Ref: LoadBalancerSecurityGroup
-      Subnets: !Ref PublicSubnets
-      Listeners:
-      - Protocol: HTTPS
-        LoadBalancerPort: '443'
-        InstancePort: '9000'
-        SSLCertificateId: !Ref ELBSSLCertificate
-      HealthCheck:
-        HealthyThreshold: '2'
-        Interval: '10'
-        Target: HTTP:9000/healthcheck
-        Timeout: '5'
-        UnhealthyThreshold: '10'
-      ConnectionDrainingPolicy:
-        Enabled: true
-        Timeout: 60 
-      Tags:
-      - Key: App
-        Value: !Ref App
-      - Key: Stack
-        Value: !Ref Stack
-      - Key: Stage
-        Value: !Ref Stage
   Role:
     Type: AWS::IAM::Role
     Properties:
@@ -204,10 +141,19 @@ Resources:
           Statement:
           - Effect: Allow
             Action:
-            - s3:ListBucket
             - s3:GetObject
             Resource:
-            - !Sub arn:aws:s3:::frontend-dist/*
+            - !Sub arn:aws:s3:::aws-frontend-artifacts/*
+      - PolicyName: capiwptbucketpolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+              Resource:
+                - !Sub arn:aws:s3:::capi-wpt-querybot/*
       - PolicyName: ELKKinesisPolicy
         PolicyDocument:
           Version: '2012-10-17'
