@@ -37,17 +37,15 @@ lazy val root = (project in file(".")).enablePlugins(RiffRaffArtifact, JDebPacka
     topLevelDirectory := Some(normalizedName.value),
     riffRaffPackageName := name.value,
     riffRaffManifestProjectName := s"dotcom:${name.value}",
-//        riffRaffBuildIdentifier :=  Option(System.getenv("BUILD_NUMBER")).getOrElse("DEV"),
     riffRaffUploadArtifactBucket := Option("riffraff-artifact"),
     riffRaffUploadManifestBucket := Option("riffraff-builds"),
-    //    riffRaffManifestBranch := Option(System.getenv("BRANCH_NAME")).getOrElse("unknown_branch"),
 
     riffRaffPackageType := (packageBin in Debian).value,
 
     debianPackageDependencies := Seq("openjdk-8-jre-headless"),
-    maintainer := "Editorial Tools <digitalcms.dev@guardian.co.uk>",
-    packageSummary := "Transcribe",
-    packageDescription := """A single place for atoms of all types""",
+    maintainer := "Dotcom <dotcom.platform@guardian.co.uk>",
+    packageSummary := "Web page test bot",
+    packageDescription := "Page weight checker that uses web page test",
 
 //    riffRaffArtifactResources ++= Seq(
 //      baseDirectory.value / "cloudformation" / "Transcribe.yml" -> s"packages/cloudformation/Transcribe.yml"
