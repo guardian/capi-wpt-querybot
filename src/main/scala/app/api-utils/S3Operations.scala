@@ -174,6 +174,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
 
   def getResultsFileFromS3(fileName:String): List[PerformanceResultsObject] = {
 // todo - update to include new fields
+    println(s"In S3Operations.getResultsFromS3 calling bucketName: $s3BucketName - filename: $fileName")
     if (doesFileExist(fileName)) {
       val s3Response = s3Client.getObject(new GetObjectRequest(s3BucketName, fileName))
       val objectData = s3Response.getObjectContent
@@ -194,7 +195,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
           data(18).toBoolean,
           data(19).toBoolean,
           data(20).toBoolean)
-        if (data.length > 21) {
+        if (data.length > 22) {
         val elementArray = data.drop(23)
         //val elementArray = data.drop(21)
         //            println("elementArray: " + elementArray.map(_.toString + "\n").mkString)
