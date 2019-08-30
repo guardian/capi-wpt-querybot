@@ -46,6 +46,7 @@ lazy val root = (project in file(".")).enablePlugins(RiffRaffArtifact, JDebPacka
     maintainer := "Dotcom <dotcom.platform@guardian.co.uk>",
     packageSummary := "Web page test bot",
     packageDescription := "Page weight checker that uses web page test",
+    mainClass := Some("app.App"),
 
 //    riffRaffArtifactResources ++= Seq(
 //      baseDirectory.value / "cloudformation" / "Transcribe.yml" -> s"packages/cloudformation/Transcribe.yml"
