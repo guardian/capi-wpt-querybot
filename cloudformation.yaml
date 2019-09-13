@@ -163,6 +163,14 @@ Resources:
             - kinesis:PutRecord
             - kinesis:DescribeStream
             Resource: !Sub arn:aws:kinesis:eu-west-1:743583969668:stream/${ELKKinesisStream}
+      - PolicyName: DescribeEC2Policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - EC2:Describe*
+            Resource: '*'
       Path: /
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile

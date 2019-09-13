@@ -10,24 +10,24 @@ import services.{AwsInstanceTags, S3}
 class Config(conf: Configuration) extends AwsInstanceTags {
 
   val stage: String = readTag("Stage") getOrElse "DEV"
-  val appName: String = readTag("App") getOrElse "transcribe"
-  val stack: String = readTag("Stack") getOrElse "flexible"
+  val appName: String = readTag("App") getOrElse "capi-wpt-querybot"
+  val stack: String = readTag("Stack") getOrElse "frontend"
   val region: Region = services.EC2Client.region
 
   val awsCredentialsProvider = new AWSCredentialsProviderChain(
-    new ProfileCredentialsProvider("composer"),
+    new ProfileCredentialsProvider("frontend"),
     new InstanceProfileCredentialsProvider(false)
   )
-  val s3Client: AmazonS3Client = S3.getS3Client(awsCredentialsProvider)
+//  val s3Client: AmazonS3Client = S3.getS3Client(awsCredentialsProvider)
 
-  val dataBucket: String = conf.get[String]("data.bucket")
-
-  val audioSourceBucket: String = conf.get[String]("s3.audioSourceBucket")
-  val transcriptOutputBucket: String = conf.get[String]("s3.transcriptOutputBucket")
-
-  val pandaDomain: String = conf.get[String]("panda.domain")
-  val pandaSystem: String = conf.get[String]("panda.system")
-  val pandaAuthCallback: String = conf.get[String]("panda.authCallback")
+//  val dataBucket: String = conf.get[String]("data.bucket")
+//
+//  val audioSourceBucket: String = conf.get[String]("s3.audioSourceBucket")
+//  val transcriptOutputBucket: String = conf.get[String]("s3.transcriptOutputBucket")
+//
+//  val pandaDomain: String = conf.get[String]("panda.domain")
+//  val pandaSystem: String = conf.get[String]("panda.system")
+//  val pandaAuthCallback: String = conf.get[String]("panda.authCallback")
 
   val elkKinesisStream: String = conf.getOptional[String]("elk.kinesis.stream").getOrElse("")
   val elkLoggingEnabled: Boolean = conf.getOptional[Boolean]("elk.logging.enabled").getOrElse(false)
