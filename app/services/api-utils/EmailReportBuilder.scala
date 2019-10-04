@@ -2,6 +2,7 @@ package app
 
 import services.apiutils.{PageAverageObject, PerformanceResultsObject}
 import org.joda.time.DateTime
+import play.api.Logger
 
 
 class EmailReportBuilder(average: String, warning: String, alert: String, articleResultsUrl: String, liveBlogResultsUrl: String, interactiveResultsUrl: String, frontsResultsUrl: String) {
@@ -52,14 +53,14 @@ class EmailReportBuilder(average: String, warning: String, alert: String, articl
     //  Add results to string which will eventually become the content of our results file
 
     if (resultsObject.alertStatusPageWeight) {
-        println("row should be red one of the items qualifies")
+        Logger.info("row should be red one of the items qualifies")
         returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLSimpleTableCells() + "</tr>"
       } else {
-      println("all fields within size limits")
+      Logger.info("all fields within size limits")
       returnString = "<tr>" + resultsObject.toHTMLSimpleTableCells() + "</tr>"
     }
-    println(DateTime.now + " returning results string to main thread")
-    println(returnString)
+    Logger.info(DateTime.now + " returning results string to main thread")
+    Logger.info(returnString)
     returnString
 
   }
@@ -70,14 +71,14 @@ class EmailReportBuilder(average: String, warning: String, alert: String, articl
     //  Add results to string which will eventually become the content of our results file
 
     if (resultsObject.alertStatusPageWeight) {
-        println("row should be red one of the items qualifies")
+        Logger.info("row should be red one of the items qualifies")
         returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
       } else {
-      println("all fields within size limits")
+      Logger.info("all fields within size limits")
       returnString = "<tr>" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
     }
-    println(DateTime.now + " returning results string to main thread")
-    println(returnString)
+    Logger.info(DateTime.now + " returning results string to main thread")
+    Logger.info(returnString)
     returnString
 
   }

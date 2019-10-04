@@ -1,8 +1,9 @@
 package services.apiutils
 
 import services.api.S3Operations
-import com.gu.contentapi.client.model.v1.{Tag, CapiDateTime, ContentFields}
+import com.gu.contentapi.client.model.v1.{CapiDateTime, ContentFields, Tag}
 import org.joda.time.DateTime
+import play.api.Logger
 
 import scala.xml.Elem
 
@@ -60,7 +61,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     val pagesAlreadyTested:List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (page <- list if previousResults.map(_.testUrl).contains(page._3)) yield page
     val testedPagesBothSourcesThatHaveChangedSinceLastTest = pagesAlreadyTested.flatMap(page => {
       for (result <- previousResults if result.testUrl.contains(page._3) && result.mostRecentUpdate < page._1.get.lastModified.getOrElse(emptyCapiDateTime).dateTime) yield page}).distinct
-   // println("pages that have been updated since last test: \n" + testedPagesBothSourcesThatHaveChangedSinceLastTest.map(_._2 + "\n").mkString)
+   // Logger.info("pages that have been updated since last test: \n" + testedPagesBothSourcesThatHaveChangedSinceLastTest.map(_._2 + "\n").mkString)
     pagesNotYetTested ::: testedPagesBothSourcesThatHaveChangedSinceLastTest
     }
 
@@ -138,26 +139,26 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
   def checkConsistency(): Boolean = {
         if (!(((previousResultsToRetest.length + recentButNoRetestRequired.length) == resultsFromLast96Hours.length) && ((resultsFromLast96Hours.length + oldResults.length) == previousResults.length))) {
-          println("ERROR: previous results list handling is borked!")
-          println("Previous Results to retest length == " + previousResultsToRetest.length + "\n")
-          println("Unchanged previous results length == " + recentButNoRetestRequired.length + "\n")
-          println("Results from last 24 hours length == " + resultsFromLast96Hours.length + "\n")
-          println("Old results length == " + oldResults.length + "\n")
-          println("Original list of previous results length == " + previousResults.length + "\n")
+          Logger.info("ERROR: previous results list handling is borked!")
+          Logger.info("Previous Results to retest length == " + previousResultsToRetest.length + "\n")
+          Logger.info("Unchanged previous results length == " + recentButNoRetestRequired.length + "\n")
+          Logger.info("Results from last 24 hours length == " + resultsFromLast96Hours.length + "\n")
+          Logger.info("Old results length == " + oldResults.length + "\n")
+          Logger.info("Original list of previous results length == " + previousResults.length + "\n")
           if (!((previousResultsToRetest.length + recentButNoRetestRequired.length) == resultsFromLast96Hours.length)) {
-            println("Results to test and unchanged results from last 24 hours dont add up correctly \n")
+            Logger.info("Results to test and unchanged results from last 24 hours dont add up correctly \n")
           }
           if (!((resultsFromLast96Hours.length + oldResults.length) == previousResults.length)) {
-            println("Results from last 24 hours and old results dont add up \n")
+            Logger.info("Results from last 24 hours and old results dont add up \n")
           }
           false
         } else {
-          println("Retrieved results from file\n")
-          println(previousResults.length + " results retrieved in total")
-          println(resultsFromLast96Hours.length + " results for last 24 hours")
-          println(previousResultsToRetest.length + " results will be elegible for retest")
-          println(dedupedPreviousResultsToRestest.length + " results are not duplicates and will actually be retested")
-          println(recentButNoRetestRequired.length + " results will be listed but not tested")
+          Logger.info("Retrieved results from file\n")
+          Logger.info(previousResults.length + " results retrieved in total")
+          Logger.info(resultsFromLast96Hours.length + " results for last 24 hours")
+          Logger.info(previousResultsToRetest.length + " results will be elegible for retest")
+          Logger.info(dedupedPreviousResultsToRestest.length + " results are not duplicates and will actually be retested")
+          Logger.info(recentButNoRetestRequired.length + " results will be listed but not tested")
           true
     }
   }
@@ -169,12 +170,12 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     val configFileName = "config.conf"
     val emailFileName = "addresses.conf"
 
-    println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
+    Logger.info("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
     var configArray: Array[String] = Array("", "", "", "", "", "")
     var urlFragments: List[String] = List()
 
-    println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
+    Logger.info(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
     val returnTuple = s3Interface.getConfig
     configArray = Array(returnTuple._1,returnTuple._2,returnTuple._3,returnTuple._4,returnTuple._5,returnTuple._6,returnTuple._7)
     urlFragments = returnTuple._8
@@ -199,8 +200,8 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
 
     val urlsToRetest = resultsWithNoPageElements.map(_.testUrl).distinct
     val containerSize: Int = if(urlsToRetest.length > 100){urlsToRetest.length / 100}else{urlsToRetest.length}
-    println("urls to retest: " + urlsToRetest.length)
-    println("container size: " + containerSize)
+    Logger.info("urls to retest: " + urlsToRetest.length)
+    Logger.info("container size: " + containerSize)
     val retestingList: List[List[String]] = if(urlsToRetest.nonEmpty){
       urlsToRetest.grouped(containerSize).toList
     }else{
@@ -243,8 +244,8 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
             newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
             newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
 
-            println("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
-            println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
+            Logger.info("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
+            Logger.info("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
             newResult
           } else {
             val newResult = getResult(urlSet._1, urlSet._3, wptBaseUrl, wptApiKey, urlFragments)
@@ -258,8 +259,8 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
             newResult.pageWeightAlertDescription = result.pageWeightAlertDescription
             newResult.pageSpeedAlertDescription = result.pageSpeedAlertDescription
 
-            println("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
-            println("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
+            Logger.info("newResult created: \n Elements in list are: \n " + newResult.editorialElementList.map(element => element.resource + "\n"))
+            Logger.info("\n\n\nEd Elements to csv string:\n" + newResult.editorialElementList.map(_.toCSVString()))
             newResult
 
           }
@@ -289,12 +290,12 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
     val configFileName = "config.conf"
     val emailFileName = "addresses.conf"
 
-    println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
+    Logger.info("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
     var configArray: Array[String] = Array("", "", "", "", "", "")
     var urlFragments: List[String] = List()
 
-    println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
+    Logger.info(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
     val returnTuple = s3Interface.getConfig
     configArray = Array(returnTuple._1,returnTuple._2,returnTuple._3,returnTuple._4,returnTuple._5,returnTuple._6,returnTuple._7)
     urlFragments = returnTuple._8
@@ -311,7 +312,7 @@ class ResultsFromPreviousTests(resultsList: List[PerformanceResultsObject]) {
       }
       catch {
         case _: Throwable => {
-          println("Page failed for some reason")
+          Logger.info("Page failed for some reason")
           result
         }
       }

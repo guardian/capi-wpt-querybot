@@ -16,7 +16,7 @@ object APIResponse extends Results {
 
   def apply[T](result: Either[TranscribeAPIError, T])(implicit writes: Writes[T]): Result = {
     val res = result.fold(apiErrorToResult, r => {
-      println(Json.stringify(Json.toJson(r)))
+      Logger.info(Json.stringify(Json.toJson(r)))
       Ok(Json.stringify(Json.toJson(r)))
     })
 

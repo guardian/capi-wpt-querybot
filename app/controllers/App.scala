@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.Paths
 
 import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest}
-import config.Config
+import config.{Config, LogConfig}
 import models._
 import play.api.Logger
 import play.api.libs.Files

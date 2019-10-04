@@ -13,6 +13,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime
+import play.api.Logger
 
 import scala.io.Source
 
@@ -36,24 +37,24 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     try {
       s3Client.getObjectMetadata(bucket, fileKeyName); true
     } catch {
-      case ex: Exception => println("File: " + fileKeyName + " was not present \n"); false
+      case ex: Exception => Logger.info("File: " + fileKeyName + " was not present \n"); false
     }
   }
 
   def getConfig: (String, String, String, String, String, String, String, List[String]) = {
-    println(DateTime.now + " retrieving config from S3 bucket: " + bucket)
+    Logger.info(DateTime.now + " retrieving config from S3 bucket: " + bucket)
 
-    println("Obtaining configfile: " + configFileName + " from S3")
+    Logger.info("Obtaining configfile: " + configFileName + " from S3")
     val s3Object = s3Client.getObject(new GetObjectRequest(bucket, configFileName))
     val objectData = s3Object.getObjectContent
 
-    println("Converting to string")
+    Logger.info("Converting to string")
     val configString = scala.io.Source.fromInputStream(objectData).mkString
 
-    println("calling parseString on ConfigFactory object")
+    Logger.info("calling parseString on ConfigFactory object")
     val conf = ConfigFactory.parseString(configString)
 
-    println("returning config object")
+    Logger.info("returning config object")
     val contentApiKey: String = conf.getString("content.api.key")
     val wptBaseUrl: String = conf.getString("wpt.api.baseUrl")
     val wptApiKey: String = conf.getString("wpt.api.key")
@@ -63,11 +64,11 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     val visualsFeedUrl = conf.getString("visuals.page.list")
     val pageFragments: List[String] = conf.getStringList("page.fragments").toList
     if ((contentApiKey.length > 0) && (wptBaseUrl.length > 0) && (wptApiKey.length > 0) && (wptLocation.length > 0) && (emailUsername.length > 0) && (emailPassword.length > 0) && (visualsFeedUrl.length > 0)){
-      println(DateTime.now + " Config retrieval successful. \n You are using the following webpagetest instance: " + wptBaseUrl)
+      Logger.info(DateTime.now + " Config retrieval successful. \n You are using the following webpagetest instance: " + wptBaseUrl)
       (contentApiKey, wptBaseUrl, wptApiKey, wptLocation, emailUsername, emailPassword, visualsFeedUrl, pageFragments)
     }
     else {
-      println(DateTime.now + " ERROR: Problem retrieving config file - one or more parameters not retrieved")
+      Logger.info(DateTime.now + " ERROR: Problem retrieving config file - one or more parameters not retrieved")
       s3Client.shutdown()
       ("", "", "", "", "", "", "", List())
     }
@@ -75,20 +76,20 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
   }
 
   def getEmailAddresses: Array[List[String]] = {
-    println(DateTime.now + " retrieving email file from S3 bucket: " + bucket)
+    Logger.info(DateTime.now + " retrieving email file from S3 bucket: " + bucket)
 
-    println("Obtaining list of emails: " + emailFileName + " from S3")
+    Logger.info("Obtaining list of emails: " + emailFileName + " from S3")
     val s3Object = s3Client.getObject(new GetObjectRequest(bucket, emailFileName))
     val objectData = s3Object.getObjectContent
 
-    println("Converting to string")
+    Logger.info("Converting to string")
     val configString = scala.io.Source.fromInputStream(objectData).mkString
 
-    println("calling parseString on ConfigFactory object")
+    Logger.info("calling parseString on ConfigFactory object")
     val conf = ConfigFactory.parseString(configString)
-    //println("conf: \n" + conf)
+    //Logger.info("conf: \n" + conf)
 
-    println("returning config object")
+    Logger.info("returning config object")
     val generalAlerts = conf.getStringList("general.alerts").toList
     val ukInteractiveAlerts = conf.getStringList("uk.interactive.alerts").toList
     val usInteractiveAlerts = conf.getStringList("us.interactive.alerts").toList
@@ -98,7 +99,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     val usGLabsAlerts = conf.getStringList("us.glabs.alerts").toList
     val auGLabsAlerts = conf.getStringList("au.glabs.alerts").toList
     if (generalAlerts.nonEmpty || ukInteractiveAlerts.nonEmpty || usInteractiveAlerts.nonEmpty || auInteractiveAlerts.nonEmpty || globalGLabsAlerts.nonEmpty || ukGLabsAlerts.nonEmpty || usGLabsAlerts.nonEmpty || auGLabsAlerts.nonEmpty){
-      println(DateTime.now + " Config retrieval successful. \n You have retrieved the following users\n" +
+      Logger.info(DateTime.now + " Config retrieval successful. \n You have retrieved the following users\n" +
         generalAlerts + "\n" +
         ukInteractiveAlerts + "\n" +
         usInteractiveAlerts + "\n" +
@@ -111,7 +112,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       returnArray
     }
     else {
-      println(DateTime.now + " ERROR: Problem retrieving config file - one or more parameters not retrieved")
+      Logger.info(DateTime.now + " ERROR: Problem retrieving config file - one or more parameters not retrieved")
       s3Client.shutdown()
       Array()
     }
@@ -119,26 +120,26 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
   }
 
   def getUrls(fileName: String): List[String] = {
-    println(DateTime.now + " retrieving url file from S3 bucket: " + bucket)
+    Logger.info(DateTime.now + " retrieving url file from S3 bucket: " + bucket)
 
-    println("Obtaining list of urls: " + fileName + " from S3")
+    Logger.info("Obtaining list of urls: " + fileName + " from S3")
     val s3Object = s3Client.getObject(new GetObjectRequest(bucket, fileName))
     val objectData = s3Object.getObjectContent
 
-    println("Converting to string")
+    Logger.info("Converting to string")
     val configString = scala.io.Source.fromInputStream(objectData).mkString
 
-    println("calling parseString on ConfigFactory object")
+    Logger.info("calling parseString on ConfigFactory object")
     val conf = ConfigFactory.parseString(configString)
 
-    println("returning config object")
+    Logger.info("returning config object")
     val interactives = conf.getStringList("sample.large.interactives").toList
     if (interactives.nonEmpty){
-      println(DateTime.now + " Config retrieval successful. \n You have retrieved the following users\n" + interactives)
+      Logger.info(DateTime.now + " Config retrieval successful. \n You have retrieved the following users\n" + interactives)
       interactives
     }
     else {
-      println(DateTime.now + " ERROR: Problem retrieving config file - one or more parameters not retrieved")
+      Logger.info(DateTime.now + " ERROR: Problem retrieving config file - one or more parameters not retrieved")
       s3Client.shutdown()
       val emptyList: List[String] = List()
       emptyList
@@ -147,27 +148,27 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
   }
 
 /*  def getliveBlogList(fileName: String): List[String] = {
-    println(DateTime.now + " retrieving url file from S3 bucket: " + bucket)
+    Logger.info(DateTime.now + " retrieving url file from S3 bucket: " + bucket)
 
-    println("Obtaining list of urls: " + fileName + " from S3")
+    Logger.info("Obtaining list of urls: " + fileName + " from S3")
     val s3Object = s3Client.getObject(new GetObjectRequest(bucket, fileName))
     val objectData = s3Object.getObjectContent
 
-    println("Converting to string")
+    Logger.info("Converting to string")
     val configString = scala.io.Source.fromInputStream(objectData).mkString
 
-    println("calling parseString on ConfigFactory object")
+    Logger.info("calling parseString on ConfigFactory object")
     val conf = ConfigFactory.parseString(configString)
-    println("conf: \n" + conf)
+    Logger.info("conf: \n" + conf)
 
-    println("returning config object")
+    Logger.info("returning config object")
     val interactives = conf.getStringList("sample.large.interactives").toList
     if (interactives.nonEmpty){
-      println(DateTime.now + " Config retrieval successful. \n You have retrieved the following users\n" + interactives)
+      Logger.info(DateTime.now + " Config retrieval successful. \n You have retrieved the following users\n" + interactives)
       interactives
     }
     else {
-      println(DateTime.now + " ERROR: Problem retrieving config file - one or more parameters not retrieved")
+      Logger.info(DateTime.now + " ERROR: Problem retrieving config file - one or more parameters not retrieved")
       s3Client.shutdown()
       List()
     }
@@ -176,7 +177,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
 
   def getResultsFileFromS3(fileName:String): List[PerformanceResultsObject] = {
 // todo - update to include new fields
-    println(s"In S3Operations.getResultsFromS3 calling bucketName: $s3BucketName - filename: $fileName")
+    Logger.info(s"In S3Operations.getResultsFromS3 calling bucketName: $s3BucketName - filename: $fileName")
     if (doesFileExist(fileName)) {
       val s3Response = s3Client.getObject(new GetObjectRequest(s3BucketName, fileName))
       val objectData = s3Response.getObjectContent
@@ -200,7 +201,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
         if (data.length > 22) {
         val elementArray = data.drop(23)
         //val elementArray = data.drop(21)
-        //            println("elementArray: " + elementArray.map(_.toString + "\n").mkString)
+        //            Logger.info("elementArray: " + elementArray.map(_.toString + "\n").mkString)
         if (elementArray.length > 9) {
           if ((elementArray(9).toInt > 0) && (data(10).toInt > -1)) {
             val elementList = getElementListFromArray(elementArray)
@@ -208,15 +209,15 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
               result.fullElementList = elementList
               result.populateEditorialElementList(elementList)
             } else {
-              println("returned list from getElementListFromArray is empty")
+              Logger.info("returned list from getElementListFromArray is empty")
             }
           } else {
-            println("Data in element array is not valid.\n")
-            println("elementArray(2).toInt gives: " + elementArray(2).toInt)
-            println("data(9).toInt gives: " + data(10).toInt)
+            Logger.info("Data in element array is not valid.\n")
+            Logger.info("elementArray(2).toInt gives: " + elementArray(2).toInt)
+            Logger.info("data(9).toInt gives: " + data(10).toInt)
           }
         } else {
-          println("no elements present for this result")
+          Logger.info("no elements present for this result")
         }
         result.setHeadline(Option(data(2)))
         result.setPageType(data(3))
@@ -280,7 +281,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       }
     elementList
   }else{
-      println("No elements found - returning empty list \n this case should never be reached as it breaks things")
+      Logger.info("No elements found - returning empty list \n this case should never be reached as it breaks things")
       val emptyList: List[PageElementFromHTMLTableRow] = List()
       emptyList
     }
@@ -313,7 +314,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     }
 
   def writeFileToS3(fileName:String, outputString: String): Unit ={
-    println(DateTime.now + " Writing the following file to S3:\n" + fileName + "\n")
+    Logger.info(DateTime.now + " Writing the following file to S3:\n" + fileName + "\n")
     s3Client.putObject(new PutObjectRequest(s3BucketName, fileName, createOutputFile(fileName, outputString)))
     val acl: AccessControlList = s3Client.getObjectAcl(bucket, fileName)
     acl.grantPermission(GroupGrantee.AllUsers, Permission.Read)
@@ -322,13 +323,13 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
   }
 
   def createOutputFile(fileName: String, content: String): File = {
-    println("creating output file")
+    Logger.info("creating output file")
     val file: File = File.createTempFile(fileName.takeWhile(_ != '.'), fileName.dropWhile(_ != '.'))
     file.deleteOnExit()
     val writer: Writer = new OutputStreamWriter(new FileOutputStream(file))
     writer.write(content)
     writer.close()
-    println("returning File object")
+    Logger.info("returning File object")
     file
   }
 

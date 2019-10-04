@@ -3,6 +3,7 @@ package services
 
 import com.gu.contentapi.client.model.v1._
 import org.joda.time.DateTime
+import play.api.Logger
 import services.api._
 import services.apiutils._
 
@@ -15,8 +16,8 @@ object Querybot {
     #####################    this should be set to false before merging!!!!################*/
     val iamTestingLocally = false
     /*#####################################################################################*/
-    println("Job started at: " + DateTime.now)
-    println("Local Testing Flag is set to: " + iamTestingLocally.toString)
+    Logger.info("Job started at: " + DateTime.now)
+    Logger.info("Local Testing Flag is set to: " + iamTestingLocally.toString)
 
     val jobStart = DateTime.now
     //  Define names of s3bucket, configuration and output Files
@@ -102,27 +103,27 @@ object Querybot {
 
 
     //Create new S3 Client
-    println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
+    Logger.info("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
     var configArray: Array[String] = Array("", "", "", "", "", "")
     var urlFragments: List[String] = List()
 
     //Get config settings
-    println("Extracting configuration values")
+    Logger.info("Extracting configuration values")
     if (!iamTestingLocally) {
-      println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
+      Logger.info(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
       val returnTuple = s3Interface.getConfig
       configArray = Array(returnTuple._1, returnTuple._2, returnTuple._3, returnTuple._4, returnTuple._5, returnTuple._6, returnTuple._7)
       urlFragments = returnTuple._8
     }
     else {
-      println(DateTime.now + " retrieving local config file: " + configFileName)
+      Logger.info(DateTime.now + " retrieving local config file: " + configFileName)
       val configReader = new LocalFileOperations
       configArray = configReader.readInConfig(configFileName)
     }
-    println("checking validity of config values")
+    Logger.info("checking validity of config values")
     if ((configArray(0).length < 1) || (configArray(1).length < 1) || (configArray(2).length < 1) || (configArray(3).length < 1)) {
-      println("problem extracting config\n" +
+      Logger.info("problem extracting config\n" +
         "contentApiKey length: " + configArray(0).length + "\n" +
         "wptBaseUrl length: " + configArray(1).length + "\n" +
         "wptApiKey length: " + configArray(2).length + "\n" +
@@ -133,7 +134,7 @@ object Querybot {
 
       System exit 1
     }
-    println("config values ok")
+    Logger.info("config values ok")
     val contentApiKey: String = configArray(0)
     val wptBaseUrl: String = configArray(1)
     val wptApiKey: String = configArray(2)
@@ -163,7 +164,7 @@ object Querybot {
     /*    val localInput = new LocalFileOperations
     val previousResults: List[PerformanceResultsObject] = localInput.getResultsFile(resultsFromPreviousTests)*/
     val previousTestResultsHandler = new ResultsFromPreviousTests(previousResults)
-    println("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
+    Logger.info("\n\n\n ***** There are " + previousTestResultsHandler.previousResults.length + " previous results in file  ********* \n\n\n")
     val previousResultsToRetest = previousTestResultsHandler.dedupedPreviousResultsToRestest
     //    val previousResultsWithElementsAdded = previousTestResultsHandler.repairPreviousResultsList()
     val previousPageWeightAlerts: List[PerformanceResultsObject] = s3Interface.getResultsFileFromS3(pageWeightAlertsFromPreviousTests)
@@ -180,16 +181,16 @@ object Querybot {
     val fronts: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Front")
     val videoPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Video")
     val audioPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = capiQuery.getUrlsForContentType("Audio")
-    println(DateTime.now + " Closing Content API query connection")
+    Logger.info(DateTime.now + " Closing Content API query connection")
 
-    println("CAPI call summary: \n")
-    println("Retrieved: " + articles.length + " article pages")
-    println("Retrieved: " + liveBlogs.length + " liveblog pages")
-    println("Retrieved: " + interactives.length + " intearactive pages")
-    println("Retrieved: " + fronts.length + " fronts")
-    println("Retrieved: " + videoPages.length + " video pages")
-    println("Retrieved: " + audioPages.length + " audio pages")
-    println((articles.length + liveBlogs.length + interactives.length + fronts.length + videoPages.length + audioPages.length) + " pages returned in total")
+    Logger.info("CAPI call summary: \n")
+    Logger.info("Retrieved: " + articles.length + " article pages")
+    Logger.info("Retrieved: " + liveBlogs.length + " liveblog pages")
+    Logger.info("Retrieved: " + interactives.length + " intearactive pages")
+    Logger.info("Retrieved: " + fronts.length + " fronts")
+    Logger.info("Retrieved: " + videoPages.length + " video pages")
+    Logger.info("Retrieved: " + audioPages.length + " audio pages")
+    Logger.info((articles.length + liveBlogs.length + interactives.length + fronts.length + videoPages.length + audioPages.length) + " pages returned in total")
 
     capiQuery.shutDown()
 
@@ -204,7 +205,7 @@ object Querybot {
 
     // sendPageWeightAlert all urls to webpagetest at once to enable parallel testing by test agents
     val urlsToSend: List[String] = (pagesToRetest ::: articleUrls ::: liveBlogUrls ::: interactiveUrls).distinct
-    println("Combined list of urls: \n" + urlsToSend)
+    Logger.info("Combined list of urls: \n" + urlsToSend)
 
     val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
     // build result page listeners
@@ -227,7 +228,7 @@ object Querybot {
 
     //obtain results for articles
     if (combinedArticleList.nonEmpty) {
-      println("Generating average values for articles")
+      Logger.info("Generating average values for articles")
       val articleAverages: PageAverageObject = new ArticleDefaultAverages(averageColor)
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
@@ -237,14 +238,14 @@ object Querybot {
       pageWeightAnchorId = getAnchorId._2
 
       combinedResultsList = articleResultsWithAnchor
-      println("\n \n \n article tests complete. \n tested " + articleResultsWithAnchor.length + "pages")
-      println("Total number of results gathered so far " + combinedResultsList.length + "pages")
+      Logger.info("\n \n \n article tests complete. \n tested " + articleResultsWithAnchor.length + "pages")
+      Logger.info("Total number of results gathered so far " + combinedResultsList.length + "pages")
 
-      println("About to sort article results list. Length of list is: " + articleResultsList.length)
+      Logger.info("About to sort article results list. Length of list is: " + articleResultsList.length)
       val sortedByWeightArticleResultsList = sorter.orderListByWeight(articleResultsWithAnchor)
       val sortedBySpeedArticleResultsList = sorter.orderListBySpeed(articleResultsWithAnchor)
       if (sortedByWeightArticleResultsList.isEmpty || sortedBySpeedArticleResultsList.isEmpty) {
-        println("Sorting algorithm for articles has returned empty list. Aborting")
+        Logger.info("Sorting algorithm for articles has returned empty list. Aborting")
         System exit 1
       }
       val articleHTMLResults: List[String] = sortedByWeightArticleResultsList.map(x => htmlString.generateHTMLRow(x))
@@ -256,26 +257,26 @@ object Querybot {
       articleResults = articleResults + htmlString.closeTable + htmlString.closePage
       //write article results to file
       if (!iamTestingLocally) {
-        println(DateTime.now + " Writing article results to S3")
+        Logger.info(DateTime.now + " Writing article results to S3")
         s3Interface.writeFileToS3(articleOutputFilename, articleResults)
       }
       else {
         val outputWriter = new LocalFileOperations
         val writeSuccess: Int = outputWriter.writeLocalResultFile(articleOutputFilename, articleResults)
         if (writeSuccess != 0) {
-          println("problem writing local outputfile")
+          Logger.info("problem writing local outputfile")
           System exit 1
         }
       }
-      println("Article Performance Test Complete")
+      Logger.info("Article Performance Test Complete")
 
     } else {
-      println("CAPI query found no article pages")
+      Logger.info("CAPI query found no article pages")
     }
 
     //obtain results for liveBlogs
     if (combinedLiveBlogList.nonEmpty) {
-      println("Generating average values for liveblogs")
+      Logger.info("Generating average values for liveblogs")
       val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
       liveBlogResults = liveBlogResults.concat(liveBlogAverages.toHTMLString)
 
@@ -285,11 +286,11 @@ object Querybot {
       pageWeightAnchorId = getAnchorId._2
 
       combinedResultsList = combinedResultsList ::: liveBlogResultsWithAnchor
-      println("\n \n \n liveBlog tests complete. \n tested " + liveBlogResultsWithAnchor.length + "pages")
-      println("Total number of results gathered so far " + combinedResultsList.length + "pages")
+      Logger.info("\n \n \n liveBlog tests complete. \n tested " + liveBlogResultsWithAnchor.length + "pages")
+      Logger.info("Total number of results gathered so far " + combinedResultsList.length + "pages")
       val sortedLiveBlogResultsList = sorter.orderListByWeight(liveBlogResultsWithAnchor)
       if (sortedLiveBlogResultsList.isEmpty) {
-        println("Sorting algorithm for Liveblogs has returned empty list. Aborting")
+        Logger.info("Sorting algorithm for Liveblogs has returned empty list. Aborting")
         System exit 1
       }
       val liveBlogHTMLResults: List[String] = sortedLiveBlogResultsList.map(x => htmlString.generateHTMLRow(x))
@@ -302,25 +303,25 @@ object Querybot {
       liveBlogResults = liveBlogResults + htmlString.closeTable + htmlString.closePage
       //write liveblog results to file
       if (!iamTestingLocally) {
-        println(DateTime.now + " Writing liveblog results to S3")
+        Logger.info(DateTime.now + " Writing liveblog results to S3")
         s3Interface.writeFileToS3(liveBlogOutputFilename, liveBlogResults)
       }
       else {
         val outputWriter = new LocalFileOperations
         val writeSuccess: Int = outputWriter.writeLocalResultFile(liveBlogOutputFilename, liveBlogResults)
         if (writeSuccess != 0) {
-          println("problem writing local outputfile")
+          Logger.info("problem writing local outputfile")
           System exit 1
         }
       }
-      println("LiveBlog Performance Test Complete")
+      Logger.info("LiveBlog Performance Test Complete")
 
     } else {
-      println("CAPI query found no liveblogs")
+      Logger.info("CAPI query found no liveblogs")
     }
 
     if (combinedInteractiveList.nonEmpty) {
-      println("Generating average values for interactives")
+      Logger.info("Generating average values for interactives")
       //      val interactiveAverages: PageAverageObject = generateInteractiveAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
       val interactiveAverages: PageAverageObject = new InteractiveDefaultAverages(averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
@@ -331,11 +332,11 @@ object Querybot {
       pageWeightAnchorId = getAnchorId._2
 
       combinedResultsList = combinedResultsList ::: interactiveResultsWithAnchor
-      println("\n \n \n interactive tests complete. \n tested " + interactiveResultsWithAnchor.length + "pages")
-      println("Total number of results gathered so far " + combinedResultsList.length + "pages")
+      Logger.info("\n \n \n interactive tests complete. \n tested " + interactiveResultsWithAnchor.length + "pages")
+      Logger.info("Total number of results gathered so far " + combinedResultsList.length + "pages")
       val sortedInteractiveResultsList = sorter.orderListByWeight(interactiveResultsWithAnchor)
       if (sortedInteractiveResultsList.isEmpty) {
-        println("Sorting algorithm has returned empty list. Aborting")
+        Logger.info("Sorting algorithm has returned empty list. Aborting")
         System exit 1
       }
       val interactiveHTMLResults: List[String] = sortedInteractiveResultsList.map(x => htmlString.interactiveHTMLRow(x))
@@ -348,42 +349,42 @@ object Querybot {
       interactiveResults = interactiveResults + htmlString.closeTable + htmlString.closePage
       //write interactive results to file
       if (!iamTestingLocally) {
-        println(DateTime.now + " Writing interactive results to S3")
+        Logger.info(DateTime.now + " Writing interactive results to S3")
         s3Interface.writeFileToS3(interactiveOutputFilename, interactiveResults)
       }
       else {
         val outputWriter = new LocalFileOperations
         val writeSuccess: Int = outputWriter.writeLocalResultFile(interactiveOutputFilename, interactiveResults)
         if (writeSuccess != 0) {
-          println("problem writing local outputfile")
+          Logger.info("problem writing local outputfile")
           System exit 1
         }
       }
-      println("Interactive Performance Test Complete")
+      Logger.info("Interactive Performance Test Complete")
 
     } else {
-      println("CAPI query found no interactives")
+      Logger.info("CAPI query found no interactives")
     }
 
-    println("length of recent but no retest required list: " + previousTestResultsHandler.recentButNoRetestRequired.length)
+    Logger.info("length of recent but no retest required list: " + previousTestResultsHandler.recentButNoRetestRequired.length)
     val sortedByWeightCombinedResults: List[PerformanceResultsObject] = sorter.orderListByWeight(combinedResultsList ::: previousTestResultsHandler.recentButNoRetestRequired)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Desktop")) yield result
     val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
     val combinedListLength = sortedByWeightCombinedResults.length
-    println("\n \n \n Combining lists of results and sorting for dashboard pages.")
-    println("length of sorted By Weight Combined List is: " + combinedListLength)
+    Logger.info("\n \n \n Combining lists of results and sorting for dashboard pages.")
+    Logger.info("length of sorted By Weight Combined List is: " + combinedListLength)
     //Generate lists for sortByWeight combined pages
 
     val sortedByWeightCombinedDesktopResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsByWeight(combinedDesktopResultsList)
     val sortedByWeightCombinedMobileResults: List[PerformanceResultsObject] = sorter.sortHomogenousResultsByWeight(combinedMobileResultsList)
 
-    println("length of sorted By Weight Mobile List is: " + sortedByWeightCombinedDesktopResults.length)
-    println("length of sorted By Weight Combined List is: " + sortedByWeightCombinedMobileResults.length)
+    Logger.info("length of sorted By Weight Mobile List is: " + sortedByWeightCombinedDesktopResults.length)
+    Logger.info("length of sorted By Weight Combined List is: " + sortedByWeightCombinedMobileResults.length)
     //  strip out errors
     val errorFreeSortedByWeightCombinedResults = for (result <- sortedByWeightCombinedResults if result.speedIndex > 0) yield result
     val errorFreeCombinedListLength = errorFreeSortedByWeightCombinedResults.length
-    println("length of errorFreeSortedByWeightCombinedResults: " + errorFreeCombinedListLength)
-    println((sortedByWeightCombinedResults.length - errorFreeSortedByWeightCombinedResults.length) + " records have been lost due to error")
+    Logger.info("length of errorFreeSortedByWeightCombinedResults: " + errorFreeCombinedListLength)
+    Logger.info((sortedByWeightCombinedResults.length - errorFreeSortedByWeightCombinedResults.length) + " records have been lost due to error")
 
     val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedByWeightCombinedMobileResults)
     val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedByWeightCombinedMobileResults)
@@ -392,12 +393,12 @@ object Querybot {
     // record results
     val combinedResultsForFile = errorFreeSortedByWeightCombinedResults.filter(_.fullElementList.nonEmpty)
 
-    println("combinedResultsForFile length = " + combinedResultsForFile.length)
+    Logger.info("combinedResultsForFile length = " + combinedResultsForFile.length)
     val resultsToRecord = (sorter.orderListByDatePublished(combinedResultsForFile) ::: previousTestResultsHandler.oldResults).take(5000)
 
     //val resultsToRecord = (combinedResultsForFile ::: previousResultsWithElementsAdded).distinct
-    println("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
-    println("of these " + previousTestResultsHandler.oldResults.length + " are from old results")
+    Logger.info("\n\n\n ***** There are " + resultsToRecord.length + " results to be saved to the previous results file  ********* \n\n\n")
+    Logger.info("of these " + previousTestResultsHandler.oldResults.length + " are from old results")
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 
     //Generate Lists for sortBySpeed combined pages
@@ -438,13 +439,13 @@ object Querybot {
     val listOfPagesWithInsecureElements = (combinedResultsList ::: previousPagesWithInsecureElements).filter(_.fullElementList.exists(test => test.resource.take(5).contains("http:")))
 
     if (listOfDupes.nonEmpty) {
-      println("\n\n\n\n ******** Duplicates found in results! ****** \n Found " + listOfDupes.length + " duplicates")
-      println("Duplicate urls are: \n" + listOfDupes.map(result => "url: " + result.testUrl + " TestType: " + result.typeOfTest + "\n"))
+      Logger.info("\n\n\n\n ******** Duplicates found in results! ****** \n Found " + listOfDupes.length + " duplicates")
+      Logger.info("Duplicate urls are: \n" + listOfDupes.map(result => "url: " + result.testUrl + " TestType: " + result.typeOfTest + "\n"))
     }
 
     //write combined results to file
     if (!iamTestingLocally) {
-      println(DateTime.now + " Writing liveblog results to S3")
+      Logger.info(DateTime.now + " Writing liveblog results to S3")
       s3Interface.writeFileToS3(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
       s3Interface.writeFileToS3(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
       s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard.toString())
@@ -464,32 +465,32 @@ object Querybot {
       val outputWriter = new LocalFileOperations
       val writeSuccessPWDC: Int = outputWriter.writeLocalResultFile(editorialPageweightFilename, editorialPageWeightDashboard.toString())
       if (writeSuccessPWDC != 0) {
-        println("problem writing local outputfile")
+        Logger.info("problem writing local outputfile")
         System exit 1
       }
       val writeSuccessPWDD: Int = outputWriter.writeLocalResultFile(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
       if (writeSuccessPWDD != 0) {
-        println("problem writing local outputfile")
+        Logger.info("problem writing local outputfile")
         System exit 1
       }
       val writeSuccessPWDM: Int = outputWriter.writeLocalResultFile(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
       if (writeSuccessPWDM != 0) {
-        println("problem writing local outputfile")
+        Logger.info("problem writing local outputfile")
         System exit 1
       }
       val writeSuccessDCPSD: Int = outputWriter.writeLocalResultFile(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
       if (writeSuccessDCPSD != 0) {
-        println("problem writing local outputfile")
+        Logger.info("problem writing local outputfile")
         System exit 1
       }
       val writeSuccessIPSD: Int = outputWriter.writeLocalResultFile(interactiveDashboardFilename, interactiveDashboard.toString())
       if (writeSuccessIPSD != 0) {
-        println("problem writing local outputfile")
+        Logger.info("problem writing local outputfile")
         System exit 1
       }
       val writeSuccessAlertsRecord: Int = outputWriter.writeLocalResultFile(resultsFromPreviousTests, resultsToRecordCSVString)
       if (writeSuccessAlertsRecord != 0) {
-        println("problem writing local outputfile")
+        Logger.info("problem writing local outputfile")
         System exit 1
       }
 
@@ -506,26 +507,26 @@ object Querybot {
 
     val alertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(!_.gLabs)
     if (alertsToSend.nonEmpty) {
-      println("There are new pageWeight alerts to send! There are " + alertsToSend.length + " new alerts")
+      Logger.info("There are new pageWeight alerts to send! There are " + alertsToSend.length + " new alerts")
       val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
       val pageWeightEmailSuccess = emailer.sendPageWeightAlert(generalAlertsAddressList, pageWeightEmailAlerts.toString())
       if (pageWeightEmailSuccess)
-        println(DateTime.now + " Page-Weight Alert Emails sent successfully. ")
+        Logger.info(DateTime.now + " Page-Weight Alert Emails sent successfully. ")
       else
-        println(DateTime.now + "ERROR: Sending of Page-Weight Alert Emails failed")
+        Logger.info(DateTime.now + "ERROR: Sending of Page-Weight Alert Emails failed")
     } else {
-      println("No pages to alert on Page-Weight. Email not sent.")
+      Logger.info("No pages to alert on Page-Weight. Email not sent.")
     }
 
     if (newInteractiveAlertsList.nonEmpty) {
-      println("dividing interactive's by their production office")
+      Logger.info("dividing interactive's by their production office")
       val ukInteractives = newInteractiveAlertsList.filter(_.productionOffice.getOrElse("").contains("UK"))
       val usInteractives = newInteractiveAlertsList.filter(_.productionOffice.getOrElse("").contains("US"))
       val auInteractives = newInteractiveAlertsList.filter(_.productionOffice.getOrElse("").contains("AU"))
-      println("There are new interactive email alerts to send - length of list is: " + newInteractiveAlertsList.length)
-      println("There are " + ukInteractives.length + " alerts for the UK interactive office")
-      println("There are " + usInteractives.length + " alerts for the US interactive office")
-      println("There are " + auInteractives.length + " alerts for the AU interactive office")
+      Logger.info("There are new interactive email alerts to send - length of list is: " + newInteractiveAlertsList.length)
+      Logger.info("There are " + ukInteractives.length + " alerts for the UK interactive office")
+      Logger.info("There are " + usInteractives.length + " alerts for the US interactive office")
+      Logger.info("There are " + auInteractives.length + " alerts for the AU interactive office")
       val ukInteractiveEmailAlerts = new InteractiveEmailTemplate(ukInteractives, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
       val usInteractiveEmailAlerts = new InteractiveEmailTemplate(usInteractives, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
       val auInteractiveEmailAlerts = new InteractiveEmailTemplate(auInteractives, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename)
@@ -533,23 +534,23 @@ object Querybot {
       val usInteractiveEmailSuccess = emailer.sendInteractiveAlert(usInteractiveAlertsAddressList ::: usInteractives.flatMap(page => page.createdBy), usInteractiveEmailAlerts.toString())
       val auInteractiveEmailSuccess = emailer.sendInteractiveAlert(auInteractiveAlertsAddressList ::: auInteractives.flatMap(page => page.createdBy), auInteractiveEmailAlerts.toString())
       if (ukInteractiveEmailSuccess && usInteractiveEmailSuccess && auInteractiveEmailSuccess) {
-        println("Interactive Alert email sent successfully.")
+        Logger.info("Interactive Alert email sent successfully.")
       } else {
-        println("ERROR: Sending of Interactive Alert Emails failed")
+        Logger.info("ERROR: Sending of Interactive Alert Emails failed")
       }
     } else {
-      println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
+      Logger.info("no interactive alerts to send, therefore Interactive Alert Email not sent.")
     }
 
     if (newGLabsAlertsList.nonEmpty) {
-      println("There are new interactive email alerts to send - length of list is: " + newGLabsAlertsList.length)
+      Logger.info("There are new interactive email alerts to send - length of list is: " + newGLabsAlertsList.length)
       val ukGLabsAlerts = newGLabsAlertsList.filter(_.productionOffice.getOrElse("").contains("UK"))
       val usGLabsAlerts = newGLabsAlertsList.filter(_.productionOffice.getOrElse("").contains("US"))
       val auGLabsAlerts = newGLabsAlertsList.filter(_.productionOffice.getOrElse("").contains("AU"))
-      println("There are new  GLabs email alerts to send - length of list is: " + newGLabsAlertsList.length)
-      println("There are " + ukGLabsAlerts.length + " alerts for the UK GLabs office")
-      println("There are " + usGLabsAlerts.length + " alerts for the US GLabs office")
-      println("There are " + auGLabsAlerts.length + " alerts for the AU GLabs office")
+      Logger.info("There are new  GLabs email alerts to send - length of list is: " + newGLabsAlertsList.length)
+      Logger.info("There are " + ukGLabsAlerts.length + " alerts for the UK GLabs office")
+      Logger.info("There are " + usGLabsAlerts.length + " alerts for the US GLabs office")
+      Logger.info("There are " + auGLabsAlerts.length + " alerts for the AU GLabs office")
       val ukFullGlabsEmailAddresses = ukGLabsAlertsAddressList ::: globalGLabsAlertsAddressList ::: ukGLabsAlerts.flatMap(page => page.createdBy)
       val usFullGlabsEmailAddresses = usGLabsAlertsAddressList ::: globalGLabsAlertsAddressList ::: usGLabsAlerts.flatMap(page => page.createdBy)
       val auFullGlabsEmailAddresses = auGLabsAlertsAddressList ::: globalGLabsAlertsAddressList ::: auGLabsAlerts.flatMap(page => page.createdBy)
@@ -578,27 +579,27 @@ object Querybot {
         }
       }
       if (ukGLabsEmailSuccess && usGLabsEmailSuccess && auGLabsEmailSuccess) {
-        println("Paid Content Alert email sent successfully.")
+        Logger.info("Paid Content Alert email sent successfully.")
       } else {
-        println("ERROR: Sending of Paid Content Alert Emails failed")
+        Logger.info("ERROR: Sending of Paid Content Alert Emails failed")
       }
     } else {
-      println("no Paid Content alerts to send, therefore Paid Content Alert Email not sent.")
+      Logger.info("no Paid Content alerts to send, therefore Paid Content Alert Email not sent.")
     }
 
 
     //todo - this needs to have both pageweight and page-speed alerts
     /*val paidContentAlertsToSend = (newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList).filter(_.gLabs)
     if (paidContentAlertsToSend.nonEmpty) {
-      println("There are new paid Content alerts to send! There are " + alertsToSend.length + " new alerts")
+      Logger.info("There are new paid Content alerts to send! There are " + alertsToSend.length + " new alerts")
       val paidContentEmailAlerts = new PageWeightEmailTemplate(paidContentAlertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename)
       val paidContentEmailSuccess = emailer.sendPageWeightAlert(generalAlertsAddressList, paidContentEmailAlerts.toString())
       if (paidContentEmailSuccess)
-        println(DateTime.now + " Paid-content Alert Emails sent successfully. ")
+        Logger.info(DateTime.now + " Paid-content Alert Emails sent successfully. ")
       else
-        println(DateTime.now + "ERROR: Sending of Paid-content Alert Emails failed")
+        Logger.info(DateTime.now + "ERROR: Sending of Paid-content Alert Emails failed")
     } else {
-      println("No pages to alert on Paid-content. Email not sent.")
+      Logger.info("No pages to alert on Paid-content. Email not sent.")
     }*/
 
     val newPageWeightAlerts = newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList
@@ -677,13 +678,13 @@ object Querybot {
         s3Interface.writeFileToS3(currentWeeklySummaryPage, periodicReportHTMLPage.toString())
 
     //write summaries to files
-        println("writing run summary data to new file")
+        Logger.info("writing run summary data to new file")
         s3Interface.writeFileToS3(runSummaryFile, resultSummary.summaryDataToString())
         s3Interface.writeFileToS3(pageWeightAlertSummaryFile, pageWeightAlertsSummary.summaryDataToString())
         s3Interface.writeFileToS3(interactiveAlertSummaryFile, interactiveAlertsSummary.summaryDataToString())
 
     if (jobStart.dayOfWeek.get == 7 && (jobStart.hourOfDay().get == 23 || jobFinish.hourOfDay().get == 23)){
-      println("end of week!")
+      Logger.info("end of week!")
 
     }
 
@@ -723,31 +724,31 @@ object Querybot {
     }
 
 
-    println("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.")
-    println("Breakdown of articles returned from CAPI\n"+ 
+    Logger.info("Job completed at: " + jobFinish + "\nJob took " + timeTaken + " minutes to run.")
+    Logger.info("Breakdown of articles returned from CAPI\n"+
       articles.length + " Article pages returned from CAPI\n" +
       liveBlogs.length + " LiveBlog pages returned from CAPI\n" +
       interactives.length + " Interactive pages returned")
-    println("Number of pages tested: " + numberOfPagesTested + " pages.")
-    println("Breakdown of pages seen as needing testing: \n" +
+    Logger.info("Number of pages tested: " + numberOfPagesTested + " pages.")
+    Logger.info("Breakdown of pages seen as needing testing: \n" +
       pagesToRetest.length + " pages retested from previous run\n" +
       articleUrls.length + " Article pages returned from CAPI seen as untested\n" +
       liveBlogUrls.length + " LiveBlog pages returned from CAPI seen as untested\n" +
       interactiveUrls.length + " Interactive pages returned from CAPI seen as untested")
-    println("Number of pageWeight Alerts found by job: " + numberOfPageWeightAlerts)
-    println("This is roughly " + percentageOfPageWeightAlerts + "% of pages tested")
-    println("Number of pageSpeed Alerts found by job: " + numberOfPageSpeedAlerts)
-    println("This is roughly " + percentageOfPageSpeedAlerts + "% of pages tested")
-    println("Breakdown of alerts: \n" +
+    Logger.info("Number of pageWeight Alerts found by job: " + numberOfPageWeightAlerts)
+    Logger.info("This is roughly " + percentageOfPageWeightAlerts + "% of pages tested")
+    Logger.info("Number of pageSpeed Alerts found by job: " + numberOfPageSpeedAlerts)
+    Logger.info("This is roughly " + percentageOfPageSpeedAlerts + "% of pages tested")
+    Logger.info("Breakdown of alerts: \n" +
       articlePageWeightAlertList.length + " Article pageWeight alerts\n" +
       liveBlogPageWeightAlertList.length + " LiveBlog pageWeight alerts\n" +
       interactivePageWeightAlertList.length + " Interactive pageWeight alerts\n" +
       interactiveAlertList.length + " Interactive weight or perfromance alerts.")
-    println(listOfDupes.length + " Duplicate test results found")
-    println("length of sorted By Weight Combined List is: " + combinedListLength)
-    println("length of errorFreeSortedByWeightCombinedResults: " + errorFreeCombinedListLength)
-    println("length of elements list in first result in combinedResultsList: " + combinedResultsList.head.fullElementList.length)
-    println("length of elements list in first result in sortedByWeightCombinedResults: " + sortedByWeightCombinedResults.head.fullElementList.length)
+    Logger.info(listOfDupes.length + " Duplicate test results found")
+    Logger.info("length of sorted By Weight Combined List is: " + combinedListLength)
+    Logger.info("length of errorFreeSortedByWeightCombinedResults: " + errorFreeCombinedListLength)
+    Logger.info("length of elements list in first result in combinedResultsList: " + combinedResultsList.head.fullElementList.length)
+    Logger.info("length of elements list in first result in sortedByWeightCombinedResults: " + sortedByWeightCombinedResults.head.fullElementList.length)
   }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
@@ -762,7 +763,7 @@ object Querybot {
   }
 
   def listenForResultPages(capiPages: List[(Option[ContentFields], Seq[Tag], String, Option[String])], contentType: String, resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String]): List[PerformanceResultsObject] = {
-    println("ListenForResultPages called with: \n\n" +
+    Logger.info("ListenForResultPages called with: \n\n" +
       " List of Urls: \n" + capiPages.map(page => page._3).mkString +
       "\n\nList of WebPage Test results: \n" + resultUrlList.mkString +
       "\n\nList of averages: \n" + averages.toHTMLString + "\n")
@@ -771,42 +772,42 @@ object Querybot {
       for (element <- resultUrlList if element._1 == page._3) yield new WptResultPageListener(element._1, contentType, page._1, page._2, element._2, page._4)
     })
 
-    println("Listener List created: \n" + listenerList.map(element => "list element: \n" + "url: " + element.pageUrl + "\n" + "resulturl" + element.wptResultUrl + "\n"))
+    Logger.info("Listener List created: \n" + listenerList.map(element => "list element: \n" + "url: " + element.pageUrl + "\n" + "resulturl" + element.wptResultUrl + "\n"))
 
     val resultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
       val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields, element.tagList, element.wptResultUrl, element.contentCreator)
-      println("getting result for page element")
+      Logger.info("getting result for page element")
       newElement.testResults = wpt.getResults(newElement.pageUrl,newElement.wptResultUrl)
-      println("result received\n setting headline")
+      Logger.info("result received\n setting headline")
       newElement.testResults.setHeadline(newElement.headline)
-      println("headline set\n setting pagetype")
+      Logger.info("headline set\n setting pagetype")
       newElement.testResults.setPageType(newElement.pageType)
-      println("pagetype set\n setting FirstPublished")
+      Logger.info("pagetype set\n setting FirstPublished")
       newElement.testResults.setFirstPublished(newElement.firstPublished)
-      println("FirstPublished set\n setting LastUpdated")
+      Logger.info("FirstPublished set\n setting LastUpdated")
       newElement.testResults.setPageLastUpdated(newElement.pageLastModified)
-      println("Lastupdated set\n setting LiveBloggingNow")
+      Logger.info("Lastupdated set\n setting LiveBloggingNow")
       newElement.testResults.setLiveBloggingNow(newElement.liveBloggingNow.getOrElse(false))
-      println("liveBloggingNow set\n setting gLabs flag")
+      Logger.info("liveBloggingNow set\n setting gLabs flag")
       newElement.testResults.setGLabs(newElement.gLabs.toString)
-      println("gLabs set \n setting production office")
+      Logger.info("gLabs set \n setting production office")
       newElement.testResults.productionOffice = newElement.productionOffice
-      println("production office set \n setting content creator")
+      Logger.info("production office set \n setting content creator")
       newElement.testResults.createdBy = newElement.contentCreator
-      println("all variables set for element")
+      Logger.info("all variables set for element")
       newElement
     })
-    println("Generating list of results objects from list of listener objects")
+    Logger.info("Generating list of results objects from list of listener objects")
     val testResults = resultsList.map(element => element.testResults).toList
-    println("setting alert status of results in list")
+    Logger.info("setting alert status of results in list")
     val resultsWithAlerts: List[PerformanceResultsObject] = testResults.map(element => setAlertStatus(element, averages))
-    println("about to return list of results")
+    Logger.info("about to return list of results")
     resultsWithAlerts
   }
     //Confirm alert status by retesting alerting urls - this has been removed as an attempt to reduce excessive load on the revised
     // - much cheaper and less powerful testing agents
-    /*println("Confirming any items that have an alert")
+    /*Logger.info("Confirming any items that have an alert")
     val confirmedTestResults = resultsWithAlerts.map(x => {
       if (x.alertStatusPageWeight || (x.timeFirstPaintInMs == -1)) {
         val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, urlFragments, wptBaseUrl, wptApiKey ,wptLocation)
@@ -831,7 +832,7 @@ object Querybot {
     } else {
       3
     }
-    println("TTFB for " + initialResult.testUrl + "\n therefore setting test count of: " + testCount)
+    Logger.info("TTFB for " + initialResult.testUrl + "\n therefore setting test count of: " + testCount)
     val AlertConfirmationTestResult: PerformanceResultsObject = setAlertStatus(webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount), averages)
     AlertConfirmationTestResult
   }
@@ -840,17 +841,17 @@ object Querybot {
     //  Add results to string which will eventually become the content of our results file
     if (resultObject.typeOfTest == "Desktop") {
       if (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded) {
-        println("PageWeight Alert Set")
+        Logger.info("PageWeight Alert Set")
         resultObject.pageWeightAlertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
         resultObject.alertStatusPageWeight = true
       }
       else {
-        println("PageWeight Alert not set")
+        Logger.info("PageWeight Alert not set")
         resultObject.alertStatusPageWeight = false
       }
       if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) ||
           (resultObject.speedIndex >= averages.desktopSpeedIndex)) {
-        println("PageSpeed alert set")
+        Logger.info("PageSpeed alert set")
         resultObject.alertStatusPageSpeed = true
         if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) && (resultObject.speedIndex >= averages.desktopSpeedIndex)) {
           resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) and time till page looks loaded (SpeedIndex) are unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
@@ -863,23 +864,23 @@ object Querybot {
           }
         }
       } else {
-        println("PageSpeed alert not set")
+        Logger.info("PageSpeed alert not set")
         resultObject.alertStatusPageSpeed = false
       }
     } else {
       //checking if status of mobile test needs an alert
       if (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {
-        println("PageWeight Alert Set")
+        Logger.info("PageWeight Alert Set")
         resultObject.pageWeightAlertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
         resultObject.alertStatusPageWeight = true
       }
       else {
-        println("PageWeight Alert not set")
+        Logger.info("PageWeight Alert not set")
         resultObject.alertStatusPageWeight = false
       }
       if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) ||
         (resultObject.speedIndex >= averages.mobileSpeedIndex)) {
-        println("PageSpeed alert set")
+        Logger.info("PageSpeed alert set")
         resultObject.alertStatusPageSpeed = true
         if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) && (resultObject.speedIndex >= averages.mobileSpeedIndex)) {
           resultObject.pageSpeedAlertDescription = "Time till page is scrollable (time-to-first-paint) and time till page looks loaded (SpeedIndex) are unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
@@ -892,11 +893,11 @@ object Querybot {
           }
         }
       } else {
-        println("PageSpeed alert not set")
+        Logger.info("PageSpeed alert not set")
         resultObject.alertStatusPageSpeed = false
       }
     }
-    println("Returning test result with alert flags set to relevant values")
+    Logger.info("Returning test result with alert flags set to relevant values")
     resultObject
   }
 
@@ -923,7 +924,7 @@ object Querybot {
     } else {
       3
     }
-    println("TTFB for " + initialResult.testUrl + "\n therefore setting test count of: " + testCount)
+    Logger.info("TTFB for " + initialResult.testUrl + "\n therefore setting test count of: " + testCount)
     //   val AlertConfirmationTestResult: PerformanceResultsObject = setAlertStatusPageWeight(webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount), averages)
     webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount)
   }

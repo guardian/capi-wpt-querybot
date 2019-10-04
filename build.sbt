@@ -61,8 +61,9 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, RiffRaffArtifact
 //      baseDirectory.value / "cloudformation" / "Transcribe.yml" -> s"packages/cloudformation/Transcribe.yml"
 //    ),
     javaOptions in Universal ++= Seq(
-      "-Dpidfile.path=/dev/null"
+      "-Dpidfile.path=/dev/null",
+      "-J-Xmx8G",
+      "-J-Xss2M"
     )
   )
-
 

@@ -1,8 +1,9 @@
 package services.api
 
-import java.io.{FileInputStream, File}
+import java.io.{File, FileInputStream}
 
-import services.apiutils.{VisualsElementType, Visuals}
+import play.api.Logger
+import services.apiutils.{Visuals, VisualsElementType}
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
@@ -47,11 +48,11 @@ class JSONOperations() {
     myJson.validate[Seq[Visuals]] match {
       case s: JsSuccess[Seq[Visuals]] => {
         val visualsList = s.get
-//        println("extracted page from json. page values are: \n" + visualsList.foreach(page => page.toString))
+//        Logger.info("extracted page from json. page values are: \n" + visualsList.foreach(page => page.toString))
         visualsList
       }
       case e: JsError => {
-        println("couldn't extract page from json")
+        Logger.info("couldn't extract page from json")
         val emptyList: List[Visuals] = List()
         emptyList
       }

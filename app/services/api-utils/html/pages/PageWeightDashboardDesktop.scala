@@ -3,6 +3,7 @@ package services.api
 
 import services.apiutils.PerformanceResultsObject
 import org.joda.time.DateTime
+import play.api.Logger
 
 /**
  * Created by mmcnamara on 15/04/16.
@@ -141,7 +142,7 @@ class PageWeightDashboardDesktop(combinedResultsList: List[PerformanceResultsObj
   // Access Methods
 
   override def toString(): String = {
-    println("\n PAGEWEIGHTDASHBOARD--DESKTOP CREATED \n" +
+    Logger.info("\n PAGEWEIGHTDASHBOARD--DESKTOP CREATED \n" +
       "Number of combined records " + numberOfCombinedRecords +
       "Number of desktop records " + numberOfDesktopRecords +
       "Number of mobile records " + numberOfMobileRecords + "\n \n \n")

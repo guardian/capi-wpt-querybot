@@ -1,8 +1,9 @@
 package services.api
 
-import services.apiutils.{PageElementFromHTMLTableRow, ResultsFromPreviousTests, PerformanceResultsObject}
+import services.apiutils.{PageElementFromHTMLTableRow, PerformanceResultsObject, ResultsFromPreviousTests}
 import com.gu.contentapi.client.model.v1.ContentType
 import org.joda.time.DateTime
+import play.api.Logger
 
 
 /**
@@ -491,9 +492,9 @@ val timeNow = DateTime.now
   def pageContainsElementType(testResult: PerformanceResultsObject, typeName: String): Boolean = {
     val checkEditorialElementList = testResult.editorialElementList.exists(_.determinedResourceType.contains(typeName))
     if(typeName.contains("audioBoom") && testResult.editorialElementList.exists(_.determinedResourceType.contains("audioBoom"))) {
-      println("typeName is : " + typeName)
-      println("resource types: " + testResult.editorialElementList.map(_.determinedResourceType + "\n").mkString)
-      println("checkEditorialElementList result: " + checkEditorialElementList)
+      Logger.info("typeName is : " + typeName)
+      Logger.info("resource types: " + testResult.editorialElementList.map(_.determinedResourceType + "\n").mkString)
+      Logger.info("checkEditorialElementList result: " + checkEditorialElementList)
     }
     //val checkEditorialElementList: List[PageElementFromHTMLTableRow] = for (element <- testResult.editorialElementList if element.determinedResourceType.contains(typeName)) yield element
     val checkFullElementList = testResult.fullElementList.exists(_.determinedResourceType.contains(typeName))
@@ -543,10 +544,10 @@ val timeNow = DateTime.now
   }
 
   def printSummaryDataToScreen(): Unit = {
-    println("\n\n\n\n ****************** SUMMARY DATA ********************\n")
-    println(summaryDataToString())
-    println("\n\n")
-    println("\n ****************************************************\n\n\n\n")
+    Logger.info("\n\n\n\n ****************** SUMMARY DATA ********************\n")
+    Logger.info(summaryDataToString())
+    Logger.info("\n\n")
+    Logger.info("\n ****************************************************\n\n\n\n")
   }
 
   def summaryDataToHTMLString(): String = {
@@ -622,7 +623,7 @@ val timeNow = DateTime.now
 
       PageSummaryData(pageType, testType, numberOfTests, numberOfPageWeightAlerts, percentageOfPageWeightAlerts, numberOfPageSpeedAlerts, percentageOfPageSpeedAlerts, averagePageWeight, averageTTFP, averageSpeedIndex)
     } else {
-      println("summarisePageType was passed an empty list!")
+      Logger.info("summarisePageType was passed an empty list!")
       PageSummaryData("Empty", "Desktop", 0, 0, 0, 0, 0, 0, 0, 0)
     }
   }

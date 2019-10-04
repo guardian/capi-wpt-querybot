@@ -1,6 +1,7 @@
 package services.apiutils
 
 import javax.mail.internet.InternetAddress
+import play.api.Logger
 
 //import courier._, Defaults._
 import scala.concurrent.Await
@@ -44,7 +45,7 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
       new javax.mail.Authenticator() {
         new PasswordAuthentication(username, password)
       })
-    println("session id: " + session.toString)
+    Logger.info("session id: " + session.toString)
 
     try {
       val message: Message = new MimeMessage(session)
@@ -53,13 +54,13 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
         internetAddressList.toArray)
       message.setSubject("PageWeight Alert - The following pages have been measured as too slow or expensive for customers to load")
       message.setContent(messageBody, "text/html")
-      println("message deets: \n" + message.toString + "\n from: " + message.getFrom.toString + "\n to: " + message.getAllRecipients.toString + "\n Session: " + message.getSession.toString)
+      Logger.info("message deets: \n" + message.toString + "\n from: " + message.getFrom.toString + "\n to: " + message.getAllRecipients.toString + "\n Session: " + message.getSession.toString)
       Transport.send(message, message.getAllRecipients, username, password )
-      println("Success - Your Email has been sent")
+      Logger.info("Success - Your Email has been sent")
       true
     }
     catch {
-      case e: MessagingException => println("Message Failed: \n" + e)
+      case e: MessagingException => Logger.info("Message Failed: \n" + e)
         false
     }
 
@@ -84,7 +85,7 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
       new javax.mail.Authenticator() {
         new PasswordAuthentication(username, password)
       })
-    println("session id: " + session.toString)
+    Logger.info("session id: " + session.toString)
 
     try {
       if(emailAddressList.nonEmpty) {
@@ -96,14 +97,14 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
           internetAddressList.toArray)
         message.setSubject("Interactive Performance Alert - The following interactive pages have been measured as too slow or too heavy")
         message.setContent(messageBody, "text/html")
-        println("message deets: \n" + message.toString + "\n from: " + message.getFrom.toString + "\n to: " + message.getAllRecipients.toString + "\n Session: " + message.getSession.toString)
+        Logger.info("message deets: \n" + message.toString + "\n from: " + message.getFrom.toString + "\n to: " + message.getAllRecipients.toString + "\n Session: " + message.getSession.toString)
         Transport.send(message, message.getAllRecipients, username, password)
-        println("Success - Your Email has been sent")
+        Logger.info("Success - Your Email has been sent")
         true
       }
     }
     catch {
-      case e: MessagingException => println("Message Failed: \n" + e)
+      case e: MessagingException => Logger.info("Message Failed: \n" + e)
         false
     }
 
@@ -129,7 +130,7 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
       new javax.mail.Authenticator() {
         new PasswordAuthentication(username, password)
       })
-    println("session id: " + session.toString)
+    Logger.info("session id: " + session.toString)
 
     try {
       val message: Message = new MimeMessage(session)
@@ -138,13 +139,13 @@ class EmailOperations(passedUserName: String, passedPassword: String) {
         internetAddressList.toArray)
       message.setSubject("Paid Content Performance Alert - The following paid-content pages have been measured as too slow or too heavy")
       message.setContent(messageBody, "text/html")
-      println("message deets: \n" + message.toString + "\n from: " + message.getFrom.toString + "\n to: " + message.getAllRecipients.toString + "\n Session: " + message.getSession.toString)
+      Logger.info("message deets: \n" + message.toString + "\n from: " + message.getFrom.toString + "\n to: " + message.getAllRecipients.toString + "\n Session: " + message.getSession.toString)
       Transport.send(message, message.getAllRecipients, username, password )
-      println("Success - Your Email has been sent")
+      Logger.info("Success - Your Email has been sent")
       true
     }
     catch {
-      case e: MessagingException => println("Message Failed: \n" + e)
+      case e: MessagingException => Logger.info("Message Failed: \n" + e)
         false
     }
 

@@ -1,5 +1,6 @@
 package services.api
 
+import play.api.Logger
 import services.apiutils.PerformanceResultsObject
 
 
@@ -15,7 +16,7 @@ class ListSorter {
     val missingFromDesktop = for (result <- mobileList if!desktopList.map(_.testUrl).contains(result.testUrl)) yield result
     val missingFromMobile = for (result <- desktopList if!mobileList.map(_.testUrl).contains(result.testUrl)) yield result
     val validListOfPairs = for (result <- list if(!missingFromDesktop.map(_.testUrl).contains(result.testUrl)) && (!missingFromMobile.map(_.testUrl).contains(result.testUrl))) yield result
-    println("list has been validated")
+    Logger.info("list has been validated")
     (validListOfPairs, missingFromDesktop ::: missingFromMobile)
   }
 
@@ -35,8 +36,8 @@ class ListSorter {
   def returnMatchingElement(result: PerformanceResultsObject, listOfMatchCandidates: List[PerformanceResultsObject]): PerformanceResultsObject ={
     val matchingResults = listOfMatchCandidates.filter(_.testUrl == result.testUrl).filter(_.getPageLastUpdated == result.getPageLastUpdated)
     if(matchingResults.isEmpty){
-      println("Error - a valid matching pair should have been found.\n Check ListSorter -> returnValidListOfPairs")
-      println("returning failed test object")
+      Logger.info("Error - a valid matching pair should have been found.\n Check ListSorter -> returnValidListOfPairs")
+      Logger.info("returning failed test object")
       new PerformanceResultsObject("Error in ListSorter -> returnValidListOfPairs", "Mobile", "", -1, -1, -1, -1, -1, -1, -1, "Error", false, false, false)
     }else{
       matchingResults.head
@@ -53,7 +54,7 @@ class ListSorter {
     val tuplesAndExtras = returnTuplesAndExtras(list)
     val tuplesToSort = tuplesAndExtras._1
     val sortedTuples = sortTupleListByDatePublished(tuplesToSort)
-    if(sortedTuples.exists(tuple => tuple._1.getPageLastUpdated == 0 || tuple._2.getPageLastUpdated == 0)) {println("No value for PageLastUpdated")}
+    if(sortedTuples.exists(tuple => tuple._1.getPageLastUpdated == 0 || tuple._2.getPageLastUpdated == 0)) {Logger.info("No value for PageLastUpdated")}
     //val sortedExtras = tuplesAndExtras._2.sortWith(_.timeLastLaunchedAsLong() > _.timeLastLaunchedAsLong())
     val tuplesAsList = sortedTuples.flatMap(tuple => List(tuple._1, tuple._2))
     (tuplesAsList ::: tuplesAndExtras._2).sortWith(_.timeLastLaunchedAsLong() > _.timeLastLaunchedAsLong())

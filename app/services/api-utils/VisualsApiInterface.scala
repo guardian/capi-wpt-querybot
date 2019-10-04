@@ -1,6 +1,7 @@
 package services.apiutils
 
 import okhttp3.{OkHttpClient, Request, Response}
+import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
@@ -15,14 +16,14 @@ class VisualsApiInterface(url: String) {
   implicit val httpClient = new OkHttpClient()
 
   def getTodaysPages(): List[String] = {
-    println("Requesting result url:" + apiUrl)
+    Logger.info("Requesting result url:" + apiUrl)
     val request: Request = new Request.Builder()
       .url(apiUrl)
       .get()
       .build()
     val response: Response = httpClient.newCall(request).execute()
 //    val responseJSON: Json = argonaut.Json.
-    println("Api call response = \n"  + response.body.toString)
+    Logger.info("Api call response = \n"  + response.body.toString)
     List(response.body().toString)
 
   }
@@ -85,8 +86,8 @@ class VisualsApiInterface(url: String) {
 
   val myjson = Json.parse(jsonString)
   //val page = Json.fromJson(json, jsonPage.getClass)
-  println("Hi")
-  println(myjson.toString())
+  Logger.info("Hi")
+  Logger.info(myjson.toString())
   val pageTypeReads: Reads[String] = (JsPath \ "pageType").read[String]
   val idReads: Reads[String] = (JsPath \ "id").read[String]
   val webPubDateReads: Reads[String] = (JsPath \ "webPublicationDate").read[String]
@@ -129,10 +130,10 @@ class VisualsApiInterface(url: String) {
   myjson.validate[Seq[JsonPage]] match {
     case s: JsSuccess[Seq[JsonPage]] => {
       val jsonPage = s.get
-      println("extracted page from json. page values are: \n" + jsonPage.foreach(page => page.toString))
+      Logger.info("extracted page from json. page values are: \n" + jsonPage.foreach(page => page.toString))
     }
     case e: JsError => {
-      println("couldn't extract page from json")
+      Logger.info("couldn't extract page from json")
     }
   }
 

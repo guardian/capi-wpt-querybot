@@ -2,6 +2,7 @@ package services.api
 
 import services.apiutils.PerformanceResultsObject
 import org.joda.time.DateTime
+import play.api.Logger
 
 /**
  * Created by mmcnamara on 05/09/16.
@@ -61,7 +62,7 @@ class GLabsEmailTemplate (resultsList: List[PerformanceResultsObject], mobileUrl
 
   //page generation methods
   def generateHTMLTable(resultsList: List[PerformanceResultsObject]): String = {
-    println("gLabs email template called with " + resultsList.length + " elements")
+    Logger.info("gLabs email template called with " + resultsList.length + " elements")
     HTML_REPORT_TABLE_HEADERS + "\n" + generateHTMLDataRows(resultsList) + "\n" + HTML_TABLE_END
   }
 
@@ -69,7 +70,7 @@ class GLabsEmailTemplate (resultsList: List[PerformanceResultsObject], mobileUrl
     val dataRows: String = (for (result <- resultsList) yield {
       if (result.alertStatusPageSpeed || result.alertStatusPageWeight) {
         if (result.alertStatusPageSpeed && result.alertStatusPageWeight) {
-          println("pageweight and speed alert")
+          Logger.info("pageweight and speed alert")
           "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
             " is showing both weight and speed issues:" + "</td></tr>\n" +
             "<tr class=\"pageclass default\">" + "<td> This page is weighing in at " + result.mBInFullyLoaded + " MB and shows a Speed Index of: " + result.speedIndex + "ms. " +
@@ -78,13 +79,13 @@ class GLabsEmailTemplate (resultsList: List[PerformanceResultsObject], mobileUrl
             "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
         } else {
           if (!result.alertStatusPageSpeed && result.alertStatusPageWeight) {
-            println("pageweight alert only")
+            Logger.info("pageweight alert only")
             "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
               "is weighing in at " + result.mBInFullyLoaded + " MB. for " + result.typeOfTestName + "." + "</td></tr>" +
               "<tr class=\"pageclass default\">" + "<td><a href = \"" + getDashboardUrl(result) + "#" + result.anchorId.getOrElse("") + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
               "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
           } else {
-            println("pagespeed alert only")
+            Logger.info("pagespeed alert only")
             "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
               "is showing speed issues, despite being within weight thresholds. Page shows a Speed Index of: " + result.speedIndex + "ms. for " + result.typeOfTestName + "s." + "</td>" + "</tr>" + "\n" +
               "<tr class=\"pageclass default\">" + "<td><a href = \"" + getDashboardUrl(result) + "#" + result.anchorId.getOrElse("") + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
@@ -92,7 +93,7 @@ class GLabsEmailTemplate (resultsList: List[PerformanceResultsObject], mobileUrl
           }
         }
       } else {
-        println("somehow neither alert is set")
+        Logger.info("somehow neither alert is set")
         "<tr class= \"pageclass default\"><td>No alerts set</td></tr>"
       }
     }).mkString
@@ -129,11 +130,11 @@ class GLabsEmailTemplate (resultsList: List[PerformanceResultsObject], mobileUrl
 
   override def toString(): String = {
     if(resultsList.isEmpty){
-      println("GLabs Email Template called and passed an Empty list.")
+      Logger.info("GLabs Email Template called and passed an Empty list.")
       return "I'm very sorry. This email was sent in error. Please ignore."
     } else {
-      println("GLabs alerts results List: \n" + resultsList)
-      println("GLabs Email: " + HTML_PAGE)
+      Logger.info("GLabs alerts results List: \n" + resultsList)
+      Logger.info("GLabs Email: " + HTML_PAGE)
       HTML_PAGE
     }
   }

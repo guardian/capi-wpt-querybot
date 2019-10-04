@@ -1,6 +1,7 @@
 package services.apiutils
 
 import org.joda.time.DateTime
+import play.api.Logger
 
 
 /**
@@ -70,14 +71,14 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
     //  Add results to string which will eventually become the content of our results file
 
       if (resultsObject.alertStatusPageWeight) {
-          println("row should be red one of the items qualifies")
+          Logger.info("row should be red one of the items qualifies")
           returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLSimpleTableCells() + "</tr>"
         }
         else {
-        println("all fields within size limits")
+        Logger.info("all fields within size limits")
         returnString = "<tr>" + resultsObject.toHTMLSimpleTableCells() + "</tr>"
       }
-    println(DateTime.now + " returning results string to main thread")
+    Logger.info(DateTime.now + " returning results string to main thread")
     returnString
 
   }
@@ -88,13 +89,13 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
     //  Add results to string which will eventually become the content of our results file
 
     if (resultsObject.alertStatusPageWeight) {
-        println("row should be red one of the items qualifies")
+        Logger.info("row should be red one of the items qualifies")
         returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLPageWeightTableCells() + "</tr>"
       } else {
-      println("all fields within size limits")
+      Logger.info("all fields within size limits")
       returnString = "<tr>" + resultsObject.toHTMLPageWeightTableCells() + "</tr>"
     }
-    println(DateTime.now + " returning results string to main thread")
+    Logger.info(DateTime.now + " returning results string to main thread")
     returnString
 
   }
@@ -106,14 +107,14 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
     //  Add results to string which will eventually become the content of our results file
 
     if (resultsObject.alertStatusPageWeight) {
-        println("row should be red one of the items qualifies")
+        Logger.info("row should be red one of the items qualifies")
         returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
       }
       else {
-      println("all fields within size limits")
+      Logger.info("all fields within size limits")
       returnString = "<tr>" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
     }
-    println(DateTime.now + " returning results string to main thread")
+    Logger.info(DateTime.now + " returning results string to main thread")
     returnString
 
   }
@@ -210,8 +211,8 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
 
   def generateAlertEmailBodyElement(alertList: List[PerformanceResultsObject]): String = {
-//    println("*\n \n \n **** \n \n \n averages.desktopHTMLResultString: \n" + averages.desktopHTMLResultString)
-//    println("*\n \n \n **** \n \n \n averages.mobileHTMLResultString: \n" + averages.mobileHTMLResultString)
+//    Logger.info("*\n \n \n **** \n \n \n averages.desktopHTMLResultString: \n" + averages.desktopHTMLResultString)
+//    Logger.info("*\n \n \n **** \n \n \n averages.mobileHTMLResultString: \n" + averages.mobileHTMLResultString)
     if(alertList.nonEmpty) {
       val desktopMessageString: String =
         if (alertList.exists(test => test.typeOfTest == "Desktop")) {
@@ -244,8 +245,8 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
 
   def generateInteractiveAlertBodyElement(alertList: List[PerformanceResultsObject]): String = {
-    //    println("*\n \n \n **** \n \n \n averages.desktopHTMLResultString: \n" + averages.desktopHTMLResultString)
-    //    println("*\n \n \n **** \n \n \n averages.mobileHTMLResultString: \n" + averages.mobileHTMLResultString)
+    //    Logger.info("*\n \n \n **** \n \n \n averages.desktopHTMLResultString: \n" + averages.desktopHTMLResultString)
+    //    Logger.info("*\n \n \n **** \n \n \n averages.mobileHTMLResultString: \n" + averages.mobileHTMLResultString)
     if(alertList.nonEmpty) {
       val desktopMessageString: String =
         if (alertList.exists(test => test.typeOfTest == "Desktop")) {

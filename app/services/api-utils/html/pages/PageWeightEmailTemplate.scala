@@ -2,6 +2,7 @@ package services.api
 
 import services.apiutils.PerformanceResultsObject
 import org.joda.time.DateTime
+import play.api.Logger
 
 /**
  * Created by mmcnamara on 15/04/16.
@@ -106,10 +107,10 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], mobi
 
   override def toString(): String = {
     if(resultsList.isEmpty){
-      println("Interactive Email Template called and passed an Empty list.")
+      Logger.info("Interactive Email Template called and passed an Empty list.")
       return "I'm very sorry. This email was sent in error. Please ignore."
     } else {
-      println("Page Weight email list: \n" + resultsList)
+      Logger.info("Page Weight email list: \n" + resultsList)
       HTML_PAGE
     }
   }

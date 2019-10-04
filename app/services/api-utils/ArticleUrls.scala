@@ -6,13 +6,15 @@ import com.gu.contentapi.client.model.v1._
 import java.time.temporal.ChronoUnit
 import java.time.Instant
 
+import play.api.Logger
+
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 class ArticleUrls(key: String) {
   val testApi:String = key
-  println("testApi = " + testApi)
+  Logger.info("testApi = " + testApi)
   val contentApiClient = new GuardianContentClient(key)
 
   val until: Instant = Instant.now()
@@ -39,7 +41,7 @@ class ArticleUrls(key: String) {
   }
 
   def shutDown(): Unit = {
-    println("Closing connection to Content API")
+    Logger.info("Closing connection to Content API")
     contentApiClient.shutdown()
   }
 
@@ -56,24 +58,24 @@ class ArticleUrls(key: String) {
         .pageSize(pageSize)
         .orderBy("newest")
         .contentType("article")
-      println("Sending query to CAPI: \n" + searchQuery.toString)
+      Logger.info("Sending query to CAPI: \n" + searchQuery.toString)
 
       val apiResponse = contentApiClient.getResponse(searchQuery)
       val returnedResponse = Await.result(apiResponse, (20, SECONDS))
       val articleContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results.toList) yield {
         (result.fields, result.tags, result.webUrl, None)
       }
-      println("received " + articleContentAndUrl.length + " pages from this query")
+      Logger.info("received " + articleContentAndUrl.length + " pages from this query")
       if (articleContentAndUrl.length < pageSize) {
         articleContentAndUrl
       } else {
         Thread.sleep(2000)
-        println("calling page: " + pageNumber + 1)
+        Logger.info("calling page: " + pageNumber + 1)
         articleContentAndUrl ::: getArticles(pageNumber + 1)
       }
     } catch {
       case _: Throwable => {
-        println("bad request - page is empty - returning empty list")
+        Logger.info("bad request - page is empty - returning empty list")
         val emptyList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = List()
         emptyList
       }
@@ -92,14 +94,14 @@ class ArticleUrls(key: String) {
       .pageSize(pageSize)
       .orderBy("newest")
       .tag("tone/minutebyminute")
-    println("Sending query to CAPI: \n" + searchQuery.toString)
+    Logger.info("Sending query to CAPI: \n" + searchQuery.toString)
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
     val liveBlogContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results.toList) yield {
         (result.fields, result.tags, result.webUrl, None)
       }
-    println("received " + liveBlogContentAndUrl.length + " pages from this query")
+    Logger.info("received " + liveBlogContentAndUrl.length + " pages from this query")
     if (liveBlogContentAndUrl.length < pageSize) {
       liveBlogContentAndUrl
     } else {
@@ -108,7 +110,7 @@ class ArticleUrls(key: String) {
     }
   } catch {
       case _: Throwable => {
-        println("bad request - page is empty - returning empty list")
+        Logger.info("bad request - page is empty - returning empty list")
         val emptyList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = List()
         emptyList
       }
@@ -128,7 +130,7 @@ class ArticleUrls(key: String) {
       .pageSize(pageSize)
       .orderBy("newest")
       .contentType("interactive")
-    println("Sending query to CAPI: \n" + searchQuery.toString)
+    Logger.info("Sending query to CAPI: \n" + searchQuery.toString)
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
@@ -136,7 +138,7 @@ class ArticleUrls(key: String) {
         val creatorEmail = result.blocks.flatMap(_.body).map(_.map(_.createdBy.map(_.email).getOrElse("")).head)
         (result.fields, result.tags, result.webUrl, creatorEmail)
     }
-    println("received " + interactiveContentAndUrl.length + " pages from this query")
+    Logger.info("received " + interactiveContentAndUrl.length + " pages from this query")
     if (interactiveContentAndUrl.length < pageSize) {
       interactiveContentAndUrl
     } else {
@@ -145,7 +147,7 @@ class ArticleUrls(key: String) {
     }
   } catch {
       case _: Throwable => {
-        println("bad request - page is empty - returning empty list")
+        Logger.info("bad request - page is empty - returning empty list")
         val emptyList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = List()
         emptyList
       }
@@ -172,7 +174,7 @@ class ArticleUrls(key: String) {
     val emptyContentFields: Option[ContentFields] = None
     val emptyTags: Seq[Tag] = List()
     val returnList:List[(Option[ContentFields], Seq[Tag], String, Option[String])] = listofFronts.map(url => (emptyContentFields, emptyTags, url, None))
-    println("CAPI Query Success - Fronts: \n" + returnList.map(element => element._2).mkString)
+    Logger.info("CAPI Query Success - Fronts: \n" + returnList.map(element => element._2).mkString)
     returnList
   }
 
@@ -189,14 +191,14 @@ class ArticleUrls(key: String) {
       .pageSize(20)
       .orderBy("newest")
       .contentType("video")
-    println("Sending query to CAPI: \n" + searchQuery.toString)
+    Logger.info("Sending query to CAPI: \n" + searchQuery.toString)
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
     val videoContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results.toList) yield {
         (result.fields, result.tags, result.webUrl, None)
       }
-    println("received " + videoContentAndUrl.length + " pages from this query")
+    Logger.info("received " + videoContentAndUrl.length + " pages from this query")
     if (videoContentAndUrl.length < pageSize) {
       videoContentAndUrl
     } else {
@@ -205,7 +207,7 @@ class ArticleUrls(key: String) {
     }
   } catch {
       case _: Throwable => {
-        println("bad request - page is empty - returning empty list")
+        Logger.info("bad request - page is empty - returning empty list")
         val emptyList: List[(Option[ContentFields], Seq[Tag], String,Option[String])] = List()
         emptyList
       }
@@ -224,14 +226,14 @@ class ArticleUrls(key: String) {
         .pageSize(20)
         .orderBy("newest")
         .contentType("audio")
-      println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
+      Logger.info("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
 
       val apiResponse = contentApiClient.getResponse(liveBlogSearchQuery)
       val returnedResponse = Await.result(apiResponse, (20, SECONDS))
       val audioContentAndUrl: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = for (result <- returnedResponse.results.toList) yield {
           (result.fields, result.tags, result.webUrl, None)
         }
-      println("received " + audioContentAndUrl.length + " pages from this query")
+      Logger.info("received " + audioContentAndUrl.length + " pages from this query")
       if (audioContentAndUrl.length < pageSize) {
         audioContentAndUrl
       } else {
@@ -240,7 +242,7 @@ class ArticleUrls(key: String) {
       }
     } catch {
       case _: Throwable => {
-        println("bad request - page is empty - returning empty list")
+        Logger.info("bad request - page is empty - returning empty list")
         val emptyList: List[(Option[ContentFields], Seq[Tag], String, Option[String])] = List()
         emptyList
       }
@@ -259,12 +261,12 @@ class ArticleUrls(key: String) {
         .page(1)
         .pageSize(1)
         .orderBy("newest")
-      println("Sending query to CAPI: \n" + searchQuery.toString)
+      Logger.info("Sending query to CAPI: \n" + searchQuery.toString)
 
       val apiResponse = contentApiClient.getResponse(searchQuery)
       val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-      println("\n\n\n\n CAPI returnedResponse: \n" + returnedResponse.toString)
-      println("\n\n\n\n CAPI returnedResponse.results: \n" + returnedResponse.content.toString)
+      Logger.info("\n\n\n\n CAPI returnedResponse: \n" + returnedResponse.toString)
+      Logger.info("\n\n\n\n CAPI returnedResponse.results: \n" + returnedResponse.content.toString)
       val emptyTags: Seq[Tag] = Seq()
       val resultAndUrl: (Option[ContentFields], Seq[Tag], String, Option[String]) = {
         val returnTuple = for (content <- returnedResponse.content) yield {
@@ -279,14 +281,14 @@ class ArticleUrls(key: String) {
       }
 
       if(resultAndUrl._1.isEmpty){
-        println("result and url is coming back as Empty")
+        Logger.info("result and url is coming back as Empty")
       } else {
-        println("CAPI headline result: \n" + resultAndUrl._1.get.headline)
+        Logger.info("CAPI headline result: \n" + resultAndUrl._1.get.headline)
       }
       resultAndUrl
     } catch {
       case _: Throwable => {
-        println("bad request - page is empty - returning empty content fields")
+        Logger.info("bad request - page is empty - returning empty content fields")
         val emptyTags: Seq[Tag] = Seq()
         val emptyContentFields: (Option[ContentFields], Seq[Tag], String, Option[String]) = (Option(makeContentStub(Option(urlString), None, Option(false))), emptyTags, urlString, None)
         emptyContentFields

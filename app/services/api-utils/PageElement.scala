@@ -1,5 +1,7 @@
 package services.apiutils
 
+import play.api.Logger
+
 /**
  * Created by mmcnamara on 25/02/16.
  */
@@ -114,9 +116,9 @@ abstract  class PageElement {
       if (stringList.nonEmpty && text != "") {
         stringList.map(stringText => text.contains(stringText))
       } else {
-        println("PageElement -> textContainsTextFromList passed empty text or StringList")
-        println("text: " + text)
-        println("stringList: " + stringList.map(string => string + "\n").mkString)
+        Logger.info("PageElement -> textContainsTextFromList passed empty text or StringList")
+        Logger.info("text: " + text)
+        Logger.info("stringList: " + stringList.map(string => string + "\n").mkString)
         List(false)
       }
     }
@@ -186,7 +188,7 @@ abstract  class PageElement {
   def roundAt(p: Int)(n: Double): Double = { val s = math pow (10, p); (math round n * s) / s }
 
   def toCSVString(): String = {
-//    println("\n\n\n\n ****** toCSVString Called!!! ***** \n" + "resource: " + resource + "\n" + "content type: " + contentType + "\n .... \n" + "error status code: \n" + errorStatusCode + "\n" + "ip: \n" + iP)
+//    Logger.info("\n\n\n\n ****** toCSVString Called!!! ***** \n" + "resource: " + resource + "\n" + "content type: " + contentType + "\n .... \n" + "error status code: \n" + errorStatusCode + "\n" + "ip: \n" + iP)
     resource + "," + contentType + "," + requestStart + "," + dnsLookUp + "," + initialConnection + "," + sslNegotiation + "," + timeToFirstByte + "," + contentDownload + "," + bytesDownloaded + "," + errorStatusCode + "," + iP
   }
 
@@ -287,7 +289,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
   val errorStatusCodeClassname: String = "reqResult"
   val iPClassname: String = "reqIP"
 
-  if(htmlTableRow.isEmpty){println("This htmlTableRow was empty:\n" + htmlTableRow)}
+  if(htmlTableRow.isEmpty){Logger.info("This htmlTableRow was empty:\n" + htmlTableRow)}
   val cleanString: String = htmlTableRow.replaceAll("<tr>","").replaceAll("</tr>", "").replaceAll(" odd","").replaceAll(" even","").replaceAll("Render", "").replaceAll("Doc","").replaceAll(" warning", "").replaceAll(" error", "").replaceAll(",", "")
 
   val resourceHTMLElement: String = getDataFromHTMLTableElement(cleanString, resourceClassname)
@@ -324,7 +326,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
 
   def getDataFromHTMLTableElement(tableRow: String, classname: String): String = {
     val returnString: String = tableRow.substring(tableRow.indexOf(classname)+ classname.length + 2,tableRow.indexOf("</td>", tableRow.indexOf(classname)+ classname.length + 2))
-//    println("\nGetDataFromHTMLTableElement Called: \n" + "classname = " + classname + "\n" + "returnString = " + returnString)
+//    Logger.info("\nGetDataFromHTMLTableElement Called: \n" + "classname = " + classname + "\n" + "returnString = " + returnString)
     returnString
   }
 
@@ -344,17 +346,17 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
   }
 
   def printElement():Unit = {
-    println("Resource: " + this.resource + ", \n")
-    println("Content VisualsElementType: " + this.contentType + ", \n")
-    println("Request Start Time: " + this.requestStart.toString + "ms, \n")
-    println("DNS Look-up Time: " + this.dnsLookUp + "ms, \n")
-    println("Initial Connection Time: " + this.initialConnection + "ms, \n")
-    println("SSL Negotiation Time: " + this.sslNegotiation + "ms, \n")
-    println("Time to First Byte: " + this.timeToFirstByte + "ms, \n")
-    println("Content Download Time: " + this.contentDownload + "ms, \n")
-    println("Bytes Downloaded: " + this.bytesDownloaded + "bytes, \n")
-    println("Error Status Code: " + this.errorStatusCode + ", \n")
-    println("IP Address: " + this.iP)
+    Logger.info("Resource: " + this.resource + ", \n")
+    Logger.info("Content VisualsElementType: " + this.contentType + ", \n")
+    Logger.info("Request Start Time: " + this.requestStart.toString + "ms, \n")
+    Logger.info("DNS Look-up Time: " + this.dnsLookUp + "ms, \n")
+    Logger.info("Initial Connection Time: " + this.initialConnection + "ms, \n")
+    Logger.info("SSL Negotiation Time: " + this.sslNegotiation + "ms, \n")
+    Logger.info("Time to First Byte: " + this.timeToFirstByte + "ms, \n")
+    Logger.info("Content Download Time: " + this.contentDownload + "ms, \n")
+    Logger.info("Bytes Downloaded: " + this.bytesDownloaded + "bytes, \n")
+    Logger.info("Error Status Code: " + this.errorStatusCode + ", \n")
+    Logger.info("IP Address: " + this.iP)
   }
 
   def toHTMLRowString():String = {
