@@ -4,7 +4,7 @@ version := "1.0"
 
 scalaVersion := "2.12.8"
 
-lazy val awsVersion = "1.11.531"
+lazy val awsVersion = "1.11.708"
 
 libraryDependencies ++= Seq(
   "com.gu" %% "content-api-client-default" % "12.10",
@@ -31,7 +31,7 @@ libraryDependencies ++= Seq(
   "com.google.apis" % "google-api-services-gmail" % "v1-rev98-1.25.0",
   "javax.mail" % "mail" % "1.5.0-b01",
   "io.argonaut" %% "argonaut" % "6.2.2",
-  "com.gu" % "kinesis-logback-appender" % "1.3.0",
+  "com.gu" % "kinesis-logback-appender" % "1.4.4",
   "com.amazonaws" % "aws-java-sdk-ec2" % awsVersion,
   "net.logstash.logback" % "logstash-logback-encoder" % "4.2",
   ws
