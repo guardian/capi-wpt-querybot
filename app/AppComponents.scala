@@ -13,20 +13,11 @@ class AppComponents(context: Context)
 
 
   val config = new Config(context.initialConfiguration)
-//
-//  val panDomainSettings = new PanDomainAuthSettingsRefresher(
-//    domain = config.pandaDomain,
-//    system = config.appName,
-//    actorSystem = actorSystem,
-//    awsCredentialsProvider = config.awsCredentialsProvider
-//  )
-
 
   val logger = new LogConfig(config)
   lazy val router: Router = new Routes(httpErrorHandler, appController, healthcheckController)
   lazy val appController = new controllers.App(wsClient, controllerComponents, config)
   lazy val healthcheckController = new controllers.Healthcheck(controllerComponents)
-//  lazy val frontendController = new controllers.FrontendController(assets, httpErrorHandler, context.initialConfiguration,controllerComponents)
 }
 
 
