@@ -1,0 +1,18 @@
+regions: [eu-west-1]
+stacks: [frontend]
+
+deployments:
+  capi-wpt-querybot:
+    type: autoscaling
+    parameters:
+      bucket: aws-frontend-artifacts
+    dependencies:
+      - capi-wpt-querybot-ami-update
+  capi-wpt-querybot-ami-update:
+    type: ami-cloudformation-parameter
+    app: capi-wpt-querybot
+    parameters:
+      amiTags:
+        Recipe: bionic-java8
+        AmigoStage: PROD
+      amiParameter: ImageId

@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VpcId of your existing Virtual Private Cloud (VPC)
+  GuardianIpRange:
+    Type: String
+    Description: Ip range for the office
+    Default: 77.91.248.0/21
+  InstanceType:
+    Type: String
+    Description: AWS instance type for the autoscaling group.
+    Default: t3.micro
+  App:
+    Type: String
+    Description: Name of the app
+  Stack:
+    Type: String
+    Description: Name of the stack
+  Stage:
+    Type: String
+    Description: Name of the stage
+    AllowedValues:
+    - CODE
+    - PROD
+  ImageId:
+    Type: String
+    Description: AMI ID
+  PrivateSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: The list of SubnetIds in your Virtual Private Cloud (VPC)
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing key pair, which will be given root access to
+      the instances
+  ELKKinesisStream:
+    Type: String
+    Description: Name of the kinesis stream for logging to ELK (logs.gutools)
+Mappings:
+  Config:
+    IpRange:
+      CODE: 77.91.248.0/21
+      PROD: 0.0.0.0/0
+    MaxSize:
+      CODE: 2
+      PROD: 2
+    MinSize:
+      CODE: 1
+      PROD: 1
+Resources:
+  LaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      IamInstanceProfile: !Sub ${InstanceProfile.Arn}
+      ImageId: !Ref ImageId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      AssociatePublicIpAddress: true
+      SecurityGroups:
+        - Ref: SSHSecurityGroup
+      UserData:
+        Fn::Base64:
+          !Sub |
+              #!/bin/bash -ev
+              aws s3 cp s3://capi-wpt-querybot/capi-wpt-querybot.conf /etc/gu/capi-wpt-querybot.conf
+              aws s3 cp s3://aws-frontend-artifacts/frontend/${Stage}/${App}/${App}_1.0_all.deb /tmp
+              dpkg -i /tmp/${App}_1.0_all.deb
+
+              echo "curl localhost:9000/run" > /etc/cron.hourly/wptcron
+              chmod +x /etc/cron.hourly/wptcron
+
+  SSMRunCommandPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: ssm-run-command-policy
+      PolicyDocument:
+        Statement:
+          # minimal policy to allow running commands via ssm
+          - Effect: Allow
+            Resource: "*"
+            Action:
+              - ec2messages:AcknowledgeMessage
+              - ec2messages:DeleteMessage
+              - ec2messages:FailMessage
+              - ec2messages:GetEndpoint
+              - ec2messages:GetMessages
+              - ec2messages:SendReply
+              - ssm:UpdateInstanceInformation
+              - ssm:ListInstanceAssociations
+              - ssm:DescribeInstanceProperties
+              - ssm:DescribeDocumentParameters
+      Roles:
+      - !Ref Role
+
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH access from the office
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: '10.0.0.0/8'
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: !Ref GuardianIpRange
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier: !Ref PrivateSubnets
+      Cooldown: '300'
+      MaxSize: !FindInMap [ Config, MaxSize, !Ref Stage ]
+      MinSize: !FindInMap [ Config, MinSize, !Ref Stage ]
+      HealthCheckGracePeriod: 300
+      HealthCheckType: ELB
+      LaunchConfigurationName:
+        Ref: LaunchConfig
+      Tags:
+      - Key: App
+        Value: !Ref App
+        PropagateAtLaunch: true
+      - Key: Stack
+        Value: !Ref Stack
+        PropagateAtLaunch: true
+      - Key: Stage
+        Value: !Ref Stage
+        PropagateAtLaunch: true
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        -
+          Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: S3ArtifactPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:GetObject
+            Resource:
+            - !Sub arn:aws:s3:::aws-frontend-artifacts/*
+      - PolicyName: capiwptbucketpolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:GetObjectAcl
+                - s3:PutObject
+                - s3:PutObjectAcl
+              Resource:
+                - !Sub arn:aws:s3:::capi-wpt-querybot/*
+      - PolicyName: ELKKinesisPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - kinesis:PutRecord
+            - kinesis:DescribeStream
+            Resource: !Sub arn:aws:kinesis:eu-west-1:642631414762:stream/${ELKKinesisStream}
+      - PolicyName: DescribeEC2Policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - EC2:Describe*
+            Resource: '*'
+      Path: /
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+      - Ref: Role
