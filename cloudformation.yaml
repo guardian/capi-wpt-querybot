@@ -166,7 +166,7 @@ Resources:
             Action:
             - kinesis:PutRecord
             - kinesis:DescribeStream
-            Resource: !Sub arn:aws:kinesis:eu-west-1:743583969668:stream/${ELKKinesisStream}
+            Resource: !Sub arn:aws:kinesis:eu-west-1:642631414762:stream/${ELKKinesisStream}
       - PolicyName: DescribeEC2Policy
         PolicyDocument:
           Version: '2012-10-17'
