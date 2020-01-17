@@ -66,6 +66,10 @@ Resources:
               aws s3 cp s3://aws-frontend-artifacts/frontend/${Stage}/${App}/${App}_1.0_all.deb /tmp
               dpkg -i /tmp/${App}_1.0_all.deb
 
+#              crontab -l > /tmp/wptcron
+#              echo "0 0 * ? * * * curl localhost:9000/run" >> /tmp/wptcron
+#              crontab /tmp/wptcron
+
   SSMRunCommandPolicy:
     Type: AWS::IAM::Policy
     Properties:

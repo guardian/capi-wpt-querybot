@@ -4,7 +4,7 @@
 
 # Serve index page from public directory
 GET     /                           controllers.App.index()
-GET     /runQueryBot                controllers.App.runBot()
+GET     /run                        controllers.App.runBot()
 
 # An example route (Prefix all API routes with apiPrefix defined in application.conf)
 GET     /healthcheck                controllers.Healthcheck.healthcheck
