@@ -1,0 +1,292 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Frontend - Webpagetest
+Parameters:
+  AvailabilityZones:
+    Type: CommaDelimitedList
+    Default: eu-west-1a,eu-west-1b,eu-west-1c
+  KeyName:
+    Description: Name of an existing EC2 KeyPair for SSH access
+    Type: String
+    Default: ec2user
+  Stage:
+    Type: String
+    AllowedValues:
+      - PROD
+      - CODE
+    ConstraintDescription: must be a valid stage.
+  VpcId:
+    Description: ID of the VPC onto which to launch the application
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-72816317
+  VpcSubnets:
+    Description: Subnets to use in VPC
+    Type: CommaDelimitedList
+    Default: subnet-07407841,subnet-17e61972,subnet-97d0cbe3
+  GuardianIpBlock:
+    Type: String
+    Description: CIDR block for Guardian IP addresses
+    Default: 77.91.248.0/21
+  GuardianUSIpBlock:
+    Type: String
+    Description: CIDR block for Guardian US IP addresses
+    Default: 74.113.160.155/32
+  GuardianAUIpBlock:
+    Type: String
+    Description: CIDR block for Guardian AU IP addresses
+    Default: 203.174.136.130/32
+  GuardianAUIpBlock2:
+    Type: String
+    Description: CIDR block for Guardian AU IP addresses
+    Default: 202.177.218.67/32
+  GuardianAUIpBlock3:
+    Type: String
+    Description: CIDR block for Guardian AU IP addresses
+    Default: 125.253.45.20/32
+  ScanSafeIpBlock:
+    Type: String
+    Description: CIDR block for ScanSafe IP addresses (temporary while under development)
+    Default: 80.254.158.0/24
+  VPCIpBlock:
+    Type: String
+    Description: CIDR block for IP addresses inside this VPC
+    Default: 10.248.136.0/22
+Resources:
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+      Policies:
+        - PolicyName: LoggerServerPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action: ec2:DescribeInstances
+                Effect: Allow
+                Resource: '*'
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'Role'
+  WptServerLoadBalancer:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      CrossZone: true
+      Listeners:
+        - Protocol: HTTP
+          LoadBalancerPort: '80'
+          InstancePort: '80'
+      SecurityGroups:
+        - !Ref 'WptSecurityGroup'
+      HealthCheck:
+        Target: HTTP:80/runtest.php
+        Timeout: '10'
+        Interval: '40'
+        UnhealthyThreshold: '10'
+        HealthyThreshold: '2'
+      Subnets: !Ref 'VpcSubnets'
+  WptServerAutoscalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones: !Ref 'AvailabilityZones'
+      LaunchConfigurationName: !Ref 'WptServerLaunchConfig'
+      MinSize: '1'
+      MaxSize: '1'
+      DesiredCapacity: '1'
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 600
+      LoadBalancerNames:
+        - !Ref 'WptServerLoadBalancer'
+      VPCZoneIdentifier: !Ref 'VpcSubnets'
+      Tags:
+        - Key: Stage
+          Value: !Ref 'Stage'
+          PropagateAtLaunch: 'true'
+        - Key: Role
+          Value: frontend-wpt
+          PropagateAtLaunch: 'true'
+        - Key: Mainclass
+          Value: frontend::wpt
+          PropagateAtLaunch: 'true'
+        - Key: Stack
+          Value: frontend-wpt
+          PropagateAtLaunch: 'true'
+        - Key: App
+          Value: frontend-wpt
+          PropagateAtLaunch: 'true'
+        - Key: Name
+          Value: wpt
+          PropagateAtLaunch: 'true'
+  WptAgentAutoscalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones: !Ref 'AvailabilityZones'
+      LaunchConfigurationName: !Ref 'WptAgentLaunchConfig'
+      MinSize: '1'
+      MaxSize: '1'
+      DesiredCapacity: '1'
+      VPCZoneIdentifier: !Ref 'VpcSubnets'
+      Tags:
+        - Key: Stage
+          Value: !Ref 'Stage'
+          PropagateAtLaunch: 'true'
+        - Key: Role
+          Value: frontend-wpt-agent
+          PropagateAtLaunch: 'true'
+        - Key: Mainclass
+          Value: frontend::wpt-agent
+          PropagateAtLaunch: 'true'
+        - Key: Stack
+          Value: frontend-wpt-agent
+          PropagateAtLaunch: 'true'
+        - Key: App
+          Value: frontend-wpt-agent
+          PropagateAtLaunch: 'true'
+        - Key: Name
+          Value: wpt-agent
+          PropagateAtLaunch: 'true'
+  WptServerLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-9978f6ee
+      SecurityGroups:
+        - !Ref 'WptSecurityGroup'
+        - !Ref 'GuardianAccessSecurityGroup'
+      InstanceType: t2.medium
+      KeyName: ec2user
+      IamInstanceProfile: frontend-PROD-ApplicationServerInstanceProfile-RP174EGSCSNK
+      InstanceMonitoring: 'true'
+      AssociatePublicIpAddress: 'true'
+      UserData: !Base64
+        Fn::Join:
+          - ''
+          - - "#!/bin/bash\n"
+            - "mkdir /var/log/webpagetest\n"
+            - "chown www-data:adm /var/log/webpagetest\n"
+            - host=
+            - !GetAtt 'WptServerLoadBalancer.DNSName'
+            - "\n"
+            - "logTestResults=/var/log/webpagetest/page_data.log\n"
+            - "logTestRequests=/var/log/webpagetest/requests.log\n"
+            - "ec2_locations=0\n"
+            - "ec2=0\n"
+            - "api_key=dotcom\n"
+            - "wget https://s3-eu-west-1.amazonaws.com/aws-frontend-store/PROD/config/locations.ini\n"
+            - "cp locations.ini /var/www/webpagetest/www/settings/locations.ini\n"
+            - "wget https://s3-eu-west-1.amazonaws.com/aws-frontend-store/PROD/config/wpt-awslogs.conf\n"
+            - "sed -i 's/location_key=.*/location_key=dotcom/g' /var/www/webpagetest/www/settings/settings.ini\n"
+  WptAgentLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-03009a026570febbb
+      SecurityGroups:
+        - !Ref 'WptSecurityGroup'
+        - !Ref 'GuardianAccessSecurityGroup'
+      InstanceType: t3.medium
+      KeyName: ec2user
+      IamInstanceProfile: frontend-PROD-ApplicationServerInstanceProfile-RP174EGSCSNK
+      InstanceMonitoring: 'true'
+      AssociatePublicIpAddress: 'true'
+      UserData: !Base64
+        Fn::Join:
+          - ''
+          - - wpt_server=
+            - !GetAtt 'WptServerLoadBalancer.DNSName'
+            - ' '
+            - wpt_key=dotcom
+            - ' '
+            - wpt_loc=eu-west-1
+            - ' '
+            - wpt_location=eu-west-1
+  WptSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref 'VpcId'
+      GroupDescription: SSH and HTTP from Guardian network and Amazon ELB
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: '0.0.0.0/0'
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: '0.0.0.0/0'
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: '0.0.0.0/0'
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: '0.0.0.0/0'
+  GuardianAccessSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: VPCSecurityGroup
+      VpcId: !Ref 'VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref 'GuardianIpBlock'
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref 'GuardianUSIpBlock'
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref 'GuardianAUIpBlock'
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref 'GuardianAUIpBlock2'
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref 'GuardianAUIpBlock3'
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref 'ScanSafeIpBlock'
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref 'VPCIpBlock'
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref 'GuardianIpBlock'
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref 'GuardianUSIpBlock'
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref 'GuardianAUIpBlock'
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref 'GuardianAUIpBlock2'
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref 'VPCIpBlock'
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'
+Outputs:
+  WptLoadBalancer:
+    Description: Wpt load balancer DNS
+    Value: !GetAtt 'WptServerLoadBalancer.DNSName'
