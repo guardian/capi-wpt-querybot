@@ -66,7 +66,8 @@ Resources:
               aws s3 cp s3://aws-frontend-artifacts/frontend/${Stage}/${App}/${App}_1.0_all.deb /tmp
               dpkg -i /tmp/${App}_1.0_all.deb
 
-              echo "curl localhost:9000/run" > /etc/cron.hourly/wptcron
+              echo "#!/bin/bash" > /etc/cron.hourly/wptcron
+              echo "curl localhost:9000/run > /dev/null" >> /etc/cron.hourly/wptcron
               chmod +x /etc/cron.hourly/wptcron
 
   SSMRunCommandPolicy:
