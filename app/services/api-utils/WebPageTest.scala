@@ -276,7 +276,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       }
       val testSummaryPage: String = (rawXMLResult \\ "response" \ "data" \ "summary").text.toString
       val timeToFirstByte: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "TTFB").text.toInt
-      val firstPaint: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "firstPaint").text.toInt
+      val firstPaint: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "firstPaint").text.toDouble.toInt
       Logger.info("firstPaint = " + firstPaint)
       val docTime: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "docTime").text.toInt
       Logger.info("docTime = " + docTime)
