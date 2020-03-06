@@ -175,6 +175,23 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
 
   }*/
 
+  def jodaDateTimeToCapiDateTime(time: DateTime): CapiDateTime = {
+    val iso8061String = time.toLocalDateTime.toString
+    CapiDateTime.apply(time.getMillis, iso8061String)
+  }
+
+  def dateWithin24Hrs(lastUpdateTime: Option[CapiDateTime]): Boolean = {
+    val cutoffTime: CapiDateTime = jodaDateTimeToCapiDateTime(DateTime.now.minusHours(24))
+    if (lastUpdateTime.isEmpty)
+      false
+    else {
+      if (lastUpdateTime.get.dateTime > cutoffTime.dateTime)
+        true
+      else
+        false
+    }
+  }
+
   def getResultsFileFromS3(fileName:String): List[PerformanceResultsObject] = {
 // todo - update to include new fields
     Logger.info(s"In S3Operations.getResultsFromS3 calling bucketName: $s3BucketName - filename: $fileName")
@@ -225,7 +242,10 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
         result.setFirstPublished(firstPublishedTime)
         val lastUpdateTime: Option[CapiDateTime] = result.stringtoCAPITime(data(5))
         result.setPageLastUpdated(lastUpdateTime)
-        result.setLiveBloggingNow(data(6))
+          if(dateWithin24Hrs(lastUpdateTime))
+            result.setLiveBloggingNow(data(6))
+          else
+            result.setLiveBloggingNow(false)
         result.setGLabs(data(7))
         result.setProductionOffice(data(21))
         result.setCreator(data(22))
